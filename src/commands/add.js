@@ -1,7 +1,8 @@
 import logger from '../utils/logger.js';
 import { execa } from 'execa';
 import Spinner from '../utils/spinner.js';
-import { pathExists, readJson } from 'fs-extra';
+import pkg from 'fs-extra';
+const { pathExists, readJson } = pkg;
 import { join } from 'path';
 
 const spinner = new Spinner();

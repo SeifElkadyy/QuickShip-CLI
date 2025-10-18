@@ -27,6 +27,11 @@ class Engine {
       // 2. Clone template
       const templateName = this.templateManager.determineTemplate(this.config);
       const template = this.templateManager.getTemplate(templateName);
+      const toolsWithAutoInstall =
+        template.useCreateNextApp ||
+        template.useCreateT3App ||
+        template.useCreateVite;
+
       await this.templateManager.cloneTemplate(
         templateName,
         this.projectPath,
@@ -34,15 +39,17 @@ class Engine {
       );
 
       // 3. Generate/update files
-      await this.fileGenerator.updatePackageJson(this.projectPath, this.config);
+      // Only update package.json for non-tool-generated templates
+      if (!toolsWithAutoInstall) {
+        await this.fileGenerator.updatePackageJson(
+          this.projectPath,
+          this.config
+        );
+      }
       await this.fileGenerator.generateReadme(this.projectPath, this.config);
       await this.fileGenerator.generateGitignore(this.projectPath);
 
       // 4. Install dependencies (unless --no-install or tool already did it)
-      const toolsWithAutoInstall =
-        template.useCreateNextApp ||
-        template.useCreateT3App ||
-        template.useCreateVite;
 
       if (this.options.install !== false && !toolsWithAutoInstall) {
         await this.dependencyInstaller.install(this.projectPath);

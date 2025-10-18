@@ -145,13 +145,14 @@ class TemplateManager {
 
     try {
       const packageManager = config.packageManager || 'npm';
-      const pmFlag = this.getPackageManagerFlag(packageManager);
 
+      // T3 uses package manager name directly with -p flag
       const args = [
         'create-t3-app@latest',
         destinationPath,
         '--CI',
-        pmFlag,
+        '-p',
+        packageManager,
         '--tailwind',
         '--trpc',
         '--prisma',
