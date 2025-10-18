@@ -25,6 +25,10 @@ program
   .command('build [project-name]')
   .description('Create a new project')
   .option('-t, --template <name>', 'template to use')
+  .option(
+    '-p, --package-manager <pm>',
+    'package manager (npm, pnpm, yarn, bun)'
+  )
   .option('-y, --yes', 'skip prompts and use defaults')
   .option('--no-git', 'skip git initialization')
   .option('--no-install', 'skip dependency installation')
@@ -41,6 +45,16 @@ program
   .action(async () => {
     const { listCommand } = await import('../src/commands/list.js');
     await listCommand();
+  });
+
+// Add command
+program
+  .command('add <feature>')
+  .description('Add features to existing project (shadcn, auth, database)')
+  .option('-v, --verbose', 'show detailed logs')
+  .action(async (feature, options) => {
+    const { addCommand } = await import('../src/commands/add.js');
+    await addCommand(feature, options);
   });
 
 // Config command

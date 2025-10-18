@@ -23,9 +23,21 @@ class TemplateManager {
       throw new Error(`Template ${templateName} not found`);
     }
 
-    // Use create-next-app for Next.js templates to get latest versions
+    // Use create-next-app for Next.js templates
     if (template.useCreateNextApp) {
       await this.createNextApp(destinationPath, config);
+      return;
+    }
+
+    // Use create-vite for Vite templates
+    if (template.useCreateVite) {
+      await this.createViteApp(destinationPath, config);
+      return;
+    }
+
+    // Use create-t3-app for T3 Stack
+    if (template.useCreateT3App) {
+      await this.createT3App(destinationPath, config);
       return;
     }
 
@@ -50,6 +62,9 @@ class TemplateManager {
     this.spinner.start('Creating Next.js app with latest versions...');
 
     try {
+      const packageManager = config.packageManager || 'npm';
+      const pmFlag = this.getPackageManagerFlag(packageManager);
+
       const args = [
         'create-next-app@latest',
         destinationPath,
@@ -59,7 +74,7 @@ class TemplateManager {
         '--no-src-dir',
         '--import-alias',
         '@/*',
-        '--use-npm',
+        pmFlag,
         '--eslint',
         '--no-git',
         '--yes', // Skip all prompts and use defaults
@@ -76,6 +91,16 @@ class TemplateManager {
     }
   }
 
+  getPackageManagerFlag(packageManager) {
+    const flags = {
+      npm: '--use-npm',
+      pnpm: '--use-pnpm',
+      yarn: '--use-yarn',
+      bun: '--use-bun',
+    };
+    return flags[packageManager] || '--use-npm';
+  }
+
   getTemplate(templateName) {
     // Search through all platforms
     for (const platform in this.templates) {
@@ -90,12 +115,92 @@ class TemplateManager {
     return this.templates[platform] || {};
   }
 
+  async createViteApp(destinationPath, config) {
+    this.spinner.start('Creating Vite + React app with latest versions...');
+
+    try {
+      const template = config.typescript ? 'react-ts' : 'react';
+
+      const args = [
+        'create-vite@latest',
+        destinationPath,
+        '--',
+        '--template',
+        template,
+      ];
+
+      await execa('npx', args, {
+        stdio: 'pipe',
+      });
+
+      this.spinner.succeed('Vite + React app created with latest versions');
+    } catch (error) {
+      this.spinner.fail('Failed to create Vite app');
+      throw error;
+    }
+  }
+
+  async createT3App(destinationPath, config) {
+    this.spinner.start('Creating T3 Stack app...');
+
+    try {
+      const packageManager = config.packageManager || 'npm';
+      const pmFlag = this.getPackageManagerFlag(packageManager);
+
+      const args = [
+        'create-t3-app@latest',
+        destinationPath,
+        '--CI',
+        pmFlag,
+        '--tailwind',
+        '--trpc',
+        '--prisma',
+        '--nextAuth',
+        '--appRouter',
+        '--noGit',
+      ];
+
+      await execa('npx', args, {
+        stdio: 'pipe',
+      });
+
+      this.spinner.succeed('T3 Stack app created successfully');
+    } catch (error) {
+      this.spinner.fail('Failed to create T3 app');
+      throw error;
+    }
+  }
+
+  async initShadcn(projectPath) {
+    this.spinner.start('Initializing shadcn/ui...');
+
+    try {
+      await execa('npx', ['shadcn@latest', 'init', '-y', '--defaults'], {
+        cwd: projectPath,
+        stdio: 'pipe',
+      });
+
+      this.spinner.succeed('shadcn/ui initialized successfully');
+    } catch (error) {
+      this.spinner.fail('Failed to initialize shadcn/ui');
+      throw error;
+    }
+  }
+
   determineTemplate(config) {
-    // For MVP: Only support Next.js with TypeScript and Tailwind
+    // React + Vite
+    if (config.stack === 'react-vite') {
+      return 'react-vite';
+    }
+
+    // T3 Stack
+    if (config.stack === 't3-stack') {
+      return 't3-stack';
+    }
+
+    // Next.js (default)
     if (config.stack === 'nextjs') {
-      if (config.typescript && config.styling === 'tailwind') {
-        return 'nextjs-typescript-tailwind';
-      }
+      return 'nextjs-typescript-tailwind';
     }
 
     // Default fallback

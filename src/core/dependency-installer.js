@@ -8,22 +8,52 @@ class DependencyInstaller {
   }
 
   async install(projectPath) {
-    this.spinner.start('Installing dependencies (this may take a minute)...');
+    const pmName = this.getPackageManagerName();
+    this.spinner.start(
+      `Installing dependencies with ${pmName} (this may take a minute)...`
+    );
 
     try {
       const command = this.packageManager;
-      const args = this.packageManager === 'npm' ? ['install'] : [];
+      const args = this.getInstallArgs();
 
       await execa(command, args, {
         cwd: projectPath,
         stdio: 'pipe',
       });
 
-      this.spinner.succeed('Dependencies installed successfully');
+      this.spinner.succeed(
+        `Dependencies installed successfully with ${pmName}`
+      );
     } catch (error) {
       this.spinner.fail('Failed to install dependencies');
       throw error;
     }
+  }
+
+  getInstallArgs() {
+    switch (this.packageManager) {
+      case 'npm':
+        return ['install'];
+      case 'pnpm':
+        return ['install'];
+      case 'yarn':
+        return ['install'];
+      case 'bun':
+        return ['install'];
+      default:
+        return ['install'];
+    }
+  }
+
+  getPackageManagerName() {
+    const names = {
+      npm: 'npm',
+      pnpm: 'pnpm',
+      yarn: 'Yarn',
+      bun: 'Bun',
+    };
+    return names[this.packageManager] || this.packageManager;
   }
 
   async detectPackageManager() {

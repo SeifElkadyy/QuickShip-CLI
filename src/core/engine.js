@@ -13,7 +13,9 @@ class Engine {
     this.projectPath = resolve(process.cwd(), config.projectName);
 
     this.templateManager = new TemplateManager();
-    this.dependencyInstaller = new DependencyInstaller();
+    this.dependencyInstaller = new DependencyInstaller(
+      config.packageManager || 'npm'
+    );
     this.fileGenerator = new FileGenerator();
   }
 
@@ -36,13 +38,23 @@ class Engine {
       await this.fileGenerator.generateReadme(this.projectPath, this.config);
       await this.fileGenerator.generateGitignore(this.projectPath);
 
-      // 4. Install dependencies (unless --no-install or create-next-app already did it)
-      if (this.options.install !== false && !template.useCreateNextApp) {
+      // 4. Install dependencies (unless --no-install or tool already did it)
+      const toolsWithAutoInstall =
+        template.useCreateNextApp ||
+        template.useCreateT3App ||
+        template.useCreateVite;
+
+      if (this.options.install !== false && !toolsWithAutoInstall) {
         await this.dependencyInstaller.install(this.projectPath);
-      } else if (template.useCreateNextApp) {
+      } else if (toolsWithAutoInstall) {
         logger.success('Dependencies installed successfully');
       } else {
         logger.info('Skipping dependency installation (--no-install flag)');
+      }
+
+      // 4.5. Initialize shadcn/ui if requested
+      if (this.config.shadcn && this.options.install !== false) {
+        await this.templateManager.initShadcn(this.projectPath);
       }
 
       // 5. Initialize Git (unless --no-git)
@@ -78,6 +90,9 @@ class Engine {
   }
 
   showSuccessMessage() {
+    const pm = this.config.packageManager || 'npm';
+    const runCommand = this.getRunCommand(pm);
+
     const message = `
 🎉 Success! Your project is ready!
 
@@ -85,7 +100,7 @@ class Engine {
 
 Next steps:
   cd ${this.config.projectName}
-  npm run dev
+  ${runCommand} dev
 
 Your app will be running at: http://localhost:3000
 
@@ -96,6 +111,16 @@ Happy coding! 💻
     `;
 
     logger.box(message, '✨ QuickShip');
+  }
+
+  getRunCommand(packageManager) {
+    const commands = {
+      npm: 'npm run',
+      pnpm: 'pnpm',
+      yarn: 'yarn',
+      bun: 'bun',
+    };
+    return commands[packageManager] || 'npm run';
   }
 }
 

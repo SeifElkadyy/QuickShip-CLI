@@ -5,6 +5,49 @@ All notable changes to QuickShip CLI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2025-01-19
+
+### Added
+- **`quickship add` Command:** Extensibility system to add features to existing projects
+- `quickship add shadcn` - Add shadcn/ui to existing Next.js projects
+- `quickship add auth` - Add NextAuth.js authentication
+- `quickship add database` - Add Prisma ORM with database setup
+- Automatic project type detection (Next.js, React + Vite, React)
+- Helpful next-steps guidance after adding features
+
+### Features
+- Add features to existing projects without recreating them
+- Support for shadcn/ui, NextAuth.js, and Prisma
+- Interactive installation with progress feedback
+- Smart detection of project framework
+
+## [0.4.0] - 2025-01-19
+
+### Added
+- **React + Vite Template:** Fast SPA development with Vite, React, TypeScript, and Tailwind CSS
+- **T3 Stack Template:** Full-stack Next.js with tRPC, Prisma, NextAuth, and Tailwind CSS
+- **shadcn/ui Integration:** Optional shadcn/ui component library for Next.js projects
+- Three template options now available: Next.js, React + Vite, T3 Stack
+- Automatic template selection in prompts
+
+### Changed
+- Updated stack selection prompt with clear descriptions
+- Template manager now supports multiple creation tools (create-next-app, create-vite, create-t3-app)
+- Improved dependency installation logic to handle all template types
+
+## [0.3.0] - 2025-01-19
+
+### Added
+- **Package Manager Choice:** Users can now choose between npm, pnpm, yarn, or bun
+- Interactive prompt for package manager selection
+- CLI flag `--package-manager <pm>` or `-p <pm>` to specify package manager
+- Success message now shows correct commands for chosen package manager (e.g., `pnpm dev` vs `npm run dev`)
+- Automatic package manager detection in `create-next-app`
+
+### Changed
+- DependencyInstaller now supports all major package managers
+- Success message dynamically adjusts based on selected package manager
+
 ## [0.2.0] - 2025-01-19
 
 ### Changed

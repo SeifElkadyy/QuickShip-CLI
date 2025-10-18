@@ -6,6 +6,18 @@
         "priority": 1,
         "recommended": true,
         "description": "Next.js with TypeScript and Tailwind CSS (Latest Versions)"
+      },
+      "react-vite": {
+        "useCreateVite": true,
+        "priority": 2,
+        "recommended": false,
+        "description": "React + Vite with TypeScript and Tailwind CSS"
+      },
+      "t3-stack": {
+        "useCreateT3App": true,
+        "priority": 3,
+        "recommended": false,
+        "description": "T3 Stack (Next.js + tRPC + Prisma + NextAuth + Tailwind)"
       }
     }
   }

@@ -21,6 +21,18 @@ export async function buildCommand(projectName, options) {
       process.exit(1);
     }
 
+    // Override with CLI flags if provided
+    if (options.packageManager) {
+      const validPMs = ['npm', 'pnpm', 'yarn', 'bun'];
+      if (!validPMs.includes(options.packageManager)) {
+        logger.error(
+          `Invalid package manager: ${options.packageManager}. Valid options: ${validPMs.join(', ')}`
+        );
+        process.exit(1);
+      }
+      config.packageManager = options.packageManager;
+    }
+
     // Step 3: Build the project
     const engine = new Engine(config, options);
     await engine.build();

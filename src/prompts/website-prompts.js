@@ -28,13 +28,16 @@ export async function websitePrompts(projectName) {
     message: 'Choose your stack:',
     choices: [
       {
-        name: 'Next.js (Recommended)',
+        name: 'Next.js (Recommended - Full-stack React framework)',
         value: 'nextjs',
       },
       {
-        name: 'React + Vite (Coming Soon)',
+        name: 'Next.js + T3 Stack (tRPC + Prisma + NextAuth)',
+        value: 't3-stack',
+      },
+      {
+        name: 'React + Vite (Fast SPA development)',
         value: 'react-vite',
-        disabled: true,
       },
       {
         name: 'MERN Stack (Coming Soon)',
@@ -52,7 +55,7 @@ export async function websitePrompts(projectName) {
     default: true,
   });
 
-  // Styling
+  // Styling (conditional based on stack)
   questions.push({
     type: 'list',
     name: 'styling',
@@ -63,6 +66,32 @@ export async function websitePrompts(projectName) {
       { name: 'Styled Components', value: 'styled-components' },
     ],
     default: 'tailwind',
+    when: (answers) => answers.stack !== 't3-stack', // T3 has Tailwind by default
+  });
+
+  // shadcn/ui option for Next.js projects
+  questions.push({
+    type: 'confirm',
+    name: 'shadcn',
+    message: 'Add shadcn/ui components?',
+    default: false,
+    when: (answers) =>
+      (answers.stack === 'nextjs' || answers.stack === 't3-stack') &&
+      answers.styling === 'tailwind',
+  });
+
+  // Package Manager
+  questions.push({
+    type: 'list',
+    name: 'packageManager',
+    message: 'Choose package manager:',
+    choices: [
+      { name: 'npm', value: 'npm' },
+      { name: 'pnpm (faster)', value: 'pnpm' },
+      { name: 'yarn', value: 'yarn' },
+      { name: 'bun (fastest)', value: 'bun' },
+    ],
+    default: 'npm',
   });
 
   // Git
