@@ -5,7 +5,30 @@ All notable changes to QuickShip CLI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.0] - 2025-01-XX
+## [0.1.3] - 2025-01-19
+
+### Fixed
+- Fixed template cloning error by switching to shadcn-ui/next-template
+- Resolved "could not find commit hash for HEAD" error
+- Updated template source to use standalone repository instead of monorepo subdirectory
+
+### Changed
+- Template now uses shadcn-ui/next-template for more reliable cloning
+- Includes shadcn/ui components setup out of the box
+
+## [0.1.2] - 2025-01-19
+
+### Fixed
+- Fixed npm publish script compatibility on Windows
+- Updated lint and format scripts to use `node` command directly
+- Improved cross-platform script execution
+
+## [0.1.1] - 2025-01-19
+
+### Changed
+- Updated repository URLs to actual GitHub repository
+
+## [0.1.0] - 2025-01-19
 
 ### Added
 - Initial release of QuickShip CLI
