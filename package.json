@@ -1,0 +1,76 @@
+{
+  "name": "quickship-cli",
+  "version": "0.1.1",
+  "description": "Ship production-ready Next.js projects in 60 seconds. Automated setup with TypeScript, Tailwind CSS, Git, and more.",
+  "main": "src/index.js",
+  "type": "module",
+  "bin": {
+    "quickship": "./bin/index.js"
+  },
+  "scripts": {
+    "dev": "node bin/index.js",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
+    "lint": "node node_modules/eslint/bin/eslint.js src/**/*.js bin/**/*.js",
+    "lint:fix": "node node_modules/eslint/bin/eslint.js src/**/*.js bin/**/*.js --fix",
+    "format": "node node_modules/prettier/bin/prettier.cjs --write \"src/**/*.js\" \"bin/**/*.js\"",
+    "format:check": "node node_modules/prettier/bin/prettier.cjs --check \"src/**/*.js\" \"bin/**/*.js\"",
+    "prepublishOnly": "npm run format:check"
+  },
+  "keywords": [
+    "cli",
+    "generator",
+    "nextjs",
+    "next",
+    "react",
+    "boilerplate",
+    "template",
+    "quickship",
+    "scaffold",
+    "typescript",
+    "tailwindcss",
+    "tailwind",
+    "project-generator",
+    "starter",
+    "create-app"
+  ],
+  "author": "QuickShip Team <contact@quickship.dev>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/quickship-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/quickship-cli/issues"
+  },
+  "homepage": "https://github.com/yourusername/quickship-cli#readme",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "files": [
+    "bin",
+    "src",
+    "LICENSE",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "dependencies": {
+    "boxen": "^8.0.1",
+    "chalk": "^5.6.2",
+    "commander": "^13.1.0",
+    "conf": "^13.1.0",
+    "degit": "^2.8.4",
+    "execa": "^9.6.0",
+    "fs-extra": "^11.3.2",
+    "inquirer": "^12.10.0",
+    "ora": "^8.2.0",
+    "simple-git": "^3.28.0",
+    "validate-npm-package-name": "^6.0.2"
+  },
+  "devDependencies": {
+    "eslint": "^9.38.0",
+    "jest": "^30.2.0",
+    "prettier": "^3.6.2"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "templates": {
+    "website": {
+      "nextjs-typescript-tailwind": {
+        "repo": "vercel/next.js/examples/with-tailwindcss",
+        "branch": "canary",
+        "priority": 1,
+        "recommended": true,
+        "description": "Next.js with TypeScript and Tailwind CSS"
+      }
+    }
+  }
+}
