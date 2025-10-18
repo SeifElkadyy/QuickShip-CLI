@@ -24,16 +24,23 @@ class Engine {
 
       // 2. Clone template
       const templateName = this.templateManager.determineTemplate(this.config);
-      await this.templateManager.cloneTemplate(templateName, this.projectPath);
+      const template = this.templateManager.getTemplate(templateName);
+      await this.templateManager.cloneTemplate(
+        templateName,
+        this.projectPath,
+        this.config
+      );
 
       // 3. Generate/update files
       await this.fileGenerator.updatePackageJson(this.projectPath, this.config);
       await this.fileGenerator.generateReadme(this.projectPath, this.config);
       await this.fileGenerator.generateGitignore(this.projectPath);
 
-      // 4. Install dependencies (unless --no-install)
-      if (this.options.install !== false) {
+      // 4. Install dependencies (unless --no-install or create-next-app already did it)
+      if (this.options.install !== false && !template.useCreateNextApp) {
         await this.dependencyInstaller.install(this.projectPath);
+      } else if (template.useCreateNextApp) {
+        logger.success('Dependencies installed successfully');
       } else {
         logger.info('Skipping dependency installation (--no-install flag)');
       }

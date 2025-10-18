@@ -2,10 +2,10 @@
   "templates": {
     "website": {
       "nextjs-typescript-tailwind": {
-        "repo": "shadcn-ui/next-template",
+        "useCreateNextApp": true,
         "priority": 1,
         "recommended": true,
-        "description": "Next.js with TypeScript and Tailwind CSS"
+        "description": "Next.js with TypeScript and Tailwind CSS (Latest Versions)"
       }
     }
   }

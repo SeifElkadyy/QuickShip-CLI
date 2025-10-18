@@ -5,6 +5,22 @@ All notable changes to QuickShip CLI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2025-01-19
+
+### Changed
+- **MAJOR:** Switched from static templates to using `create-next-app@latest` for Next.js projects
+- Now generates projects with the latest versions of Next.js, React, and all dependencies
+- Projects now use Next.js 15.5.6+ and React 19 (latest stable versions)
+- Improved template generation reliability and maintainability
+
+### Added
+- Automatic detection of create-next-app usage to skip redundant dependency installation
+- Support for both create-next-app and degit-based templates
+
+### Fixed
+- Outdated package versions (Next.js 13 → 15, React 18.2 → 19)
+- Template now always uses the latest official Next.js configuration
+
 ## [0.1.3] - 2025-01-19
 
 ### Fixed
