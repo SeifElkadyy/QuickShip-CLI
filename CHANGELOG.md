@@ -5,6 +5,21 @@ All notable changes to QuickShip CLI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.5] - 2025-01-19
+
+### Fixed
+- Fixed T3 Stack creation - now uses `npx --yes create-t3-app@latest` with proper flags
+- Added `--npm`, `--pnpm`, `--yarn`, `--bun` flags for package manager selection
+- Changed from `npm create` to `npx` to avoid npm config parsing errors
+- Fixed TTY initialization error by using correct T3 CLI invocation
+
+## [0.5.4] - 2025-01-19
+
+### Fixed
+- Fixed Git initialization error for Vite projects (Vite auto-creates Git repo)
+- Added check to detect if Git is already initialized before trying to init
+- Prevents "Git error" when template already has Git initialized
+
 ## [0.5.3] - 2025-01-19
 
 ### Fixed

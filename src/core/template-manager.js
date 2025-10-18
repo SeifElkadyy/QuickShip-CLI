@@ -146,44 +146,37 @@ class TemplateManager {
     try {
       const packageManager = config.packageManager || 'npm';
 
-      // T3 CLI uses the package manager from the command (npm/pnpm/yarn/bun create)
-      // We'll use the appropriate create command based on package manager
-      let command;
-      let args;
-
-      switch (packageManager) {
-        case 'pnpm':
-          command = 'pnpm';
-          args = ['create', 't3-app@latest'];
-          break;
-        case 'yarn':
-          command = 'yarn';
-          args = ['create', 't3-app'];
-          break;
-        case 'bun':
-          command = 'bun';
-          args = ['create', 't3-app@latest'];
-          break;
-        case 'npm':
-        default:
-          command = 'npm';
-          args = ['create', 't3-app@latest'];
-          break;
-      }
-
-      args.push(
+      // Use npx with --yes to skip install prompt, and CI mode
+      const args = [
+        '--yes',
+        'create-t3-app@latest',
         destinationPath,
         '--CI',
+        '--noGit',
+      ];
+
+      // Add package manager specific args after CI flag
+      if (packageManager === 'npm') {
+        args.push('--npm');
+      } else if (packageManager === 'pnpm') {
+        args.push('--pnpm');
+      } else if (packageManager === 'yarn') {
+        args.push('--yarn');
+      } else if (packageManager === 'bun') {
+        args.push('--bun');
+      }
+
+      // Add feature flags
+      args.push(
         '--tailwind',
         '--trpc',
         '--prisma',
         '--nextAuth',
-        '--appRouter',
-        '--noGit'
+        '--appRouter'
       );
 
-      await execa(command, args, {
-        stdio: 'pipe',
+      await execa('npx', args, {
+        stdio: 'inherit',
       });
 
       this.spinner.succeed('T3 Stack app created successfully');

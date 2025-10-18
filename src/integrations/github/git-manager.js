@@ -7,7 +7,24 @@ class GitManager {
     this.spinner = new Spinner();
   }
 
+  async isGitRepo() {
+    try {
+      await this.git.status();
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   async init() {
+    // Check if already a git repo
+    const isRepo = await this.isGitRepo();
+    if (isRepo) {
+      this.spinner.start('Git repository already initialized');
+      this.spinner.succeed('Git repository already initialized');
+      return;
+    }
+
     this.spinner.start('Initializing Git repository');
 
     try {
