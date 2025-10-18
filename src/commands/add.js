@@ -93,14 +93,14 @@ async function addShadcn(projectType) {
     process.exit(1);
   }
 
-  spinner.start('Initializing shadcn/ui...');
+  logger.info('\nInitializing shadcn/ui...');
 
   try {
-    await execa('npx', ['shadcn@latest', 'init', '-y', '--defaults'], {
+    await execa('npx', ['shadcn@latest', 'init', '-d', '-y'], {
       stdio: 'inherit',
     });
 
-    spinner.succeed('shadcn/ui initialized successfully!');
+    logger.success('\nshadcn/ui initialized successfully!');
 
     logger.success('\nshadcn/ui is now set up!');
     logger.info('\nNext steps:');

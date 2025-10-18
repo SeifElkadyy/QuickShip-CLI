@@ -146,22 +146,43 @@ class TemplateManager {
     try {
       const packageManager = config.packageManager || 'npm';
 
-      // T3 uses package manager name directly with -p flag
-      const args = [
-        'create-t3-app@latest',
+      // T3 CLI uses the package manager from the command (npm/pnpm/yarn/bun create)
+      // We'll use the appropriate create command based on package manager
+      let command;
+      let args;
+
+      switch (packageManager) {
+        case 'pnpm':
+          command = 'pnpm';
+          args = ['create', 't3-app@latest'];
+          break;
+        case 'yarn':
+          command = 'yarn';
+          args = ['create', 't3-app'];
+          break;
+        case 'bun':
+          command = 'bun';
+          args = ['create', 't3-app@latest'];
+          break;
+        case 'npm':
+        default:
+          command = 'npm';
+          args = ['create', 't3-app@latest'];
+          break;
+      }
+
+      args.push(
         destinationPath,
         '--CI',
-        '-p',
-        packageManager,
         '--tailwind',
         '--trpc',
         '--prisma',
         '--nextAuth',
         '--appRouter',
-        '--noGit',
-      ];
+        '--noGit'
+      );
 
-      await execa('npx', args, {
+      await execa(command, args, {
         stdio: 'pipe',
       });
 
@@ -176,9 +197,10 @@ class TemplateManager {
     this.spinner.start('Initializing shadcn/ui...');
 
     try {
-      await execa('npx', ['shadcn@latest', 'init', '-y', '--defaults'], {
+      // Use inherit to show the actual shadcn prompts and progress
+      await execa('npx', ['shadcn@latest', 'init', '-d', '-y'], {
         cwd: projectPath,
-        stdio: 'pipe',
+        stdio: 'inherit',
       });
 
       this.spinner.succeed('shadcn/ui initialized successfully');

@@ -39,15 +39,15 @@ class Engine {
       );
 
       // 3. Generate/update files
-      // Only update package.json for non-tool-generated templates
+      // Only update package.json and README for non-tool-generated templates
       if (!toolsWithAutoInstall) {
         await this.fileGenerator.updatePackageJson(
           this.projectPath,
           this.config
         );
+        await this.fileGenerator.generateReadme(this.projectPath, this.config);
+        await this.fileGenerator.generateGitignore(this.projectPath);
       }
-      await this.fileGenerator.generateReadme(this.projectPath, this.config);
-      await this.fileGenerator.generateGitignore(this.projectPath);
 
       // 4. Install dependencies (unless --no-install or tool already did it)
 
