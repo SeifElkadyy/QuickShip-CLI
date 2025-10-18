@@ -40,6 +40,16 @@ class GitManager {
     this.spinner.start('Creating initial commit');
 
     try {
+      // Check if there are any commits already
+      try {
+        await this.git.log();
+        // If log succeeds, there are already commits
+        this.spinner.succeed('Initial commit already exists');
+        return;
+      } catch {
+        // No commits yet, create initial commit
+      }
+
       await this.git.add('.');
       await this.git.commit('Initial commit from QuickShip 🚀');
       this.spinner.succeed('Initial commit created');

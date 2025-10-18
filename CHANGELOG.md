@@ -5,6 +5,17 @@ All notable changes to QuickShip CLI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.6] - 2025-01-19
+
+### Fixed
+- Fixed T3 Stack `--npm` flag error - T3 CLI doesn't support package manager flags in CI mode
+- Fixed Vite Git error - now detects existing commits before trying to create initial commit
+- Simplified T3 Stack creation to use default npm with all features enabled
+
+### Changed
+- Removed package manager flags from T3 Stack (not supported in CI mode)
+- Git manager now checks for existing commits before creating initial commit
+
 ## [0.5.5] - 2025-01-19
 
 ### Fixed

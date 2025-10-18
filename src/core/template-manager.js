@@ -144,36 +144,20 @@ class TemplateManager {
     this.spinner.start('Creating T3 Stack app...');
 
     try {
-      const packageManager = config.packageManager || 'npm';
-
-      // Use npx with --yes to skip install prompt, and CI mode
+      // T3 doesn't support package manager flags in CI mode
+      // Just use default features with CI mode
       const args = [
         '--yes',
         'create-t3-app@latest',
         destinationPath,
         '--CI',
         '--noGit',
-      ];
-
-      // Add package manager specific args after CI flag
-      if (packageManager === 'npm') {
-        args.push('--npm');
-      } else if (packageManager === 'pnpm') {
-        args.push('--pnpm');
-      } else if (packageManager === 'yarn') {
-        args.push('--yarn');
-      } else if (packageManager === 'bun') {
-        args.push('--bun');
-      }
-
-      // Add feature flags
-      args.push(
         '--tailwind',
         '--trpc',
         '--prisma',
         '--nextAuth',
-        '--appRouter'
-      );
+        '--appRouter',
+      ];
 
       await execa('npx', args, {
         stdio: 'inherit',
