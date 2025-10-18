@@ -40,9 +40,8 @@ export async function websitePrompts(projectName) {
         value: 'react-vite',
       },
       {
-        name: 'MERN Stack (Coming Soon)',
-        value: 'mern',
-        disabled: true,
+        name: 'MERN Stack (MongoDB + Express + React + Node.js)',
+        value: 'mern-stack',
       },
     ],
   });

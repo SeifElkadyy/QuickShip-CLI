@@ -18,6 +18,12 @@
         "priority": 3,
         "recommended": false,
         "description": "T3 Stack (Next.js + tRPC + Prisma + NextAuth + Tailwind)"
+      },
+      "mern-stack": {
+        "useManualScaffold": true,
+        "priority": 4,
+        "recommended": false,
+        "description": "MERN Stack (MongoDB + Express + React + Node.js)"
       }
     }
   }

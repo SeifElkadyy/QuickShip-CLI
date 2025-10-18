@@ -30,7 +30,8 @@ class Engine {
       const toolsWithAutoInstall =
         template.useCreateNextApp ||
         template.useCreateT3App ||
-        template.useCreateVite;
+        template.useCreateVite ||
+        template.useManualScaffold;
 
       await this.templateManager.cloneTemplate(
         templateName,
@@ -66,16 +67,23 @@ class Engine {
 
       // 5. Initialize Git (unless --no-git)
       if (this.options.git !== false && this.config.git) {
-        const gitManager = new GitManager(this.projectPath);
-        const isGitAvailable = await gitManager.isGitInstalled();
+        try {
+          const gitManager = new GitManager(this.projectPath);
+          const isGitAvailable = await gitManager.isGitInstalled();
 
-        if (isGitAvailable) {
-          await gitManager.init();
-          await gitManager.createInitialCommit();
-        } else {
-          logger.warning(
-            'Git is not installed, skipping repository initialization'
-          );
+          if (isGitAvailable) {
+            await gitManager.init();
+            await gitManager.createInitialCommit();
+          } else {
+            logger.warning(
+              'Git is not installed, skipping repository initialization'
+            );
+          }
+        } catch (error) {
+          logger.warning('Git initialization failed, but continuing...');
+          if (this.options.verbose) {
+            console.error(error);
+          }
         }
       } else {
         logger.info('Skipping Git initialization (--no-git flag)');
@@ -99,18 +107,68 @@ class Engine {
   showSuccessMessage() {
     const pm = this.config.packageManager || 'npm';
     const runCommand = this.getRunCommand(pm);
+    const stack = this.config.stack;
 
-    const message = `
+    // Base message
+    let message = `
 🎉 Success! Your project is ready!
 
 📁 Location: ${this.projectPath}
+`;
+
+    // Add stack-specific instructions
+    if (stack === 'mern-stack') {
+      message += `
+⚠️  IMPORTANT: Configure MongoDB before running
+
+1. Set up environment variables:
+   cd ${this.config.projectName}/server
+   cp .env.example .env
+   # Edit .env with your MongoDB URI and JWT secret
+
+2. Make sure MongoDB is installed and running:
+   - Local: mongod
+   - Cloud: Get free URI from https://www.mongodb.com/cloud/atlas
+
+Next steps:
+  cd ${this.config.projectName}
+  ${runCommand} dev
+
+Your app will be running at:
+  Frontend: http://localhost:5173
+  Backend:  http://localhost:5000
+`;
+    } else if (stack === 't3-stack') {
+      message += `
+⚠️  IMPORTANT: Configure environment variables
+
+1. Set up your .env file:
+   cd ${this.config.projectName}
+   cp .env.example .env
+   # Add your database URL, NextAuth secret, etc.
+
+2. Set up your database with Prisma:
+   npx prisma db push
 
 Next steps:
   cd ${this.config.projectName}
   ${runCommand} dev
 
 Your app will be running at: http://localhost:3000
+`;
+    } else {
+      // Default message for Next.js and Vite
+      message += `
+Next steps:
+  cd ${this.config.projectName}
+  ${runCommand} dev
 
+Your app will be running at: http://localhost:${stack === 'react-vite' ? '5173' : '3000'}
+`;
+    }
+
+    // Add footer
+    message += `
 Documentation: https://quickship.dev/docs
 Need help? https://quickship.dev/support
 

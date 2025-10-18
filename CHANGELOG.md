@@ -5,6 +5,106 @@ All notable changes to QuickShip CLI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.2] - 2025-01-19
+
+### Documentation
+- **Completely redesigned README** with comprehensive documentation
+- Added detailed template descriptions for all 4 templates
+- Template comparison table for easy decision-making
+- Real-world examples for Next.js, T3 Stack, Vite, and MERN
+- Comprehensive troubleshooting guide
+- Updated badges with npm downloads and version
+- Better structured sections with emojis and formatting
+
+## [0.7.1] - 2025-01-19
+
+### Improved
+- **Enhanced success messages** with stack-specific setup instructions
+- MERN Stack now shows MongoDB configuration steps (`.env` setup, connection URI)
+- T3 Stack now shows Prisma database setup steps
+- Clearer port information for different stacks (Vite: 5173, Next.js: 3000, MERN: both)
+- Better user experience with important warnings for required configuration
+- **Better installation feedback** - Show live npm output during MERN Stack installations
+- Users can now see real-time progress instead of frozen spinners
+- Clear labels for each installation step (backend, frontend, Tailwind, root dependencies)
+
+## [0.7.0] - 2025-01-19
+
+### Added
+- **🎉 NEW: MERN Stack Template** - Full-stack MongoDB + Express + React + Node.js
+- Client/server monorepo structure with separate package.json files
+- Express backend with Mongoose ODM, JWT auth, and bcryptjs
+- React frontend using Vite with TypeScript and Tailwind CSS support
+- Axios for API calls, React Router for navigation
+- Concurrently for running both client and server with one command
+- Complete README with setup instructions and MongoDB configuration
+- Environment variable templates (.env.example)
+
+### Features
+- 4 production-ready templates now available (Next.js, Vite, T3 Stack, MERN)
+- MERN Stack includes:
+  - Express.js server with proper project structure (routes, models, controllers, middleware)
+  - MongoDB connection with Mongoose
+  - CORS and security middleware
+  - JWT authentication setup
+  - React + Vite frontend
+  - Root scripts to run both client/server together
+
+## [0.6.2] - 2025-01-19
+
+### Fixed
+- **CRITICAL:** Fixed Tailwind CSS v4 PostCSS plugin error for Vite projects
+- Now installs `@tailwindcss/postcss` package (required for Tailwind v4)
+- Updated postcss.config.js to use `@tailwindcss/postcss` instead of `tailwindcss`
+- Tailwind CSS now works correctly with Vite without PostCSS errors
+
+## [0.6.1] - 2025-01-19
+
+### Fixed
+- Fixed Tailwind CSS initialization failing with "could not determine executable to run"
+- Now creates tailwind.config.js and postcss.config.js manually instead of using `npx tailwindcss init`
+- Tailwind setup now works reliably for Vite projects
+
+## [0.6.0] - 2025-01-19
+
+### Fixed
+- **CRITICAL:** Fixed Vite dependencies not being installed - now installs manually after scaffolding
+- **CRITICAL:** Fixed Vite dev server auto-starting and blocking CLI completion
+- Changed Vite creation to use `stdio: 'pipe'` to avoid interactive prompts
+- CLI now completes successfully after Vite project creation
+
+### Added
+- **Tailwind CSS support for Vite projects** - automatically configures Tailwind when selected
+- Automatic installation of tailwindcss, postcss, and autoprefixer for Vite
+- Auto-generation of tailwind.config.js and postcss.config.js
+- Tailwind directives automatically added to index.css
+
+### Changed
+- Vite template now manually installs dependencies after scaffolding
+- Vite template creation no longer shows interactive prompts during setup
+- Dependencies are installed but dev server is not auto-started
+- Improved Vite project setup with proper Tailwind CSS integration
+
+## [0.5.8] - 2025-01-19
+
+### Fixed
+- **CRITICAL:** Fixed Vite template not creating project folder - now runs `create-vite` in parent directory
+- Fixed `create-vite` invocation to properly create project directory with correct working directory
+
+### Changed
+- Improved error logging for Vite template creation failures
+
+## [0.5.7] - 2025-01-19
+
+### Fixed
+- Improved Git initialization error handling - now shows warning instead of failing build
+- Vite template builds complete successfully even if Git initialization encounters issues
+- Added verbose error logging for Git initialization failures
+
+### Changed
+- Git initialization wrapped in try-catch to prevent build failures
+- Better error messages for Git-related issues
+
 ## [0.5.6] - 2025-01-19
 
 ### Fixed
