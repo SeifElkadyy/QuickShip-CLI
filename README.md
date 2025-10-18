@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="assets/logo.png" alt="QuickShip CLI Logo" width="200">
+  <img src="./assets/QuickShip-Logo.png" alt="QuickShip CLI Logo" width="200">
 
   # QuickShip CLI ⚡
 
