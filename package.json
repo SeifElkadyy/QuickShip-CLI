@@ -1,6 +1,6 @@
 {
   "name": "quickship-cli",
-  "version": "0.7.2",
+  "version": "0.8.1",
   "description": "Ship production-ready Next.js projects in 60 seconds. Automated setup with TypeScript, Tailwind CSS, Git, and more.",
   "main": "src/index.js",
   "type": "module",

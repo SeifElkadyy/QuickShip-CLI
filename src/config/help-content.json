@@ -1,0 +1,168 @@
+{
+  "projectName": {
+    "title": "Project Name",
+    "description": "Choose a name for your project. This will be used as the directory name and package name.",
+    "tips": [
+      "Use lowercase letters, numbers, and hyphens",
+      "Keep it short and descriptive",
+      "Avoid spaces and special characters",
+      "Examples: my-app, todo-list, awesome-project"
+    ],
+    "examples": [
+      "my-saas-app",
+      "portfolio-site",
+      "ecommerce-store",
+      "blog-platform"
+    ]
+  },
+  "stack": {
+    "title": "Stack Selection",
+    "description": "Choose the technology stack for your project.",
+    "options": {
+      "nextjs": {
+        "name": "Next.js",
+        "description": "Full-stack React framework with server components and API routes",
+        "best_for": "Web apps, marketing sites, dashboards, SEO-focused sites",
+        "includes": ["Next.js 15+", "React 19", "TypeScript", "Tailwind CSS", "App Router"],
+        "deploy": ["Vercel", "Netlify", "AWS"],
+        "learning": "https://nextjs.org/learn"
+      },
+      "t3": {
+        "name": "T3 Stack",
+        "description": "Type-safe full-stack Next.js with tRPC, Prisma, and NextAuth",
+        "best_for": "Apps requiring database and authentication with end-to-end type safety",
+        "includes": ["Next.js", "TypeScript", "tRPC", "Prisma", "NextAuth.js", "Tailwind CSS"],
+        "deploy": ["Vercel"],
+        "learning": "https://create.t3.gg"
+      },
+      "vite": {
+        "name": "React + Vite",
+        "description": "Lightning-fast React SPA development with Vite",
+        "best_for": "Single-page applications, admin dashboards, client-side apps",
+        "includes": ["React 18+", "Vite 7+", "TypeScript", "Tailwind CSS", "React Router"],
+        "deploy": ["Netlify", "Vercel", "Cloudflare Pages"],
+        "learning": "https://vitejs.dev/guide"
+      },
+      "mern": {
+        "name": "MERN Stack",
+        "description": "Full-stack MongoDB + Express + React + Node.js",
+        "best_for": "Full-stack CRUD apps, REST APIs, MongoDB-based projects",
+        "includes": ["MongoDB", "Express.js", "React", "Node.js", "TypeScript", "JWT Auth"],
+        "deploy": ["Railway", "Heroku", "DigitalOcean", "AWS"],
+        "learning": "https://www.mongodb.com/mern-stack"
+      }
+    }
+  },
+  "typescript": {
+    "title": "TypeScript",
+    "description": "TypeScript adds static typing to JavaScript, catching errors before runtime.",
+    "tips": [
+      "TypeScript is recommended for all projects",
+      "Provides better IDE support and autocomplete",
+      "Catches bugs early in development",
+      "Makes refactoring safer and easier"
+    ],
+    "pros": [
+      "Type safety - catch errors before runtime",
+      "Better IDE autocomplete and IntelliSense",
+      "Easier refactoring with confidence",
+      "Self-documenting code"
+    ],
+    "cons": [
+      "Slight learning curve for beginners",
+      "More initial setup time",
+      "Compile step required"
+    ]
+  },
+  "styling": {
+    "title": "Styling Framework",
+    "description": "Choose how you want to style your application.",
+    "options": {
+      "tailwind": {
+        "name": "Tailwind CSS",
+        "description": "Utility-first CSS framework for rapid UI development",
+        "pros": ["Fast development", "Small bundle size", "Consistent design", "Easy responsive design"],
+        "best_for": "Most projects, especially prototypes and MVPs"
+      },
+      "css-modules": {
+        "name": "CSS Modules",
+        "description": "Scoped CSS with local class names",
+        "pros": ["No learning curve", "Scoped styles", "Works with plain CSS"],
+        "best_for": "Developers familiar with traditional CSS"
+      },
+      "styled-components": {
+        "name": "Styled Components",
+        "description": "CSS-in-JS library for styled React components",
+        "pros": ["Dynamic styling", "Theme support", "No class name conflicts"],
+        "best_for": "Complex applications with dynamic theming"
+      }
+    }
+  },
+  "packageManager": {
+    "title": "Package Manager",
+    "description": "Choose which package manager to use for dependencies.",
+    "options": {
+      "npm": {
+        "name": "npm",
+        "description": "Node Package Manager (default, comes with Node.js)",
+        "pros": ["Pre-installed with Node.js", "Most widely used", "Good documentation"],
+        "speed": "Medium",
+        "disk_space": "Medium"
+      },
+      "pnpm": {
+        "name": "pnpm",
+        "description": "Fast, disk space efficient package manager",
+        "pros": ["Fastest", "Saves disk space", "Strict dependency resolution"],
+        "speed": "Very Fast",
+        "disk_space": "Very Efficient"
+      },
+      "yarn": {
+        "name": "Yarn",
+        "description": "Fast, reliable package manager by Facebook",
+        "pros": ["Fast", "Workspaces support", "Offline mode"],
+        "speed": "Fast",
+        "disk_space": "Medium"
+      },
+      "bun": {
+        "name": "Bun",
+        "description": "All-in-one JavaScript runtime and toolkit",
+        "pros": ["Extremely fast", "Built-in bundler", "Drop-in Node.js replacement"],
+        "speed": "Fastest",
+        "disk_space": "Efficient"
+      }
+    }
+  },
+  "shadcn": {
+    "title": "shadcn/ui",
+    "description": "Beautiful, accessible React components built with Radix UI and Tailwind CSS.",
+    "tips": [
+      "Components are copied into your project (not a dependency)",
+      "Fully customizable - you own the code",
+      "Built on Radix UI for accessibility",
+      "Styled with Tailwind CSS"
+    ],
+    "includes": [
+      "40+ pre-built components",
+      "Accessible by default (Radix UI)",
+      "Dark mode support",
+      "Fully customizable"
+    ],
+    "best_for": "Projects that need beautiful UI components quickly"
+  },
+  "git": {
+    "title": "Git Initialization",
+    "description": "Initialize a Git repository and create an initial commit.",
+    "tips": [
+      "Recommended for all projects",
+      "Required for deployment to Vercel/Netlify",
+      "Makes version control easier",
+      "Enables collaboration"
+    ],
+    "what_happens": [
+      "Creates .git directory",
+      "Initializes empty Git repository",
+      "Creates initial commit with all files",
+      "Ready to connect to GitHub/GitLab"
+    ]
+  }
+}

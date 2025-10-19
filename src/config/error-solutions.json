@@ -1,0 +1,111 @@
+{
+  "EACCES": {
+    "title": "Permission Denied",
+    "description": "You don't have permission to access this file or directory",
+    "solutions": [
+      "Try running with sudo (macOS/Linux): sudo quickship build my-app",
+      "Check directory permissions: ls -la && chmod 755 .",
+      "Change to a directory where you have write permissions",
+      "Fix npm permissions: sudo chown -R $USER /usr/local/lib/node_modules",
+      "Use npx instead: npx quickship-cli@latest build my-app"
+    ],
+    "docs": "https://github.com/SeifElkadyy/QuickShip-CLI#troubleshooting"
+  },
+  "EEXIST": {
+    "title": "Directory Already Exists",
+    "description": "A project with this name already exists in the current directory",
+    "solutions": [
+      "Choose a different project name",
+      "Delete the existing directory: rm -rf project-name",
+      "Move to a different directory: cd ..",
+      "Rename the existing directory: mv old-name new-name",
+      "Use a unique project name with timestamp: my-app-$(date +%s)"
+    ],
+    "docs": "https://github.com/SeifElkadyy/QuickShip-CLI#troubleshooting"
+  },
+  "ENOTFOUND": {
+    "title": "Network Error",
+    "description": "Unable to connect to the internet or resolve DNS",
+    "solutions": [
+      "Check your internet connection",
+      "Try again in a few moments",
+      "Check if you're behind a proxy or firewall",
+      "Try using a different DNS server",
+      "Disable VPN temporarily and try again"
+    ],
+    "docs": "https://github.com/SeifElkadyy/QuickShip-CLI#network-issues"
+  },
+  "ENOENT": {
+    "title": "File or Directory Not Found",
+    "description": "The specified file or directory does not exist",
+    "solutions": [
+      "Check if the path is correct",
+      "Make sure you're in the right directory: pwd",
+      "Create the parent directory first: mkdir -p path/to/dir",
+      "Check file permissions: ls -la",
+      "Verify the file name (case-sensitive on Linux/macOS)"
+    ],
+    "docs": "https://github.com/SeifElkadyy/QuickShip-CLI#troubleshooting"
+  },
+  "PORT_IN_USE": {
+    "title": "Port Already in Use",
+    "description": "The port is already being used by another application",
+    "solutions": [
+      "Kill process using the port: lsof -ti:3000 | xargs kill -9",
+      "Use a different port: PORT=3001 npm run dev",
+      "Find what's using the port: lsof -i:3000",
+      "Restart your computer",
+      "Check for other dev servers running"
+    ],
+    "docs": "https://github.com/SeifElkadyy/QuickShip-CLI#port-in-use"
+  },
+  "NPM_INSTALL_FAILED": {
+    "title": "Dependency Installation Failed",
+    "description": "npm/pnpm/yarn failed to install dependencies",
+    "solutions": [
+      "Clear npm cache: npm cache clean --force",
+      "Delete node_modules and package-lock.json: rm -rf node_modules package-lock.json",
+      "Try installing again: npm install",
+      "Use a different package manager: pnpm install or yarn install",
+      "Check npm registry status: https://status.npmjs.org",
+      "Try with --legacy-peer-deps flag: npm install --legacy-peer-deps"
+    ],
+    "docs": "https://github.com/SeifElkadyy/QuickShip-CLI#dependency-issues"
+  },
+  "GIT_NOT_FOUND": {
+    "title": "Git Not Installed",
+    "description": "Git is not installed on your system",
+    "solutions": [
+      "Install Git: https://git-scm.com/downloads",
+      "macOS: brew install git",
+      "Ubuntu/Debian: sudo apt-get install git",
+      "Windows: Download from https://git-scm.com",
+      "Skip git initialization: quickship build --no-git"
+    ],
+    "docs": "https://github.com/SeifElkadyy/QuickShip-CLI#git-setup"
+  },
+  "NODE_VERSION": {
+    "title": "Node.js Version Too Old",
+    "description": "QuickShip CLI requires Node.js 18.0.0 or higher",
+    "solutions": [
+      "Update Node.js: https://nodejs.org",
+      "Use nvm: nvm install 22 && nvm use 22",
+      "macOS: brew upgrade node",
+      "Windows: Download latest from https://nodejs.org",
+      "Check current version: node --version"
+    ],
+    "docs": "https://github.com/SeifElkadyy/QuickShip-CLI#requirements"
+  },
+  "TEMPLATE_CLONE_FAILED": {
+    "title": "Template Download Failed",
+    "description": "Failed to clone the project template",
+    "solutions": [
+      "Check your internet connection",
+      "Try again - it might be a temporary GitHub issue",
+      "Check GitHub status: https://www.githubstatus.com",
+      "Try with verbose mode: quickship build -v",
+      "Report issue: https://github.com/SeifElkadyy/QuickShip-CLI/issues"
+    ],
+    "docs": "https://github.com/SeifElkadyy/QuickShip-CLI#troubleshooting"
+  }
+}
