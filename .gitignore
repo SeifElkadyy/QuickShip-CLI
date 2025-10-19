@@ -9,6 +9,9 @@ coverage/
 *.tgz
 .npm
 
+# Claude Code settings (local only)
+.claude/
+
 # Development documentation (keep locally, don't push)
 /docs/
 BUILD_STATUS.md
@@ -20,3 +23,5 @@ PROJECT_OVERVIEW.md
 QUICK_REFERENCE.md
 READY_TO_PUBLISH.md
 START_HERE.txt
+PUBLISH.md
+cleanup.sh
