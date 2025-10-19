@@ -9,13 +9,16 @@ export async function buildCommand(projectName, options) {
     // Show welcome banner
     logger.welcome();
 
-    // Step 1: Select platform
-    const platform = await selectPlatform();
+    // Step 1: Select platform (skip if -y flag and template provided)
+    let platform = 'website'; // Default platform
+    if (!options.yes || !options.template) {
+      platform = await selectPlatform();
+    }
 
     // Step 2: Platform-specific prompts
     let config;
     if (platform === 'website') {
-      config = await websitePrompts(projectName);
+      config = await websitePrompts(projectName, options);
     } else {
       logger.error('This platform is not yet supported');
       process.exit(1);

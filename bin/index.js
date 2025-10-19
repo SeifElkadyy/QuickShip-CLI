@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
-import chalk from 'chalk';
+import logger from '../src/utils/logger.js';
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -57,12 +57,50 @@ program
     await addCommand(feature, options);
   });
 
+// Doctor command
+program
+  .command('doctor')
+  .description('Check project health and environment')
+  .option('--fix', 'auto-fix common issues (coming soon)')
+  .action(async (options) => {
+    const { doctorCommand } = await import('../src/commands/doctor.js');
+    await doctorCommand(options);
+  });
+
+// Info command
+program
+  .command('info')
+  .description('Show project information')
+  .action(async () => {
+    const { infoCommand } = await import('../src/commands/info.js');
+    await infoCommand();
+  });
+
+// Templates command
+program
+  .command('templates')
+  .description('Show detailed template information')
+  .option('--compare', 'compare all templates side-by-side')
+  .action(async (options) => {
+    const { templatesCommand } = await import('../src/commands/templates.js');
+    await templatesCommand(options);
+  });
+
+// Update command
+program
+  .command('update')
+  .description('Update QuickShip CLI to latest version')
+  .action(async () => {
+    const { updateCommand } = await import('../src/commands/update.js');
+    await updateCommand();
+  });
+
 // Config command
 program
   .command('config')
   .description('Configure CLI settings')
   .action(() => {
-    console.log(chalk.blue('Config command coming soon...'));
+    logger.info('Config command coming soon...');
   });
 
 program.parse(process.argv);

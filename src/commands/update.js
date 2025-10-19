@@ -1,5 +1,5 @@
+import logger from '../utils/logger.js';
 import chalk from 'chalk';
-import boxen from 'boxen';
 import inquirer from 'inquirer';
 import { exec } from 'child_process';
 import { promisify } from 'util';
@@ -17,17 +17,10 @@ const __dirname = dirname(__filename);
  */
 export async function updateCommand() {
   try {
-    console.log('\n');
-    console.log(
-      boxen(chalk.bold.cyan('🔄 QuickShip CLI Update'), {
-        padding: 1,
-        margin: 1,
-        borderStyle: 'double',
-        borderColor: 'cyan',
-      })
-    );
+    logger.log('\n');
+    logger.box('🔄 QuickShip CLI Update');
 
-    console.log(chalk.blue('\n🔍 Checking for updates...\n'));
+    logger.info('🔍 Checking for updates...\n');
 
     // Get current version
     const packageJsonPath = join(__dirname, '../../package.json');
@@ -40,30 +33,28 @@ export async function updateCommand() {
       const { stdout } = await execAsync('npm view quickship-cli version');
       latestVersion = stdout.trim();
     } catch (error) {
-      console.log(chalk.red('✘ Could not check for updates'));
-      console.log(chalk.gray('Make sure you have an internet connection\n'));
+      logger.error('✘ Could not check for updates');
+      logger.dim('Make sure you have an internet connection\n');
       return;
     }
 
-    console.log(
-      chalk.bold('📦 Current version: ') + chalk.cyan(currentVersion)
-    );
-    console.log(chalk.bold('✨ Latest version: ') + chalk.green(latestVersion));
+    logger.log(chalk.bold('📦 Current version: ') + chalk.cyan(currentVersion));
+    logger.log(chalk.bold('✨ Latest version: ') + chalk.green(latestVersion));
 
     // Compare versions
     if (semver.gte(currentVersion, latestVersion)) {
-      console.log(chalk.green("\n✅ You're already on the latest version!\n"));
+      logger.log(chalk.green("\n✅ You're already on the latest version!\n"));
       return;
     }
 
     // Show what's new
-    console.log(chalk.bold("\n📋 What's new in v" + latestVersion + ':\n'));
+    logger.header("📋 What's new in v" + latestVersion + ':', 'white');
     const releaseNotes = await getReleaseNotes(latestVersion);
     if (releaseNotes) {
-      console.log(releaseNotes);
+      logger.log(releaseNotes);
     } else {
-      console.log(chalk.gray('  • Bug fixes and improvements'));
-      console.log(chalk.gray('  • Performance enhancements'));
+      logger.dim('  • Bug fixes and improvements');
+      logger.dim('  • Performance enhancements');
     }
 
     // Ask to update
@@ -77,12 +68,12 @@ export async function updateCommand() {
     ]);
 
     if (!shouldUpdate) {
-      console.log(chalk.yellow('\n⏭  Update cancelled\n'));
+      logger.warning('\n⏭  Update cancelled\n');
       return;
     }
 
     // Update
-    console.log(chalk.blue('\n⏳ Updating QuickShip CLI...\n'));
+    logger.info('\n⏳ Updating QuickShip CLI...\n');
 
     try {
       // Determine if installed globally or locally
@@ -95,23 +86,17 @@ export async function updateCommand() {
 
       await execAsync(updateCommand);
 
-      console.log(
-        chalk.green('✔ Successfully updated to v' + latestVersion + '!\n')
-      );
-      console.log(
-        chalk.gray("🎉 You're all set! Run 'quickship --version' to verify.\n")
-      );
+      logger.success('✔ Successfully updated to v' + latestVersion + '!\n');
+      logger.dim("🎉 You're all set! Run 'quickship --version' to verify.\n");
     } catch (error) {
-      console.log(chalk.red('\n✘ Update failed'));
-      console.log(
-        chalk.gray(
-          'Try manually updating: npm install -g quickship-cli@latest\n'
-        )
+      logger.error('\n✘ Update failed');
+      logger.dim(
+        'Try manually updating: npm install -g quickship-cli@latest\n'
       );
     }
   } catch (error) {
-    console.log(chalk.red('\n✘ Error checking for updates'));
-    console.log(chalk.gray(error.message + '\n'));
+    logger.error('\n✘ Error checking for updates');
+    logger.dim(error.message + '\n');
   }
 }
 

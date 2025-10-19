@@ -1,5 +1,5 @@
+import logger from './logger.js';
 import chalk from 'chalk';
-import boxen from 'boxen';
 import inquirer from 'inquirer';
 
 /**
@@ -18,37 +18,30 @@ export async function showPreview(config) {
     git,
   } = config;
 
-  console.log('\n');
-  console.log(
-    boxen(chalk.bold.cyan('📋 Project Preview'), {
-      padding: 1,
-      margin: 1,
-      borderStyle: 'double',
-      borderColor: 'cyan',
-    })
-  );
+  logger.log('\n');
+  logger.box('📋 Project Preview');
 
   // Project Structure
-  console.log(chalk.bold('\n📁 Project Structure:'));
-  console.log(getProjectStructure(stack, shadcn));
+  logger.header('📁 Project Structure:', 'white');
+  logger.log(getProjectStructure(stack, shadcn));
 
   // Stack Information
-  console.log(chalk.bold('\n🛠️  Tech Stack:'));
-  console.log(getStackInfo(stack, typescript, styling));
+  logger.header('🛠️  Tech Stack:', 'white');
+  logger.log(getStackInfo(stack, typescript, styling));
 
   // Packages
-  console.log(chalk.bold('\n📦 Packages to Install:'));
-  console.log(getPackageInfo(stack, shadcn));
+  logger.header('📦 Packages to Install:', 'white');
+  logger.log(getPackageInfo(stack, shadcn));
 
   // Commands
-  console.log(chalk.bold('\n🛠️  Commands that will run:'));
-  console.log(getCommandInfo(projectName, stack, packageManager, shadcn, git));
+  logger.header('🛠️  Commands that will run:', 'white');
+  logger.log(getCommandInfo(projectName, stack, packageManager, shadcn, git));
 
   // Estimates
-  console.log(chalk.bold('\n⏱️  Estimates:'));
-  console.log(getEstimates(stack, shadcn));
+  logger.header('⏱️  Estimates:', 'white');
+  logger.log(getEstimates(stack, shadcn));
 
-  console.log('');
+  logger.log('');
 
   // Confirm
   const { proceed } = await inquirer.prompt([

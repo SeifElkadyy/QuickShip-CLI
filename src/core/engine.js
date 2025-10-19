@@ -36,7 +36,8 @@ class Engine {
       await this.templateManager.cloneTemplate(
         templateName,
         this.projectPath,
-        this.config
+        this.config,
+        this.options
       );
 
       // 3. Generate/update files

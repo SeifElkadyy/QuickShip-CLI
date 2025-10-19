@@ -1,5 +1,5 @@
+import logger from '../utils/logger.js';
 import chalk from 'chalk';
-import boxen from 'boxen';
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -20,15 +20,8 @@ export async function templatesCommand(options = {}) {
   }
 
   // Show detailed template list
-  console.log('\n');
-  console.log(
-    boxen(chalk.bold.cyan('📚 Available Templates'), {
-      padding: 1,
-      margin: 1,
-      borderStyle: 'double',
-      borderColor: 'cyan',
-    })
-  );
+  logger.log('\n');
+  logger.box('📚 Available Templates');
 
   // Template details
   const templates = [
@@ -106,61 +99,61 @@ export async function templatesCommand(options = {}) {
 
   templates.forEach((template, index) => {
     if (index > 0) {
-      console.log('\n' + chalk.blue('━'.repeat(70)));
+      logger.log('\n' + chalk.blue('━'.repeat(70)));
     }
 
-    console.log(
+    logger.log(
       '\n' +
         chalk.bold(`${template.emoji} ${template.name}`) +
         (template.recommended ? chalk.yellow(' ⭐ Recommended') : '')
     );
-    console.log(chalk.gray('   ' + template.description));
+    logger.dim('   ' + template.description);
 
-    console.log(chalk.bold('\n   Stack:'));
+    logger.log(chalk.bold('\n   Stack:'));
     template.stack.forEach((tech) => {
-      console.log(chalk.cyan('     • ' + tech));
+      logger.log(chalk.cyan('     • ' + tech));
     });
 
-    console.log(chalk.bold('\n   Features:'));
+    logger.log(chalk.bold('\n   Features:'));
     template.features.forEach((feature) => {
-      console.log(chalk.green('     • ' + feature));
+      logger.log(chalk.green('     • ' + feature));
     });
 
-    console.log(chalk.bold('\n   Best for: ') + chalk.yellow(template.bestFor));
-    console.log(
+    logger.log(chalk.bold('\n   Best for: ') + chalk.yellow(template.bestFor));
+    logger.log(
       chalk.bold('   Deploy: ') + chalk.blue(template.deploy.join(', '))
     );
-    console.log(
+    logger.log(
       chalk.bold('   Popularity: ') + getPopularityBar(template.popularity)
     );
 
-    console.log(chalk.bold('\n   Create:'));
-    console.log(chalk.gray('     ' + template.command));
+    logger.log(chalk.bold('\n   Create:'));
+    logger.dim('     ' + template.command);
   });
 
-  console.log('\n' + chalk.blue('━'.repeat(70)));
+  logger.log('\n' + chalk.blue('━'.repeat(70)));
 
   // Footer with helpful commands
-  console.log(chalk.bold('\n💡 Helpful Commands:\n'));
-  console.log(
+  logger.header('💡 Helpful Commands:', 'white');
+  logger.log(
     chalk.cyan('  quickship templates --compare') +
       chalk.gray('  - Compare all templates side-by-side')
   );
-  console.log(
+  logger.log(
     chalk.cyan('  quickship build') +
       chalk.gray('                 - Create a new project (interactive)')
   );
-  console.log(
+  logger.log(
     chalk.cyan('  quickship --help') +
       chalk.gray('                - Show all available commands')
   );
 
-  console.log(chalk.bold('\n📚 Documentation:'));
-  console.log(
+  logger.header('📚 Documentation:', 'white');
+  logger.log(
     chalk.blue('  https://github.com/SeifElkadyy/QuickShip-CLI#templates')
   );
 
-  console.log('');
+  logger.log('');
 }
 
 /**

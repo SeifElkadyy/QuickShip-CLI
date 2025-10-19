@@ -1,5 +1,5 @@
+import logger from '../utils/logger.js';
 import chalk from 'chalk';
-import boxen from 'boxen';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { existsSync, readFileSync } from 'fs';
@@ -13,17 +13,10 @@ const execAsync = promisify(exec);
  * @param {object} options - Command options
  */
 export async function doctorCommand(options = {}) {
-  console.log('\n');
-  console.log(
-    boxen(chalk.bold.cyan('🔍 QuickShip Doctor - Health Check'), {
-      padding: 1,
-      margin: 1,
-      borderStyle: 'double',
-      borderColor: 'cyan',
-    })
-  );
+  logger.log('\n');
+  logger.box('🔍 QuickShip Doctor - Health Check');
 
-  console.log(chalk.blue('\n⏳ Running health check...\n'));
+  logger.info('⏳ Running health check...\n');
 
   const checks = [];
   const warnings = [];
@@ -68,7 +61,7 @@ export async function doctorCommand(options = {}) {
   }
 
   // Display results
-  console.log(chalk.bold('Results:\n'));
+  logger.header('Results:', 'white');
   checks.forEach((check) => {
     const icon =
       check.status === 'ok'
@@ -77,27 +70,27 @@ export async function doctorCommand(options = {}) {
           ? chalk.yellow('⚠')
           : chalk.red('✘');
     const message = `${icon} ${check.name}: ${check.message}`;
-    console.log('  ' + message);
+    logger.log('  ' + message);
   });
 
   // Show warnings
   if (warnings.length > 0) {
-    console.log(chalk.bold('\n⚠️  WARNINGS:\n'));
+    logger.log(chalk.bold('\n⚠️  WARNINGS:\n'));
     warnings.forEach((warning, index) => {
-      console.log(chalk.yellow(`${index + 1}. ${warning.details}`));
+      logger.log(chalk.yellow(`${index + 1}. ${warning.details}`));
       if (warning.fix) {
-        console.log(chalk.cyan(`   Fix: ${warning.fix}\n`));
+        logger.log(chalk.cyan(`   Fix: ${warning.fix}\n`));
       }
     });
   }
 
   // Show errors
   if (errors.length > 0) {
-    console.log(chalk.bold('\n✘ ERRORS:\n'));
+    logger.log(chalk.bold('\n✘ ERRORS:\n'));
     errors.forEach((error, index) => {
-      console.log(chalk.red(`${index + 1}. ${error.details}`));
+      logger.log(chalk.red(`${index + 1}. ${error.details}`));
       if (error.fix) {
-        console.log(chalk.cyan(`   Fix: ${error.fix}\n`));
+        logger.log(chalk.cyan(`   Fix: ${error.fix}\n`));
       }
     });
   }
@@ -107,23 +100,17 @@ export async function doctorCommand(options = {}) {
   const okChecks = checks.filter((c) => c.status === 'ok').length;
   const healthScore = Math.round((okChecks / totalChecks) * 100);
 
-  console.log(
-    chalk.bold('\n📊 Overall Health: ') + getHealthBadge(healthScore)
-  );
+  logger.log(chalk.bold('\n📊 Overall Health: ') + getHealthBadge(healthScore));
 
   if (options.fix) {
-    console.log(chalk.yellow('\n⚠️  Auto-fix is not yet implemented'));
-    console.log(
-      chalk.gray('Please fix issues manually using the suggestions above\n')
-    );
+    logger.warning('⚠️  Auto-fix is not yet implemented');
+    logger.dim('Please fix issues manually using the suggestions above\n');
   } else if (warnings.length > 0 || errors.length > 0) {
-    console.log(
-      chalk.gray(
-        '\n💡 Run with --fix flag to auto-fix common issues (coming soon)\n'
-      )
+    logger.dim(
+      '\n💡 Run with --fix flag to auto-fix common issues (coming soon)\n'
     );
   } else {
-    console.log(chalk.green('\n✨ Everything looks good!\n'));
+    logger.log(chalk.green('\n✨ Everything looks good!\n'));
   }
 }
 

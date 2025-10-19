@@ -1,3 +1,4 @@
+import logger from './logger.js';
 import chalk from 'chalk';
 
 /**
@@ -57,26 +58,26 @@ export async function handleSlashCommand(input, context = {}) {
     case '/help':
     case '/?':
       if (context.help) {
-        console.log('\n' + chalk.blue('💡 Help:'));
-        console.log(context.help);
-        console.log('');
+        logger.log('\n' + chalk.blue('💡 Help:'));
+        logger.log(context.help);
+        logger.log('');
       } else {
-        console.log('\n' + chalk.yellow('No help available for this step.'));
-        console.log(getSlashCommandsHelp());
+        logger.log('\n' + chalk.yellow('No help available for this step.'));
+        logger.log(getSlashCommandsHelp());
       }
       return 'RETRY';
 
     case '/list':
-      console.log('\n' + chalk.blue('📚 Available Templates:'));
-      console.log('  • Next.js (Recommended)');
-      console.log('  • T3 Stack');
-      console.log('  • React + Vite');
-      console.log('  • MERN Stack');
-      console.log('');
+      logger.log('\n' + chalk.blue('📚 Available Templates:'));
+      logger.log('  • Next.js (Recommended)');
+      logger.log('  • T3 Stack');
+      logger.log('  • React + Vite');
+      logger.log('  • MERN Stack');
+      logger.log('');
       return 'RETRY';
 
     case '/skip':
-      console.log(chalk.yellow('\n⏭  Skipping... using default value\n'));
+      logger.warning('\n⏭  Skipping... using default value\n');
       return 'SKIP';
 
     case '/back':

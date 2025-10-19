@@ -1,5 +1,5 @@
+import logger from './logger.js';
 import chalk from 'chalk';
-import boxen from 'boxen';
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -24,80 +24,74 @@ export function showHelp(topic) {
   const content = helpContent[topic];
 
   if (!content) {
-    console.log(chalk.yellow('\n⚠️  No help available for this topic.\n'));
+    logger.warning('\n⚠️  No help available for this topic.\n');
     return;
   }
 
-  console.log('\n');
-  console.log(
-    boxen(chalk.bold.blue('💡 ' + content.title), {
-      padding: 1,
-      borderStyle: 'round',
-      borderColor: 'blue',
-    })
-  );
+  logger.log('\n');
+  logger.box('💡 ' + content.title);
 
-  console.log(chalk.bold('\n📖 Description:'));
-  console.log('  ' + chalk.gray(content.description));
+  logger.header('📖 Description:', 'white');
+  logger.dim('  ' + content.description);
 
   if (content.tips) {
-    console.log(chalk.bold('\n💡 Tips:'));
+    logger.header('💡 Tips:', 'white');
     content.tips.forEach((tip) => {
-      console.log(chalk.cyan('  • ' + tip));
+      logger.log(chalk.cyan('  • ' + tip));
     });
   }
 
   if (content.examples) {
-    console.log(chalk.bold('\n📝 Examples:'));
+    logger.header('📝 Examples:', 'white');
     content.examples.forEach((example) => {
-      console.log(chalk.green('  • ' + example));
+      logger.log(chalk.green('  • ' + example));
     });
   }
 
   if (content.options) {
-    console.log(chalk.bold('\n🎯 Available Options:\n'));
+    logger.header('🎯 Available Options:', 'white');
     Object.entries(content.options).forEach(([key, option]) => {
-      console.log(chalk.cyan(`  ${option.name}`));
-      console.log('    ' + chalk.gray(option.description));
+      logger.log(chalk.cyan(`  ${option.name}`));
+      logger.dim('    ' + option.description);
       if (option.best_for) {
-        console.log('    ' + chalk.yellow('Best for: ') + option.best_for);
+        logger.log('    ' + chalk.yellow('Best for: ') + option.best_for);
       }
       if (option.pros) {
-        console.log('    ' + chalk.green('Pros: ') + option.pros.join(', '));
+        logger.log('    ' + chalk.green('Pros: ') + option.pros.join(', '));
       }
-      console.log('');
+      logger.log('');
     });
   }
 
   if (content.pros) {
-    console.log(chalk.bold('\n✅ Pros:'));
+    logger.header('✅ Pros:', 'white');
     content.pros.forEach((pro) => {
-      console.log(chalk.green('  • ' + pro));
+      logger.log(chalk.green('  • ' + pro));
     });
   }
 
   if (content.cons) {
-    console.log(chalk.bold('\n❌ Cons:'));
+    logger.header('❌ Cons:', 'white');
     content.cons.forEach((con) => {
-      console.log(chalk.red('  • ' + con));
+      logger.log(chalk.red('  • ' + con));
     });
   }
 
   if (content.includes) {
-    console.log(chalk.bold('\n📦 Includes:'));
+    logger.header('📦 Includes:', 'white');
     content.includes.forEach((item) => {
-      console.log(chalk.cyan('  • ' + item));
+      logger.log(chalk.cyan('  • ' + item));
     });
   }
 
   if (content.what_happens) {
-    console.log(chalk.bold('\n🔄 What happens:'));
+    logger.header('🔄 What happens:', 'white');
     content.what_happens.forEach((item) => {
-      console.log(chalk.cyan('  • ' + item));
+      logger.log(chalk.cyan('  • ' + item));
     });
   }
 
-  console.log('');
+  logger.log('');
 }
 
 /**

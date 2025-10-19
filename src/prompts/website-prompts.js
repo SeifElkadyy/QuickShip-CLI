@@ -1,7 +1,20 @@
 import inquirer from 'inquirer';
 import validator from '../utils/validator.js';
 
-export async function websitePrompts(projectName) {
+export async function websitePrompts(projectName, options = {}) {
+  // If -y flag is set, use defaults
+  if (options.yes) {
+    return {
+      projectName: projectName || 'my-awesome-project',
+      stack: options.template || 'nextjs',
+      typescript: true,
+      styling: 'tailwind',
+      shadcn: false,
+      packageManager: options.packageManager || 'npm',
+      git: options.git !== false,
+    };
+  }
+
   const questions = [];
 
   // Project name

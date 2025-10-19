@@ -1,5 +1,5 @@
+import logger from '../utils/logger.js';
 import chalk from 'chalk';
-import boxen from 'boxen';
 import { readFileSync, existsSync } from 'fs';
 import { exec } from 'child_process';
 import { promisify } from 'util';
@@ -12,21 +12,14 @@ const execAsync = promisify(exec);
  */
 export async function infoCommand() {
   try {
-    console.log('\n');
-    console.log(
-      boxen(chalk.bold.cyan('📊 QuickShip CLI - Project Info'), {
-        padding: 1,
-        margin: 1,
-        borderStyle: 'double',
-        borderColor: 'cyan',
-      })
-    );
+    logger.log('\n');
+    logger.box('📊 QuickShip CLI - Project Info');
 
     // Check if we're in a project directory
     const packageJsonPath = path.join(process.cwd(), 'package.json');
     if (!existsSync(packageJsonPath)) {
-      console.log(chalk.yellow('\n⚠️  Not in a project directory'));
-      console.log(chalk.gray('Run this command inside a QuickShip project\n'));
+      logger.warning('⚠️  Not in a project directory');
+      logger.dim('Run this command inside a QuickShip project\n');
       return;
     }
 
@@ -46,55 +39,53 @@ export async function infoCommand() {
     const gitInitialized = existsSync(path.join(process.cwd(), '.git'));
 
     // Show info
-    console.log(
-      chalk.bold('\n🔍 Detected Project: ') + chalk.cyan(projectType)
-    );
-    console.log(chalk.bold('📁 Location: ') + chalk.gray(process.cwd()));
-    console.log(
+    logger.log(chalk.bold('\n🔍 Detected Project: ') + chalk.cyan(projectType));
+    logger.log(chalk.bold('📁 Location: ') + chalk.gray(process.cwd()));
+    logger.log(
       chalk.bold('📦 Package Manager: ') + chalk.green(packageManager)
     );
-    console.log(chalk.bold('🔧 Node.js: ') + chalk.green(nodeVersion));
+    logger.log(chalk.bold('🔧 Node.js: ') + chalk.green(nodeVersion));
 
     // Show features
-    console.log(chalk.bold('\n📚 Installed Features:'));
+    logger.header('📚 Installed Features:', 'white');
     const features = detectFeatures(packageJson);
     features.forEach((feature) => {
-      console.log(chalk.green('  ✔ ' + feature));
+      logger.log(chalk.green('  ✔ ' + feature));
     });
 
     // Show missing features
-    console.log(chalk.bold('\n💡 Available to add:'));
+    logger.header('💡 Available to add:', 'white');
     const missingFeatures = getMissingFeatures(packageJson, projectType);
     if (missingFeatures.length > 0) {
       missingFeatures.forEach((feature) => {
-        console.log(
+        logger.log(
           chalk.cyan(`  quickship add ${feature.command}`) +
             chalk.gray(` - ${feature.description}`)
         );
       });
     } else {
-      console.log(chalk.gray('  All major features installed!'));
+      logger.dim('  All major features installed!');
     }
 
     // Show quick commands
-    console.log(chalk.bold('\n🚀 Quick Commands:'));
+    logger.header('🚀 Quick Commands:', 'white');
     const scripts = packageJson.scripts || {};
     if (scripts.dev) {
-      console.log(
+      logger.log(
         chalk.cyan(
           `  ${packageManager} ${packageManager === 'npm' ? 'run ' : ''}dev`
         ) + chalk.gray(' - Start development server')
       );
     }
     if (scripts.build) {
-      console.log(
+      logger.log(
         chalk.cyan(
           `  ${packageManager} ${packageManager === 'npm' ? 'run ' : ''}build`
         ) + chalk.gray(' - Build for production')
       );
     }
     if (scripts.lint) {
-      console.log(
+      logger.log(
         chalk.cyan(
           `  ${packageManager} ${packageManager === 'npm' ? 'run ' : ''}lint`
         ) + chalk.gray(' - Run ESLint')
@@ -102,15 +93,15 @@ export async function infoCommand() {
     }
 
     // Documentation link
-    console.log(chalk.bold('\n📚 Documentation:'));
-    console.log(
+    logger.header('📚 Documentation:', 'white');
+    logger.log(
       chalk.blue('  https://github.com/SeifElkadyy/QuickShip-CLI#readme')
     );
 
-    console.log('');
+    logger.log('');
   } catch (error) {
-    console.log(chalk.red('\n✘ Error reading project information'));
-    console.log(chalk.gray(error.message + '\n'));
+    logger.error('✘ Error reading project information');
+    logger.dim(error.message + '\n');
   }
 }
 

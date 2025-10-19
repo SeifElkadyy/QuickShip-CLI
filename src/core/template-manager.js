@@ -16,7 +16,7 @@ class TemplateManager {
     ).templates;
   }
 
-  async cloneTemplate(templateName, destinationPath, config = {}) {
+  async cloneTemplate(templateName, destinationPath, config = {}, options = {}) {
     const template = this.getTemplate(templateName);
 
     if (!template) {
@@ -25,25 +25,25 @@ class TemplateManager {
 
     // Use create-next-app for Next.js templates
     if (template.useCreateNextApp) {
-      await this.createNextApp(destinationPath, config);
+      await this.createNextApp(destinationPath, config, options);
       return;
     }
 
     // Use create-vite for Vite templates
     if (template.useCreateVite) {
-      await this.createViteApp(destinationPath, config);
+      await this.createViteApp(destinationPath, config, options);
       return;
     }
 
     // Use create-t3-app for T3 Stack
     if (template.useCreateT3App) {
-      await this.createT3App(destinationPath, config);
+      await this.createT3App(destinationPath, config, options);
       return;
     }
 
     // Manual scaffold for MERN Stack
     if (template.useManualScaffold) {
-      await this.createMERNApp(destinationPath, config);
+      await this.createMERNApp(destinationPath, config, options);
       return;
     }
 
@@ -64,7 +64,7 @@ class TemplateManager {
     }
   }
 
-  async createNextApp(destinationPath, config) {
+  async createNextApp(destinationPath, config, options = {}) {
     this.spinner.start('Creating Next.js app with latest versions...');
 
     try {
@@ -85,6 +85,11 @@ class TemplateManager {
         '--no-git',
         '--yes', // Skip all prompts and use defaults
       ];
+
+      // Add --skip-install if --no-install flag is set
+      if (options.install === false) {
+        args.push('--skip-install');
+      }
 
       await execa('npx', args, {
         stdio: 'pipe',
@@ -121,7 +126,7 @@ class TemplateManager {
     return this.templates[platform] || {};
   }
 
-  async createViteApp(destinationPath, config) {
+  async createViteApp(destinationPath, config, options = {}) {
     this.spinner.start('Creating Vite + React app with latest versions...');
 
     try {
@@ -148,20 +153,24 @@ class TemplateManager {
 
       this.spinner.succeed('Vite + React app created with latest versions');
 
-      // Install dependencies manually since we're using stdio: 'pipe'
-      this.spinner.start('Installing dependencies...');
+      // Install dependencies manually since we're using stdio: 'pipe' (unless --no-install)
+      if (options.install !== false) {
+        this.spinner.start('Installing dependencies...');
 
-      const packageManager = config.packageManager || 'npm';
-      await execa(packageManager, ['install'], {
-        cwd: destinationPath,
-        stdio: 'pipe',
-      });
+        const packageManager = config.packageManager || 'npm';
+        await execa(packageManager, ['install'], {
+          cwd: destinationPath,
+          stdio: 'pipe',
+        });
 
-      this.spinner.succeed('Dependencies installed');
+        this.spinner.succeed('Dependencies installed');
 
-      // Install Tailwind CSS if selected
-      if (config.styling === 'tailwind') {
-        await this.setupTailwindForVite(destinationPath, config);
+        // Install Tailwind CSS if selected
+        if (config.styling === 'tailwind') {
+          await this.setupTailwindForVite(destinationPath, config);
+        }
+      } else {
+        this.spinner.info('Skipping dependency installation (--no-install flag)');
       }
     } catch (error) {
       this.spinner.fail('Failed to create Vite app');
