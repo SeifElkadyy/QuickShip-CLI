@@ -157,6 +157,31 @@ Next steps:
 
 Your app will be running at: http://localhost:3000
 `;
+    } else if (stack === 'expo-react-native') {
+      const expoTemplate = this.config.expoTemplate || 'tabs';
+      const styling = this.config.nativewind
+        ? 'NativeWind (Tailwind CSS)'
+        : 'StyleSheet (React Native default)';
+      message += `
+📱 Mobile App Ready!
+${expoTemplate === 'tabs' ? '📂 Template: Tabs (with Expo Router file-based routing)\n' : '📂 Template: Blank (minimal)\n'}🎨 Styling: ${styling}
+
+Next steps:
+  cd ${this.config.projectName}
+  npx expo start
+
+Scan the QR code with:
+  • Expo Go app (iOS/Android)
+  • Camera app (iOS only)
+
+Or press:
+  • a - Open on Android emulator
+  • i - Open on iOS simulator
+  • w - Open in web browser
+
+${this.config.nativewind ? '✨ NativeWind (Tailwind CSS) is configured and ready!\n' : ''}${expoTemplate === 'tabs' ? '🧭 Expo Router is ready for file-based navigation!\n' : ''}
+Your cross-platform mobile app will run on iOS, Android, and Web!
+`;
     } else {
       // Default message for Next.js and Vite
       message += `

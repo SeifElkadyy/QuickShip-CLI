@@ -95,6 +95,23 @@ program
     await updateCommand();
   });
 
+// Deploy command
+program
+  .command('deploy')
+  .description('Deploy your project to production')
+  .option(
+    '-p, --platform <name>',
+    'deployment platform (vercel, netlify, railway, render)'
+  )
+  .option('-y, --yes', 'skip confirmation prompts')
+  .option('--skip-env', 'skip environment variable setup')
+  .option('--production', 'deploy to production (default: true)', true)
+  .option('-v, --verbose', 'show detailed logs')
+  .action(async (options) => {
+    const { deployCommand } = await import('../src/commands/deploy.js');
+    await deployCommand(options);
+  });
+
 // Config command
 program
   .command('config')

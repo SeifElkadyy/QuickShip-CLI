@@ -25,6 +25,27 @@
         "recommended": false,
         "description": "MERN Stack (MongoDB + Express + React + Node.js)"
       }
+    },
+    "mobile": {
+      "expo-react-native": {
+        "useCreateExpoApp": true,
+        "priority": 1,
+        "recommended": true,
+        "description": "Expo React Native with TypeScript (StyleSheet or NativeWind)",
+        "template": "tabs",
+        "features": [
+          "React Native + Expo SDK 52+",
+          "TypeScript",
+          "StyleSheet (default) or NativeWind (optional)",
+          "Expo Router (File-based routing)",
+          "Tab Navigation or Blank template",
+          "Dark Mode Support",
+          "Hot Reload",
+          "Runs on iOS, Android, and Web"
+        ],
+        "platforms": ["ios", "android", "web"],
+        "devCommand": "npx expo start"
+      }
     }
   }
 }

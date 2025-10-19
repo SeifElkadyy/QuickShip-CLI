@@ -12,13 +12,12 @@ export async function selectPlatform() {
           value: 'website',
         },
         {
-          name: '🧩 Browser Extension (Coming Soon)',
-          value: 'extension',
-          disabled: true,
+          name: '📱 Mobile App',
+          value: 'mobile',
         },
         {
-          name: '📱 Mobile App (Coming Soon)',
-          value: 'mobile',
+          name: '🧩 Browser Extension (Coming Soon)',
+          value: 'extension',
           disabled: true,
         },
         {

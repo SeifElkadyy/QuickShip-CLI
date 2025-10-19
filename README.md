@@ -23,12 +23,17 @@ npx quickship-cli@latest build my-app
 ## ✨ Features
 
 - ⚡ **60-Second Setup** - From zero to coding in under a minute
-- 🎨 **Beautiful Interactive CLI** - Colorful prompts, spinners, and progress feedback
-- 🚀 **4 Production-Ready Templates** - Next.js, T3 Stack, React + Vite, MERN Stack
+- 🎨 **Beautiful Interactive CLI** - Professional output with colors, boxes, and progress indicators
+- 🚀 **5 Production-Ready Templates** - Next.js, T3 Stack, React + Vite, MERN Stack, Expo React Native
+- 📱 **Mobile Development** - Build iOS, Android, and Web apps with Expo React Native
 - 📦 **Fully Automated** - Dependencies, Git, TypeScript, Tailwind - all configured
 - 🔧 **Latest Versions** - Always uses the latest stable versions of frameworks
 - 🌍 **Cross-Platform** - Works on Windows, macOS, and Linux
 - 💎 **Zero Configuration** - Sensible defaults, start coding immediately
+- 🛠️ **Extensible** - Add features like shadcn/ui, auth, and database with simple commands
+- 🏥 **Health Check** - Built-in doctor command to verify your environment
+- 📊 **Project Info** - Get detailed information about your project structure
+- 🚢 **One-Command Deploy** - Deploy to Vercel, Netlify, Railway, or Render instantly
 
 ---
 
@@ -47,15 +52,93 @@ npm install -g quickship-cli
 quickship build my-awesome-app
 ```
 
+### Headless Mode (CI/CD)
+
+```bash
+# Skip all prompts and use defaults
+npx quickship-cli@latest build my-app -y
+
+# Full control with flags
+npx quickship-cli@latest build my-app --template nextjs -p npm --no-git -y
+```
+
 That's it! Your project is ready to code.
+
+---
+
+## 📋 Available Commands
+
+QuickShip CLI provides a comprehensive set of commands for all your project needs:
+
+### Core Commands
+
+```bash
+# Create a new project (interactive)
+quickship build [project-name]
+
+# List all available templates
+quickship list
+
+# Add features to existing projects
+quickship add <feature>
+```
+
+### Project Management
+
+```bash
+# Show detailed project information
+quickship info
+
+# Check project and environment health
+quickship doctor
+
+# View detailed template information
+quickship templates [--compare]
+
+# Update CLI to latest version
+quickship update
+```
+
+### Deployment
+
+```bash
+# Deploy to production (interactive)
+quickship deploy
+
+# Deploy to specific platform
+quickship deploy --platform vercel
+quickship deploy --platform netlify
+quickship deploy --platform railway
+quickship deploy --platform render
+
+# Skip confirmations
+quickship deploy -y
+```
+
+### Configuration
+
+```bash
+# Configure CLI settings (coming soon)
+quickship config
+```
+
+### Get Help
+
+```bash
+quickship --help              # Show all commands
+quickship build --help        # Show build command options
+quickship --version           # Show CLI version
+```
 
 ---
 
 ## 🎯 Available Templates
 
-QuickShip offers **4 production-ready templates** to choose from:
+QuickShip offers **5 production-ready templates** across web and mobile platforms:
 
-### 1. 🌐 **Next.js** (Recommended)
+### Website Templates
+
+#### 1. 🌐 **Next.js** (Recommended)
 Full-stack React framework with server components and API routes.
 
 **Includes:**
@@ -70,7 +153,7 @@ Full-stack React framework with server components and API routes.
 
 ---
 
-### 2. 🔥 **T3 Stack**
+#### 2. 🔥 **T3 Stack**
 The best way to start a full-stack, type-safe Next.js app.
 
 **Includes:**
@@ -86,7 +169,7 @@ The best way to start a full-stack, type-safe Next.js app.
 
 ---
 
-### 3. ⚛️ **React + Vite**
+#### 3. ⚛️ **React + Vite**
 Lightning-fast React SPA development.
 
 **Includes:**
@@ -101,7 +184,7 @@ Lightning-fast React SPA development.
 
 ---
 
-### 4. 🗄️ **MERN Stack**
+#### 4. 🗄️ **MERN Stack**
 Full-stack MongoDB + Express + React + Node.js application.
 
 **Includes:**
@@ -130,7 +213,34 @@ Full-stack MongoDB + Express + React + Node.js application.
 
 ---
 
+### Mobile Templates
+
+#### 5. 📱 **Expo React Native** (New!)
+Cross-platform mobile app development for iOS, Android, and Web.
+
+**Includes:**
+- ✅ Expo SDK 52+ (Latest stable)
+- ✅ React Native with TypeScript
+- ✅ StyleSheet (React Native's default styling) or NativeWind (Tailwind CSS) - your choice
+- ✅ Expo Router (File-based navigation with tabs template)
+- ✅ Tab Navigation (Pre-configured) or Blank template
+- ✅ Dark Mode Support
+- ✅ Hot Reload (Fast Refresh)
+- ✅ Runs on iOS, Android, and Web
+
+**Development:**
+- ✅ Test on your phone with Expo Go app
+- ✅ iOS Simulator support (macOS)
+- ✅ Android Emulator support
+- ✅ Web browser support
+
+**Perfect for:** Cross-platform mobile apps, MVPs, prototypes, production mobile apps
+
+---
+
 ## 📊 Template Comparison
+
+### Website Templates
 
 | Feature | Next.js | T3 Stack | React + Vite | MERN Stack |
 |---------|---------|----------|--------------|------------|
@@ -143,56 +253,172 @@ Full-stack MongoDB + Express + React + Node.js application.
 | **Deployment** | Vercel, Netlify | Vercel | Netlify, Vercel | VPS, Heroku, AWS |
 | **Best For** | Full-stack apps | Type-safe apps | SPAs | REST APIs + MongoDB |
 
+### Mobile Templates
+
+| Feature | Expo React Native |
+|---------|-------------------|
+| **Framework** | React Native + Expo |
+| **Type Safety** | ✅ TypeScript |
+| **Styling** | NativeWind (Tailwind CSS) |
+| **Navigation** | ✅ Expo Router (File-based) |
+| **Platforms** | iOS, Android, Web |
+| **Hot Reload** | ✅ Fast Refresh |
+| **Deployment** | EAS Build, App Store, Play Store |
+| **Best For** | Cross-platform mobile apps |
+
 ---
 
 ## 📖 Usage
 
 ### Create a New Project
 
-**Interactive Mode:**
+#### Interactive Mode (Default)
 ```bash
 npx quickship-cli@latest build
 ```
 Answer a few questions, and QuickShip handles the rest.
 
-**With Project Name:**
+#### With Project Name
 ```bash
 npx quickship-cli@latest build my-project
 ```
 
-**With Options:**
+#### Headless Mode (Skip All Prompts)
 ```bash
-# Choose package manager
-npx quickship-cli@latest build my-project -p pnpm
+# Use all defaults
+npx quickship-cli@latest build my-project -y
+
+# Specify template
+npx quickship-cli@latest build my-project --template nextjs -y
+
+# Full customization
+npx quickship-cli@latest build my-project \
+  --template vite \
+  -p pnpm \
+  --no-git \
+  --no-install \
+  -y
+```
+
+#### Available Build Options
+
+```bash
+-t, --template <name>     # Template to use (nextjs, vite, t3-stack, mern-stack, expo-react-native)
+-p, --package-manager <pm> # Package manager (npm, pnpm, yarn, bun)
+-y, --yes                 # Skip prompts and use defaults
+--no-git                  # Skip git initialization
+--no-install              # Skip dependency installation
+-v, --verbose             # Show detailed logs
+```
+
+**Examples:**
+
+```bash
+# Skip all prompts, use Next.js
+npx quickship-cli@latest build my-app -y
+
+# Use Vite with pnpm
+npx quickship-cli@latest build my-app --template vite -p pnpm -y
+
+# Create without installing dependencies (for CI/CD)
+npx quickship-cli@latest build my-app --no-install -y
 
 # Skip Git initialization
-npx quickship-cli@latest build my-project --no-git
-
-# Skip dependency installation
-npx quickship-cli@latest build my-project --no-install
-
-# Verbose output
-npx quickship-cli@latest build my-project -v
+npx quickship-cli@latest build my-app --no-git -y
 ```
 
 ---
 
 ### Add Features to Existing Projects
 
+QuickShip can add features to your existing Next.js projects:
+
 ```bash
-# Add shadcn/ui to Next.js projects
+# Add shadcn/ui component library
+cd my-nextjs-app
 npx quickship-cli@latest add shadcn
 
-# Add NextAuth.js (Coming Soon)
+# Add NextAuth.js authentication
 npx quickship-cli@latest add auth
 
-# Add Prisma database (Coming Soon)
+# Add Prisma database ORM
 npx quickship-cli@latest add database
 ```
 
+**Note:** The `add` command currently supports Next.js projects only.
+
 ---
 
-### List Available Templates
+### Check Project Health
+
+Run a comprehensive health check on your project and development environment:
+
+```bash
+npx quickship-cli@latest doctor
+```
+
+**Checks:**
+- ✅ Node.js version
+- ✅ Package manager availability
+- ✅ Git installation
+- ✅ Project structure validity
+- ✅ Dependencies status
+- ✅ Environment variables
+- ✅ TypeScript configuration
+
+**Output:**
+- Health score (0-100%)
+- Warnings with fixes
+- Errors with solutions
+
+---
+
+### View Project Information
+
+Get detailed information about your current project:
+
+```bash
+cd my-project
+npx quickship-cli@latest info
+```
+
+**Shows:**
+- 📊 Detected project type
+- 📁 Project location
+- 📦 Package manager
+- 🔧 Node.js version
+- ✅ Installed features
+- 💡 Available features to add
+- 🚀 Quick commands
+
+---
+
+### Browse Templates
+
+View detailed information about all available templates:
+
+```bash
+# View all templates
+npx quickship-cli@latest templates
+
+# Compare templates side-by-side (coming soon)
+npx quickship-cli@latest templates --compare
+```
+
+**Shows:**
+- Template descriptions
+- Full tech stack
+- Features included
+- Best use cases
+- Deployment options
+- Popularity metrics
+- Create commands
+
+---
+
+### List Templates (Quick View)
+
+Get a quick list of available templates:
 
 ```bash
 npx quickship-cli@latest list
@@ -200,12 +426,101 @@ npx quickship-cli@latest list
 
 ---
 
-### Get Help
+### Update CLI
+
+Check for and install the latest version:
 
 ```bash
-npx quickship-cli@latest --help
-npx quickship-cli@latest build --help
+npx quickship-cli@latest update
 ```
+
+**Features:**
+- Checks current vs latest version
+- Shows what's new in the latest version
+- Interactive update confirmation
+- Automatic installation
+
+---
+
+### Deploy Your Project
+
+Deploy your project to production with a single command:
+
+```bash
+cd my-project
+npx quickship-cli@latest deploy
+```
+
+**Interactive Deployment:**
+
+The deploy command will:
+1. 🔍 Detect your project type (Next.js, T3 Stack, Vite, MERN)
+2. ✅ Validate build setup and dependencies
+3. 📦 Suggest best deployment platform for your stack
+4. 🔐 Handle authentication with the platform
+5. 🔑 Configure environment variables interactively
+6. 🚀 Deploy to production
+7. 🌐 Show deployment URL and next steps
+
+**Supported Platforms:**
+
+| Platform | Best For | Features |
+|----------|----------|----------|
+| **Vercel** | Next.js, T3 Stack | Zero-config, automatic CI/CD, edge functions |
+| **Netlify** | Vite, Next.js | Fast CDN, instant builds, deploy previews |
+| **Railway** | MERN Stack | Full-stack apps, MongoDB support, $5 free credit |
+| **Render** | MERN Stack | Free tier, managed databases, auto-deploy from Git |
+
+**Deployment Options:**
+
+```bash
+# Deploy to specific platform
+quickship deploy --platform vercel
+
+# Skip all prompts
+quickship deploy --platform netlify -y
+
+# Skip environment variable setup
+quickship deploy --skip-env
+
+# Show detailed logs
+quickship deploy --verbose
+```
+
+**Platform-Specific Examples:**
+
+```bash
+# Next.js to Vercel (recommended)
+cd my-nextjs-app
+quickship deploy --platform vercel
+
+# Vite to Netlify (recommended)
+cd my-vite-app
+quickship deploy --platform netlify
+
+# MERN Stack to Railway (recommended)
+cd my-mern-app
+quickship deploy --platform railway
+
+# T3 Stack to Vercel
+cd my-t3-app
+quickship deploy --platform vercel
+```
+
+**Environment Variables:**
+
+The deploy command automatically:
+- ✅ Detects required variables from `.env.example`
+- ✅ Prompts for missing values
+- ✅ Masks sensitive information
+- ✅ Validates critical variables (DATABASE_URL, API keys, etc.)
+- ✅ Sets variables on the deployment platform
+
+**What Gets Deployed:**
+
+- **Next.js/T3 Stack**: Full application with API routes, optimized for platform
+- **Vite**: Static build from `dist` folder, served via CDN
+- **MERN Stack**: Both frontend and backend deployed as separate services
 
 ---
 
@@ -269,6 +584,117 @@ npx prisma db push
 
 # Run development server
 pnpm dev
+```
+
+### Create an Expo React Native Mobile App
+
+```bash
+npx quickship-cli@latest build my-mobile-app
+# Select: 📱 Mobile App
+# Stack: Expo React Native
+# Expo Template: Tabs (with Expo Router - Recommended)
+# Styling: StyleSheet (Expo's default - Recommended)
+# Package Manager: npm
+# Git: Yes
+
+cd my-mobile-app
+npx expo start
+
+# Then:
+# - Scan QR code with Expo Go app on your phone
+# - Press 'a' for Android emulator
+# - Press 'i' for iOS simulator
+# - Press 'w' for web browser
+```
+
+**Template Options:**
+- **Tabs** (Recommended): Includes Expo Router with file-based routing and tab navigation
+- **Blank**: Minimal template for custom navigation setup
+
+**Styling Options:**
+- **StyleSheet** (Default): React Native's official styling approach
+- **NativeWind**: Tailwind CSS for React Native (automatically configured if chosen)
+
+**Access your mobile app:**
+- 📱 iOS/Android: Scan QR code with Expo Go app
+- 🖥️ iOS Simulator: Press `i` (macOS only)
+- 📲 Android Emulator: Press `a` (requires Android Studio)
+- 🌐 Web: Press `w` (opens in browser)
+
+**Headless mode for CI/CD:**
+```bash
+# Tabs template with Expo Router (default)
+npx quickship-cli@latest build my-mobile-app \
+  --template expo-react-native \
+  -p npm \
+  -y
+```
+
+### Headless CI/CD Example
+
+```bash
+# Perfect for automated deployments
+npx quickship-cli@latest build production-app \
+  --template nextjs \
+  -p npm \
+  --no-git \
+  -y
+
+cd production-app
+npm run build
+```
+
+### Deploy a Next.js App to Vercel
+
+```bash
+# Create the app
+npx quickship-cli@latest build my-saas
+
+# Select Next.js, TypeScript, Tailwind CSS
+cd my-saas
+
+# Deploy to production
+npx quickship-cli@latest deploy
+
+# The CLI will:
+# 1. Detect it's a Next.js project
+# 2. Recommend Vercel as the platform
+# 3. Prompt you to log in to Vercel (opens browser)
+# 4. Ask about environment variables
+# 5. Deploy to production
+# 6. Show you the live URL
+
+# Your app is now live! 🎉
+```
+
+### Deploy MERN Stack to Railway
+
+```bash
+# Create the app
+npx quickship-cli@latest build my-fullstack-app
+
+# Select MERN Stack
+cd my-fullstack-app
+
+# Set up MongoDB connection
+cd server
+cp .env.example .env
+# Edit .env with your MongoDB URI
+
+cd ..
+
+# Deploy both client and server
+npx quickship-cli@latest deploy --platform railway
+
+# The CLI will:
+# 1. Detect MERN Stack structure
+# 2. Install Railway CLI if needed
+# 3. Prompt for login
+# 4. Deploy backend (Express + MongoDB)
+# 5. Deploy frontend (React + Vite)
+# 6. Show both deployment URLs
+
+# Your full-stack app is now live! 🚀
 ```
 
 ---
@@ -349,35 +775,124 @@ sudo chown -R $USER /usr/local/lib/node_modules
 
 ---
 
-For more help, open an issue on [GitHub](https://github.com/SeifElkadyy/QuickShip-CLI/issues).
+### Deployment Issues
+
+#### Authentication Failed
+
+```bash
+# Manually log in to the platform first
+npx vercel login
+npx netlify login
+railway login  # Requires CLI installation
+
+# Then try deploying again
+quickship deploy
+```
+
+#### Build Fails on Platform
+
+```bash
+# Test your build locally first
+npm run build
+
+# Check for errors
+quickship doctor
+
+# Verify environment variables are set
+quickship deploy --verbose
+```
+
+#### MERN Stack: Railway CLI Not Found
+
+```bash
+# Install Railway CLI globally
+npm install -g @railway/cli
+
+# Or let QuickShip install it automatically
+quickship deploy --platform railway
+# Select "Yes" when prompted to install
+```
+
+#### Environment Variables Not Working
+
+```bash
+# Make sure .env.example exists with all required vars
+# Deploy command will auto-detect and prompt for values
+
+# Or skip env setup and configure manually
+quickship deploy --skip-env
+```
+
+---
+
+### Get More Help
+
+```bash
+# Run the doctor command
+npx quickship-cli@latest doctor
+
+# Check the documentation
+npx quickship-cli@latest --help
+
+# Open an issue
+# https://github.com/SeifElkadyy/QuickShip-CLI/issues
+```
 
 ---
 
 ## 🗺️ Roadmap
 
-### ✅ Completed (v0.7.x)
+### ✅ Completed (v0.9.0)
 - ✅ Next.js template with TypeScript & Tailwind
 - ✅ React + Vite template
 - ✅ T3 Stack template (Next.js + tRPC + Prisma + NextAuth)
 - ✅ MERN Stack template (MongoDB + Express + React + Node.js)
 - ✅ shadcn/ui integration
 - ✅ Package manager choice (npm, pnpm, yarn, bun)
-- ✅ `quickship add` command for extensibility
+- ✅ `quickship add` command (shadcn, auth, database)
+- ✅ `quickship doctor` - Health check command
+- ✅ `quickship info` - Project information command
+- ✅ `quickship templates` - Detailed template browser
+- ✅ `quickship update` - CLI updater
+- ✅ Headless mode with `-y` flag
+- ✅ `--no-install` and `--no-git` flags
+- ✅ Enhanced logger with professional output
+- ✅ **`quickship deploy` - One-command deployment** 🎉
+  - ✅ Vercel integration (Next.js, T3 Stack, Vite)
+  - ✅ Netlify integration (Vite, Next.js)
+  - ✅ Railway integration (MERN Stack)
+  - ✅ Render integration (MERN Stack)
+  - ✅ Environment variable management
+  - ✅ Auto-detection of project type
+  - ✅ Platform authentication handling
+  - ✅ Pre-deployment validation
 
-### 🚀 Coming Soon (v0.8.0+)
-- 🔜 More `quickship add` features (auth, database, payments)
+### ✅ Phase 2 Complete (v0.10.0)
+- ✅ **📱 Expo React Native template** - Cross-platform mobile development
+- ✅ Mobile platform selection in CLI
+- ✅ NativeWind (Tailwind CSS for React Native) integration
+- ✅ Expo Router with tab navigation
+- ✅ TypeScript support for mobile apps
+- ✅ iOS, Android, and Web support
+
+### 🚀 Coming Soon (v0.11.0+)
+- 🔜 Environment variable encryption for teams
+- 🔜 Component generator (`quickship generate component`)
+- 🔜 Custom template creation and sharing
+- 🔜 More styling options (Emotion, CSS-in-JS)
+- 🔜 Database integrations (Supabase, Planetscale)
+- 🔜 Auth provider integrations (Clerk, Auth0)
 - 🔜 Astro template (static sites, blogs)
 - 🔜 SvelteKit template
 - 🔜 Remix template
-- 🔜 Automated deployment commands
-- 🔜 Custom template creation
+- 🔜 Template marketplace
 
 ### 🌟 Future (v1.0.0+)
 - 🧩 Browser extension templates
-- 📱 React Native + Expo templates
 - 🖥️ Electron/Tauri desktop app templates
-- 🎨 Template marketplace
+- 🎨 Visual template selector
 - 👥 Team collaboration features
+- 🔌 Plugin system
 
 ---
 
@@ -417,7 +932,7 @@ Inspired by create-next-app, create-t3-app, create-vite, and the MERN community.
 
 - **Issues:** [GitHub Issues](https://github.com/SeifElkadyy/QuickShip-CLI/issues)
 - **Discussions:** [GitHub Discussions](https://github.com/SeifElkadyy/QuickShip-CLI/discussions)
-- **Twitter:** [@YourTwitter](https://twitter.com/YourTwitter)
+- **Documentation:** [GitHub README](https://github.com/SeifElkadyy/QuickShip-CLI#readme)
 
 ---
 
@@ -429,4 +944,4 @@ If QuickShip saves you time, give it a ⭐ on [GitHub](https://github.com/SeifEl
 
 **Built with ❤️ for developers who want to ship fast**
 
-**Version:** 0.7.1 | **License:** MIT
+**Version:** 0.8.13 | **License:** MIT

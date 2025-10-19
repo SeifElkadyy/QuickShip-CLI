@@ -4,6 +4,8 @@ import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import Spinner from '../utils/spinner.js';
+import pkg from 'fs-extra';
+const { writeFile } = pkg;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -16,7 +18,12 @@ class TemplateManager {
     ).templates;
   }
 
-  async cloneTemplate(templateName, destinationPath, config = {}, options = {}) {
+  async cloneTemplate(
+    templateName,
+    destinationPath,
+    config = {},
+    options = {}
+  ) {
     const template = this.getTemplate(templateName);
 
     if (!template) {
@@ -44,6 +51,12 @@ class TemplateManager {
     // Manual scaffold for MERN Stack
     if (template.useManualScaffold) {
       await this.createMERNApp(destinationPath, config, options);
+      return;
+    }
+
+    // Use create-expo-app for Expo React Native
+    if (template.useCreateExpoApp) {
+      await this.createExpoApp(destinationPath, config, options);
       return;
     }
 
@@ -170,7 +183,9 @@ class TemplateManager {
           await this.setupTailwindForVite(destinationPath, config);
         }
       } else {
-        this.spinner.info('Skipping dependency installation (--no-install flag)');
+        this.spinner.info(
+          'Skipping dependency installation (--no-install flag)'
+        );
       }
     } catch (error) {
       this.spinner.fail('Failed to create Vite app');
@@ -623,7 +638,192 @@ ${config.styling === 'tailwind' ? '- Tailwind CSS' : ''}
     }
   }
 
+  async createExpoApp(destinationPath, config, options = {}) {
+    this.spinner.start('Creating Expo React Native app...');
+
+    try {
+      const projectName = destinationPath.split('/').pop();
+      const parentDir = destinationPath.substring(
+        0,
+        destinationPath.lastIndexOf('/')
+      );
+
+      // Use user's template choice or default to tabs
+      const templateName = config.expoTemplate || 'tabs';
+
+      const args = ['create-expo', projectName, '--template', templateName];
+
+      //Create the Expo app
+      await execa('npx', args, {
+        cwd: parentDir || '.',
+        stdio: 'pipe',
+      });
+
+      this.spinner.succeed(
+        `Expo app created with ${templateName} template${templateName === 'tabs' ? ' (includes Expo Router)' : ''}`
+      );
+
+      // Add NativeWind if requested
+      if (config.nativewind !== false) {
+        await this.setupNativeWind(destinationPath, config);
+      }
+    } catch (error) {
+      this.spinner.fail('Failed to create Expo app');
+      throw error;
+    }
+  }
+
+  async setupNativeWind(projectPath, config) {
+    this.spinner.start('Setting up NativeWind (Tailwind CSS)...');
+
+    try {
+      const packageManager = config.packageManager || 'npm';
+
+      // Install NativeWind and dependencies
+      const installCmd = packageManager === 'npm' ? 'install' : 'add';
+      const saveDevFlag = packageManager === 'npm' ? '--save-dev' : '-D';
+
+      // Install NativeWind and Tailwind CSS
+      const deps = ['nativewind@^4.0.1', 'tailwindcss@^3.4.0'];
+      await execa(packageManager, [installCmd, ...deps], {
+        cwd: projectPath,
+        stdio: 'pipe',
+      });
+
+      // Install babel-preset-expo as devDependency (required for babel config)
+      this.spinner.text = 'Installing babel-preset-expo...';
+      await execa(
+        packageManager,
+        [installCmd, saveDevFlag, 'babel-preset-expo'],
+        {
+          cwd: projectPath,
+          stdio: 'pipe',
+        }
+      );
+
+      // Install react-native-reanimated using expo install to get SDK-compatible version
+      this.spinner.text = 'Installing react-native-reanimated...';
+      await execa('npx', ['expo', 'install', 'react-native-reanimated'], {
+        cwd: projectPath,
+        stdio: 'pipe',
+      });
+
+      // Create Tailwind config
+      const tailwindConfig = `/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: ["./app/**/*.{js,jsx,ts,tsx}", "./components/**/*.{js,jsx,ts,tsx}"],
+  presets: [require("nativewind/preset")],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}`;
+
+      await writeFile(
+        `${projectPath}/tailwind.config.js`,
+        tailwindConfig,
+        'utf-8'
+      );
+
+      // Create global.css
+      const globalCss = `@tailwind base;
+@tailwind components;
+@tailwind utilities;`;
+
+      await writeFile(`${projectPath}/global.css`, globalCss, 'utf-8');
+
+      // Create nativewind-env.d.ts
+      const nativewindEnv = `/// <reference types="nativewind/types" />`;
+
+      await writeFile(
+        `${projectPath}/nativewind-env.d.ts`,
+        nativewindEnv,
+        'utf-8'
+      );
+
+      // Create babel.config.js for NativeWind
+      // Expo projects don't include babel.config.js by default
+      const babelPath = `${projectPath}/babel.config.js`;
+      const babelConfig = `module.exports = function (api) {
+  api.cache(true);
+  return {
+    presets: [
+      ["babel-preset-expo", { jsxImportSource: "nativewind" }],
+      "nativewind/babel"
+    ],
+    plugins: ["react-native-reanimated/plugin"]
+  };
+};`;
+
+      await writeFile(babelPath, babelConfig, 'utf-8');
+
+      // Update metro.config.js
+      const metroConfig = `const { getDefaultConfig } = require('expo/metro-config');
+const { withNativeWind } = require('nativewind/metro');
+
+const config = getDefaultConfig(__dirname);
+
+module.exports = withNativeWind(config, { input: './global.css' });`;
+
+      await writeFile(`${projectPath}/metro.config.js`, metroConfig, 'utf-8');
+
+      // Import global.css in the appropriate layout file
+      this.spinner.text = 'Updating app layout to import global styles...';
+      const { readFile } = pkg;
+
+      // Try app/_layout.tsx first (tabs template), then App.tsx (blank template)
+      const possibleLayoutPaths = [
+        `${projectPath}/app/_layout.tsx`,
+        `${projectPath}/App.tsx`,
+        `${projectPath}/App.js`,
+      ];
+
+      for (const layoutPath of possibleLayoutPaths) {
+        try {
+          let layoutContent = await readFile(layoutPath, 'utf-8');
+          const importPath = layoutPath.includes('/app/')
+            ? '../global.css'
+            : './global.css';
+
+          // Add import at the top if it doesn't exist
+          if (!layoutContent.includes('global.css')) {
+            // Find the first import statement
+            const importRegex = /^import /m;
+            const match = layoutContent.match(importRegex);
+
+            if (match) {
+              const insertPosition = match.index;
+              layoutContent =
+                layoutContent.slice(0, insertPosition) +
+                `import '${importPath}';\n` +
+                layoutContent.slice(insertPosition);
+            } else {
+              // If no imports found, add at the very top
+              layoutContent = `import '${importPath}';\n` + layoutContent;
+            }
+
+            await writeFile(layoutPath, layoutContent, 'utf-8');
+            break; // Successfully updated, exit loop
+          }
+        } catch (layoutError) {
+          // Try next path
+          continue;
+        }
+      }
+
+      this.spinner.succeed('NativeWind configured successfully');
+    } catch (error) {
+      this.spinner.fail('Failed to setup NativeWind');
+      throw error;
+    }
+  }
+
   determineTemplate(config) {
+    // Expo React Native
+    if (config.stack === 'expo-react-native') {
+      return 'expo-react-native';
+    }
+
     // React + Vite
     if (config.stack === 'react-vite') {
       return 'react-vite';
@@ -646,6 +846,20 @@ ${config.styling === 'tailwind' ? '- Tailwind CSS' : ''}
 
     // Default fallback
     return 'nextjs-typescript-tailwind';
+  }
+
+  getTemplate(templateName) {
+    // Check in website templates
+    if (this.templates.website && this.templates.website[templateName]) {
+      return this.templates.website[templateName];
+    }
+
+    // Check in mobile templates
+    if (this.templates.mobile && this.templates.mobile[templateName]) {
+      return this.templates.mobile[templateName];
+    }
+
+    return null;
   }
 }
 

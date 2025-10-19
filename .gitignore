@@ -8,3 +8,15 @@ coverage/
 .idea/
 *.tgz
 .npm
+
+# Development documentation (keep locally, don't push)
+/docs/
+BUILD_STATUS.md
+GETTING_STARTED.md
+IMPLEMENTATION_ROADMAP.md
+PHASE_1_COMPLETE.md
+PROGRESS_TRACKER.md
+PROJECT_OVERVIEW.md
+QUICK_REFERENCE.md
+READY_TO_PUBLISH.md
+START_HERE.txt

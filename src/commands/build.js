@@ -1,6 +1,7 @@
 import logger from '../utils/logger.js';
 import { selectPlatform } from '../prompts/platform-selector.js';
 import { websitePrompts } from '../prompts/website-prompts.js';
+import { mobilePrompts } from '../prompts/mobile-prompts.js';
 import Engine from '../core/engine.js';
 import ErrorHandler from '../utils/error-handler.js';
 
@@ -11,6 +12,15 @@ export async function buildCommand(projectName, options) {
 
     // Step 1: Select platform (skip if -y flag and template provided)
     let platform = 'website'; // Default platform
+
+    // Check if template is mobile-related
+    if (
+      options.template === 'expo-react-native' ||
+      options.template === 'expo'
+    ) {
+      platform = 'mobile';
+    }
+
     if (!options.yes || !options.template) {
       platform = await selectPlatform();
     }
@@ -19,6 +29,8 @@ export async function buildCommand(projectName, options) {
     let config;
     if (platform === 'website') {
       config = await websitePrompts(projectName, options);
+    } else if (platform === 'mobile') {
+      config = await mobilePrompts(projectName, options);
     } else {
       logger.error('This platform is not yet supported');
       process.exit(1);
