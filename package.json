@@ -1,6 +1,6 @@
 {
   "name": "quickship-cli",
-  "version": "0.8.12",
+  "version": "0.8.13",
   "description": "Ship production-ready Next.js projects in 60 seconds. Automated setup with TypeScript, Tailwind CSS, Git, and more.",
   "main": "src/index.js",
   "type": "module",
@@ -36,14 +36,14 @@
   ],
   "author": "QuickShip Team <contact@quickship.dev>",
   "license": "MIT",
-"repository": {
-  "type": "git",
-  "url": "https://github.com/SeifElkadyy/QuickShip-CLI.git"
-},
-"bugs": {
-  "url": "https://github.com/SeifElkadyy/QuickShip-CLI/issues"
-},
-"homepage": "https://github.com/SeifElkadyy/QuickShip-CLI#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SeifElkadyy/QuickShip-CLI.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SeifElkadyy/QuickShip-CLI/issues"
+  },
+  "homepage": "https://github.com/SeifElkadyy/QuickShip-CLI#readme",
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=9.0.0"
