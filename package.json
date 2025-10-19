@@ -77,6 +77,10 @@
     "url": "https://github.com/SeifElkadyy/QuickShip-CLI/issues"
   },
   "homepage": "https://github.com/SeifElkadyy/QuickShip-CLI#readme",
+  "funding": {
+    "type": "paypal",
+    "url": "https://paypal.me/destoyt"
+  },
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=9.0.0"

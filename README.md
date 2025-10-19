@@ -383,7 +383,17 @@ Inspired by create-next-app, create-t3-app, create-vite, and create-expo-app.
 
 ## ⭐ Show Your Support
 
-If QuickShip saves you time, give it a ⭐ on [GitHub](https://github.com/SeifElkadyy/QuickShip-CLI)!
+If QuickShip saves you time and helps you ship faster:
+
+- Give it a ⭐ on [GitHub](https://github.com/SeifElkadyy/QuickShip-CLI)
+- Share it with your developer friends
+- [Buy me a coffee](https://paypal.me/destoyt) ☕
+
+<div align="center">
+  <a href="https://paypal.me/destoyt">
+    <img src="https://img.shields.io/badge/Donate-PayPal-blue.svg?style=flat-square&logo=paypal" alt="Donate with PayPal" />
+  </a>
+</div>
 
 ---
 
