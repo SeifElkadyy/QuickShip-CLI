@@ -1,6 +1,6 @@
 {
   "name": "quickship-cli",
-  "version": "0.11.0",
+  "version": "0.11.11",
   "description": "Ship production-ready web and mobile projects in 60 seconds. Create Next.js, React, T3 Stack, MERN, or Expo React Native apps with TypeScript, Tailwind CSS, and modern tooling - then deploy instantly to Vercel, Netlify, Railway, or Render.",
   "main": "src/index.js",
   "type": "module",

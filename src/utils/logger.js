@@ -8,8 +8,7 @@ const LOGOS = {
 ██║   ██║██║   ██║██║██║     █████╔╝ ███████╗███████║██║██████╔╝
 ██║▄▄ ██║██║   ██║██║██║     ██╔═██╗ ╚════██║██╔══██║██║██╔═══╝
 ╚██████╔╝╚██████╔╝██║╚██████╗██║  ██╗███████║██║  ██║██║██║
- ╚══▀▀═╝  ╚═════╝ ╚═╝ ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝╚═╝
-Welcome to QuickShip! Let's build something awesome. 🚀`,
+ ╚══▀▀═╝  ╚═════╝ ╚═╝ ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝╚═╝`,
 
   small: `
           ▝▀▚▄     ▄▄▄█▀▀▀▀▀▀▀█▄▄
@@ -46,9 +45,19 @@ Welcome to QuickShip! Let's build something awesome. 🚀`,
 };
 
 const logger = {
-  // Show main welcome banner
+  // Show main welcome banner with boxen for rounded corners
   welcome() {
     console.log(chalk.cyan(LOGOS.main));
+    console.log(
+      boxen('Welcome to QuickShip! Build Fast. Ship Fast. 🚀', {
+        padding: 0,
+        margin: { top: 1, bottom: 0, left: 0, right: 0 },
+        borderStyle: 'round',
+        borderColor: 'cyan',
+        textAlignment: 'center',
+        width: 68,
+      })
+    );
   },
 
   // Show small logo for loading, processing, etc.
