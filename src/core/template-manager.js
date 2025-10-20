@@ -6,6 +6,7 @@ import { dirname, join } from 'path';
 import Spinner from '../utils/spinner.js';
 import pkg from 'fs-extra';
 const { writeFile } = pkg;
+import * as backendTemplates from './backend-templates.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -49,8 +50,20 @@ class TemplateManager {
     }
 
     // Manual scaffold for MERN Stack
-    if (template.useManualScaffold) {
+    if (template.useManualScaffold && templateName === 'mern-stack') {
       await this.createMERNApp(destinationPath, config, options);
+      return;
+    }
+
+    // Manual scaffold for Express API
+    if (template.useManualScaffold && templateName === 'express-api') {
+      await this.createExpressApp(destinationPath, config, options);
+      return;
+    }
+
+    // Manual scaffold for NestJS API
+    if (template.useManualScaffold && templateName === 'nestjs-api') {
+      await this.createNestApp(destinationPath, config, options);
       return;
     }
 
@@ -524,7 +537,7 @@ JWT_SECRET=your_jwt_secret_here_change_in_production
     // Create README
     const readme = `# ${config.projectName}
 
-MERN Stack Application generated with [QuickShip](https://quickship.dev) 🚀
+MERN Stack Application generated with [QuickShip](https://github.com/SeifElkadyy/QuickShip-CLI) 🚀
 
 ## Project Structure
 
@@ -619,6 +632,186 @@ ${config.styling === 'tailwind' ? '- Tailwind CSS' : ''}
     });
 
     console.log('');
+  }
+
+  async createExpressApp(destinationPath, config, options = {}) {
+    const { mkdir, writeFile } = await import('fs/promises');
+    const packageManager = config.packageManager || 'npm';
+
+    try {
+      this.spinner.start('Creating Express API project...');
+
+      // Create main project directory
+      await mkdir(destinationPath, { recursive: true });
+
+      // Create directory structure
+      await mkdir(join(destinationPath, 'src', 'config'), { recursive: true });
+      await mkdir(join(destinationPath, 'src', 'controllers'), {
+        recursive: true,
+      });
+      await mkdir(join(destinationPath, 'src', 'middleware'), {
+        recursive: true,
+      });
+      await mkdir(join(destinationPath, 'src', 'models'), { recursive: true });
+      await mkdir(join(destinationPath, 'src', 'routes'), { recursive: true });
+      await mkdir(join(destinationPath, 'src', 'services'), {
+        recursive: true,
+      });
+      await mkdir(join(destinationPath, 'src', 'utils'), { recursive: true });
+      await mkdir(join(destinationPath, 'src', 'validators'), {
+        recursive: true,
+      });
+      await mkdir(join(destinationPath, 'src', 'types'), { recursive: true });
+      await mkdir(join(destinationPath, 'tests'), { recursive: true });
+
+      // Create package.json
+      await backendTemplates.createExpressPackageJson(destinationPath, config);
+
+      // Create TypeScript config
+      await backendTemplates.createExpressTsConfig(destinationPath);
+
+      // Create main entry point
+      await backendTemplates.createExpressIndex(destinationPath, config);
+
+      // Create config files
+      await backendTemplates.createExpressConfig(destinationPath, config);
+
+      // Create middleware
+      await backendTemplates.createExpressMiddleware(destinationPath, config);
+
+      // Create routes
+      await backendTemplates.createExpressRoutes(destinationPath, config);
+
+      // Create controllers and services (if auth is enabled and database is present)
+      if (config.includeAuth && config.database !== 'none') {
+        await backendTemplates.createExpressAuth(destinationPath, config);
+      }
+
+      // Create database setup (if database is enabled)
+      if (config.database !== 'none') {
+        await backendTemplates.createExpressDatabase(destinationPath, config);
+      }
+
+      // Create Docker files (if enabled)
+      if (config.includeDocker) {
+        await backendTemplates.createExpressDocker(destinationPath, config);
+      }
+
+      // Create Swagger setup (if enabled)
+      if (config.includeSwagger) {
+        await backendTemplates.createExpressSwagger(destinationPath, config);
+      }
+
+      // Create .env.example and .gitignore
+      await backendTemplates.createExpressEnvFiles(destinationPath, config);
+      await backendTemplates.createBackendGitignore(destinationPath);
+
+      // Create README
+      await backendTemplates.createExpressReadme(destinationPath, config);
+
+      // Create Jest config
+      await backendTemplates.createExpressJestConfig(destinationPath);
+
+      this.spinner.succeed('Express API files created');
+
+      // Install dependencies
+      if (options.install !== false) {
+        console.log(
+          '\n📦 Installing dependencies (this may take a minute)...\n'
+        );
+        await execa(packageManager, ['install'], {
+          cwd: destinationPath,
+          stdio: 'inherit',
+        });
+        console.log('');
+      }
+    } catch (error) {
+      this.spinner.fail('Failed to create Express API project');
+      throw error;
+    }
+  }
+
+  async createNestApp(destinationPath, config, options = {}) {
+    const { mkdir } = await import('fs/promises');
+    const packageManager = config.packageManager || 'npm';
+
+    try {
+      this.spinner.start('Creating NestJS API project...');
+
+      // Create main project directory
+      await mkdir(destinationPath, { recursive: true });
+
+      // Create directory structure
+      await mkdir(join(destinationPath, 'src', 'common'), { recursive: true });
+      await mkdir(join(destinationPath, 'src', 'config'), { recursive: true });
+      await mkdir(join(destinationPath, 'test'), { recursive: true });
+
+      // Only create database/auth/users modules if database is enabled
+      if (config.database !== 'none') {
+        await mkdir(join(destinationPath, 'src', 'auth'), { recursive: true });
+        await mkdir(join(destinationPath, 'src', 'users'), { recursive: true });
+        await mkdir(join(destinationPath, 'src', 'database'), {
+          recursive: true,
+        });
+      }
+
+      // Create package.json
+      await backendTemplates.createNestPackageJson(destinationPath, config);
+
+      // Create TypeScript config
+      await backendTemplates.createNestTsConfig(destinationPath);
+
+      // Create main files
+      await backendTemplates.createNestMainFiles(destinationPath, config);
+
+      // Create database module (if database is enabled)
+      if (config.database !== 'none') {
+        await backendTemplates.createNestDatabase(destinationPath, config);
+
+        // Create users module
+        await backendTemplates.createNestUsers(destinationPath, config);
+
+        // Create auth module (if enabled)
+        if (config.includeAuth) {
+          await backendTemplates.createNestAuth(destinationPath, config);
+        }
+      }
+
+      // Create Docker files (if enabled)
+      if (config.includeDocker) {
+        await backendTemplates.createNestDocker(destinationPath, config);
+      }
+
+      // Create .env.example and .gitignore
+      await backendTemplates.createNestEnvFiles(destinationPath, config);
+      await backendTemplates.createBackendGitignore(destinationPath);
+
+      // Create README
+      await backendTemplates.createNestReadme(destinationPath, config);
+
+      // Create nest-cli.json
+      await backendTemplates.createNestCliConfig(destinationPath);
+
+      // Create Jest config
+      await backendTemplates.createNestJestConfig(destinationPath);
+
+      this.spinner.succeed('NestJS API files created');
+
+      // Install dependencies
+      if (options.install !== false) {
+        console.log(
+          '\n📦 Installing dependencies (this may take a minute)...\n'
+        );
+        await execa(packageManager, ['install'], {
+          cwd: destinationPath,
+          stdio: 'inherit',
+        });
+        console.log('');
+      }
+    } catch (error) {
+      this.spinner.fail('Failed to create NestJS API project');
+      throw error;
+    }
   }
 
   async initShadcn(projectPath) {
@@ -839,6 +1032,16 @@ module.exports = withNativeWind(config, { input: './global.css' });`;
       return 'mern-stack';
     }
 
+    // Express API
+    if (config.stack === 'express-api') {
+      return 'express-api';
+    }
+
+    // NestJS API
+    if (config.stack === 'nestjs-api') {
+      return 'nestjs-api';
+    }
+
     // Next.js (default)
     if (config.stack === 'nextjs') {
       return 'nextjs-typescript-tailwind';
@@ -857,6 +1060,11 @@ module.exports = withNativeWind(config, { input: './global.css' });`;
     // Check in mobile templates
     if (this.templates.mobile && this.templates.mobile[templateName]) {
       return this.templates.mobile[templateName];
+    }
+
+    // Check in backend templates
+    if (this.templates.backend && this.templates.backend[templateName]) {
+      return this.templates.backend[templateName];
     }
 
     return null;

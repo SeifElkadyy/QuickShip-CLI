@@ -182,6 +182,140 @@ Or press:
 ${this.config.nativewind ? '✨ NativeWind (Tailwind CSS) is configured and ready!\n' : ''}${expoTemplate === 'tabs' ? '🧭 Expo Router is ready for file-based navigation!\n' : ''}
 Your cross-platform mobile app will run on iOS, Android, and Web!
 `;
+    } else if (stack === 'express-api') {
+      const dbName = this.config.database.startsWith('postgresql')
+        ? 'PostgreSQL'
+        : this.config.database.startsWith('mongodb')
+          ? 'MongoDB'
+          : this.config.database.startsWith('sqlite')
+            ? 'SQLite'
+            : 'None';
+      const useOrm =
+        this.config.database.includes('prisma') ||
+        this.config.database.includes('mongoose');
+      message += `
+🔌 Express API Ready!
+${this.config.database !== 'none' ? `💾 Database: ${dbName}\n` : ''}${this.config.includeAuth ? '🔐 Auth: JWT Authentication\n' : ''}${this.config.includeSwagger ? '📚 Docs: Swagger/OpenAPI\n' : ''}${this.config.includeDocker ? '🐳 Docker: Ready to containerize\n' : ''}
+
+${
+  this.config.database === 'postgresql-prisma' ||
+  this.config.database === 'mongodb-mongoose'
+    ? `⚠️  IMPORTANT: Configure your database before running
+
+1. Set up environment variables:
+   cd ${this.config.projectName}
+   cp .env.example .env
+   # Edit .env with your database connection
+
+${
+  this.config.database === 'postgresql-prisma'
+    ? `2. Run Prisma migrations:
+   npx prisma migrate dev --name init
+   npx prisma generate
+
+`
+    : `2. Make sure ${dbName} is running locally or use a cloud instance
+
+`
+}`
+    : this.config.database === 'sqlite'
+      ? `1. Set up environment (optional):
+   cd ${this.config.projectName}
+   cp .env.example .env
+
+`
+      : ''
+}Next steps:
+  cd ${this.config.projectName}
+  ${runCommand} dev
+
+Your API will be running at:
+  🚀 http://localhost:3000
+  ❤️  Health: http://localhost:3000/health${this.config.includeSwagger ? '\n  📖 Swagger docs: http://localhost:3000/api/docs' : ''}
+${
+  this.config.includeAuth
+    ? `
+🔐 Authentication endpoints:
+  POST /api/auth/register - Register new user
+  POST /api/auth/login    - Login user
+  GET  /api/auth/me       - Get current user (protected)
+`
+    : ''
+}${
+        this.config.includeDocker
+          ? `
+🐳 Run with Docker:
+  docker-compose up
+`
+          : ''
+      }`;
+    } else if (stack === 'nestjs-api') {
+      const dbName = this.config.database.startsWith('postgresql')
+        ? 'PostgreSQL'
+        : this.config.database.startsWith('mongodb')
+          ? 'MongoDB'
+          : this.config.database.startsWith('sqlite')
+            ? 'SQLite'
+            : 'None';
+      const useOrm =
+        this.config.database.includes('prisma') ||
+        this.config.database.includes('mongoose');
+      message += `
+🏗️  NestJS API Ready!
+${this.config.database !== 'none' ? `💾 Database: ${dbName}\n` : ''}${this.config.includeAuth ? '🔐 Auth: Passport.js + JWT\n' : ''}${this.config.includeSwagger ? '📚 Docs: Swagger/OpenAPI (auto-generated)\n' : ''}${this.config.includeDocker ? '🐳 Docker: Ready to containerize\n' : ''}
+
+${
+  this.config.database === 'postgresql-prisma' ||
+  this.config.database === 'mongodb-mongoose'
+    ? `⚠️  IMPORTANT: Configure your database before running
+
+1. Set up environment variables:
+   cd ${this.config.projectName}
+   cp .env.example .env
+   # Edit .env with your database connection
+
+${
+  this.config.database === 'postgresql-prisma'
+    ? `2. Run Prisma migrations:
+   npx prisma migrate dev --name init
+   npx prisma generate
+
+`
+    : `2. Make sure ${dbName} is running locally or use a cloud instance
+
+`
+}`
+    : this.config.database === 'sqlite'
+      ? `1. Set up environment (optional):
+   cd ${this.config.projectName}
+   cp .env.example .env
+
+`
+      : ''
+}Next steps:
+  cd ${this.config.projectName}
+  ${runCommand} start:dev
+
+Your API will be running at:
+  🚀 http://localhost:3000
+  ❤️  Health: http://localhost:3000/api/health${this.config.includeSwagger ? '\n  📖 Swagger docs: http://localhost:3000/api/docs' : ''}
+${
+  this.config.includeAuth
+    ? `
+🔐 Authentication endpoints:
+  POST /api/auth/register - Register new user
+  POST /api/auth/login    - Login user
+  GET  /api/auth/me       - Get current user (protected)
+`
+    : ''
+}${
+        this.config.includeDocker
+          ? `
+🐳 Run with Docker:
+  docker-compose up
+`
+          : ''
+      }`;
     } else {
       // Default message for Next.js and Vite
       message += `
@@ -195,8 +329,8 @@ Your app will be running at: http://localhost:${stack === 'react-vite' ? '5173' 
 
     // Add footer
     message += `
-Documentation: https://quickship.dev/docs
-Need help? https://quickship.dev/support
+Documentation: https://github.com/SeifElkadyy/QuickShip-CLI#readme
+Need help? https://github.com/SeifElkadyy/QuickShip-CLI/issues
 
 Happy coding! 💻
     `;

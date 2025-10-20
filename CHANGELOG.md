@@ -5,6 +5,232 @@ All notable changes to QuickShip CLI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2025-10-20
+
+### 🎉 MAJOR RELEASE: v1.0.0 - Production Ready
+
+#### Added
+
+- **🎯 Optional ORM/ODM Support** - Maximum Flexibility
+  - **Separate Database and ORM Choices** - Choose database first, then optionally add ORM/ODM
+  - **PostgreSQL Options**:
+    - With Prisma ORM (type-safe, migrations, recommended)
+    - With raw `pg` driver (lightweight, direct SQL)
+  - **MongoDB Options**:
+    - With Mongoose ODM (schemas, validation, modeling)
+    - With raw `mongodb` driver (lightweight, direct queries)
+  - **SQLite Options**:
+    - With Prisma ORM (type-safe, migrations)
+    - With `better-sqlite3` (synchronous, fast, simple)
+  - **No Database Option** - Build APIs without database dependencies
+
+- **🔌 Express + TypeScript API Template** - Production-ready RESTful API
+  - ✅ Express.js 4+ with TypeScript
+  - ✅ 6 Database Configurations (3 databases × 2 options each + none)
+  - ✅ JWT Authentication (optional, requires database)
+  - ✅ Swagger Documentation (optional)
+  - ✅ Docker Support (optional)
+  - ✅ Zod Validation
+  - ✅ Complete error handling
+  - ✅ Security (Helmet, CORS, bcrypt)
+  - ✅ Jest testing setup
+
+- **🏗️ NestJS API Template** - Enterprise-grade modular API
+  - ✅ NestJS 10+ with TypeScript
+  - ✅ 6 Database Configurations (3 databases × 2 options each + none)
+  - ✅ Passport.js + JWT Authentication (optional, requires database)
+  - ✅ Swagger Documentation (optional, auto-generated)
+  - ✅ Docker Support (optional)
+  - ✅ Class Validator with DTOs
+  - ✅ Modular architecture (Auth, Users, Database modules)
+  - ✅ JWT Guards & Strategies
+  - ✅ Jest with NestJS testing utilities
+
+#### Fixed
+
+- **🐛 NestJS MongoDB Dependency Injection** - Resolved Mongoose schema registration issues
+  - Fixed UsersModule to properly import MongooseModule.forFeature()
+  - Fixed AuthModule to properly import MongooseModule.forFeature()
+  - Fixed JWT Strategy constructor to properly inject ConfigService
+  - All modules now correctly resolve UserModel dependencies
+
+- **🔧 Environment Variable Management**
+  - Both `.env.example` and `.env` files now created automatically
+  - No more "JWT secret missing" errors on first run
+  - Projects work immediately after creation without manual file copying
+
+- **📋 Platform Selection Order**
+  - Reordered to: Website → Backend → Mobile App
+  - Removed "Browser Extension (Coming Soon)" option for cleaner UX
+
+#### Changed
+
+- **💾 Database Selection UX** - Two-step process for clarity
+  - Step 1: Choose database type (PostgreSQL, MongoDB, SQLite, None)
+  - Step 2: Choose ORM/ODM if database selected (optional)
+  - Clear labels explain what each option provides
+  - Smart defaults (Prisma/Mongoose recommended)
+
+- **📦 Dependency Management** - Lighter, more flexible
+  - Only installs selected database driver
+  - No unnecessary ORM dependencies if raw driver chosen
+  - Cleaner package.json for simpler projects
+
+#### Improved
+
+- **📖 Success Messages** - Context-aware instructions
+  - Shows different setup steps based on database choice
+  - Hides database configuration for no-database projects
+  - Clear next steps for each combination
+  - No confusing Prisma instructions for raw driver users
+
+- **🎨 Template Structure** - Conditional module generation
+  - Database modules only created when needed
+  - Auth/Users modules only for database-enabled projects
+  - Cleaner project structure for API-only apps
+
+## [0.12.0] - 2025-10-20
+
+### Added - 🎉 MAJOR RELEASE: Backend API Support
+
+- **🔌 Express + TypeScript API Template** - Production-ready RESTful API
+  - ✅ **Express.js 4+** - Fast, minimalist web framework
+  - ✅ **TypeScript** - Full type safety throughout
+  - ✅ **3 Database Options**:
+    - PostgreSQL with Prisma ORM (type-safe, migrations)
+    - MongoDB with Mongoose (NoSQL, flexible)
+    - SQLite (zero-config, local development)
+  - ✅ **JWT Authentication** (Optional) - Complete auth system with register/login/protected routes
+  - ✅ **Swagger Documentation** (Optional) - Auto-generated API docs at `/api/docs`
+  - ✅ **Docker Support** (Optional) - Dockerfile + docker-compose with database
+  - ✅ **Zod Validation** - Request validation with TypeScript inference
+  - ✅ **Error Handling** - Centralized error middleware with proper HTTP codes
+  - ✅ **Security** - Helmet, CORS, bcrypt password hashing
+  - ✅ **Testing** - Jest configuration with example tests
+  - ✅ **Production Ready** - TypeScript build, environment validation
+
+- **🏗️  NestJS API Template** - Enterprise-grade modular API
+  - ✅ **NestJS 10+** - Progressive Node.js framework
+  - ✅ **TypeScript** - Decorators, dependency injection, modular architecture
+  - ✅ **3 Database Options**:
+    - PostgreSQL with Prisma ORM (type-safe, migrations)
+    - MongoDB with Mongoose (NoSQL, flexible)
+    - SQLite (zero-config, local development)
+  - ✅ **Passport.js + JWT Authentication** (Optional) - Complete auth with JWT strategy
+  - ✅ **Swagger Documentation** (Optional) - Auto-generated from decorators at `/api`
+  - ✅ **Docker Support** (Optional) - Dockerfile + docker-compose with database
+  - ✅ **Class Validator** - DTO validation with decorators
+  - ✅ **Modular Structure** - Auth module, Users module, Database module
+  - ✅ **Guards & Strategies** - JWT authentication guard
+  - ✅ **Testing** - Jest with NestJS testing utilities
+  - ✅ **Production Ready** - TypeScript build, environment configuration
+
+- **🌐 New Platform: API / Backend**
+  - Added to platform selector alongside Website and Mobile App
+  - Dedicated backend prompts with database/auth/Docker options
+  - Smart defaults for headless mode (`-y` flag)
+  - Support for both Express and NestJS stacks
+
+- **📦 Backend Template Features**:
+  - **Modular Architecture**: Controllers, services, routes, middleware
+  - **Environment Validation**: Zod-based .env validation on startup
+  - **Database Setup**:
+    - Prisma schema generation for PostgreSQL/SQLite
+    - Mongoose models for MongoDB
+    - Connection handling with error recovery
+  - **Authentication System** (when enabled):
+    - User registration with password hashing
+    - JWT token generation and verification
+    - Protected route middleware
+    - Auth endpoints: `/api/auth/register`, `/api/auth/login`, `/api/auth/me`
+  - **API Documentation** (when enabled):
+    - Swagger UI at `/api/docs`
+    - OpenAPI 3.0 specification
+    - Bearer token authentication support
+  - **Docker Configuration** (when enabled):
+    - Multi-stage Dockerfile for production
+    - docker-compose with database service
+    - Environment variable configuration
+  - **Comprehensive README**: Setup instructions, API endpoints, deployment guide
+
+- **🔧 CLI Enhancements**:
+  - New backend prompts: `src/prompts/backend-prompts.js`
+  - Backend template generation: `src/core/backend-templates.js`
+  - Express detection in `project-detector.js`
+  - Backend success messages in `engine.js`
+
+- **🚀 Deployment Support**:
+  - Railway (Recommended) - Easy backend deployment with database support
+  - Render - Free tier with managed databases
+  - Fly.io - Global edge deployment
+  - Platform recommendations for Express APIs
+
+### Technical Implementation
+
+- **Files Created**:
+  - `src/prompts/backend-prompts.js` - Backend configuration prompts
+  - `src/core/backend-templates.js` - Template generation helpers (~2100+ lines)
+    - Express helper methods (~1200 lines)
+    - NestJS helper methods (~900 lines)
+  - Template structure: 15+ TypeScript files generated per Express project
+  - Template structure: 20+ TypeScript files generated per NestJS project
+
+- **Files Modified**:
+  - `src/config/templates.json` - Added backend template definitions (express-api, nestjs-api)
+  - `src/prompts/platform-selector.js` - Added "API / Backend" option
+  - `src/commands/build.js` - Backend platform handling
+  - `src/core/template-manager.js` - `createExpressApp()` and `createNestApp()` integration
+  - `src/core/engine.js` - Backend success messages for Express and NestJS
+  - `src/utils/project-detector.js` - Express/NestJS detection
+  - `README.md` - Backend documentation (6 templates now)
+
+### Usage
+
+**Express API:**
+```bash
+# Interactive mode
+quickship build my-api
+# Select: 🔌 API / Backend
+# Choose: Express + TypeScript
+# Database: PostgreSQL with Prisma
+# Auth: Yes
+# Swagger: Yes
+# Docker: Yes
+
+# Headless mode (uses defaults)
+quickship build my-api --template express-api -y
+
+# Custom configuration
+quickship build my-api --template express-api -p pnpm --no-git
+```
+
+**NestJS API:**
+```bash
+# Interactive mode
+quickship build my-api
+# Select: 🔌 API / Backend
+# Choose: NestJS
+# Database: PostgreSQL with Prisma
+# Auth: Yes (Passport.js + JWT)
+# Swagger: Yes
+# Docker: Yes
+
+# Headless mode (uses defaults)
+quickship build my-api --template nestjs-api -y
+
+# Custom configuration
+quickship build my-api --template nestjs-api -p pnpm --no-git
+```
+
+### Future Plans
+
+- **GraphQL Support** (v0.13.0) - GraphQL APIs with Apollo Server and type generation
+- **More Auth Providers** (v0.14.0) - OAuth providers, social login
+- **API Gateway** - Kong, Traefik integration templates
+- **Microservices** - Multi-service architecture templates
+
+---
+
 ## [0.10.21] - 2025-01-19
 
 ### Added

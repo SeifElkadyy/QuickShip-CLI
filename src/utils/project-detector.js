@@ -37,6 +37,21 @@ export async function detectProjectType(projectPath = process.cwd()) {
       return 'mern-stack';
     }
 
+    // Express API detection (has Express but not Mongoose, and has TypeScript)
+    if (
+      deps['express'] &&
+      !deps['mongoose'] &&
+      !deps['next'] &&
+      !deps['react']
+    ) {
+      return 'express-api';
+    }
+
+    // NestJS detection
+    if (deps['@nestjs/core']) {
+      return 'nestjs-api';
+    }
+
     // Next.js detection
     if (deps['next']) {
       return 'nextjs';
@@ -101,6 +116,9 @@ export function getDevPort(projectType) {
       return 5173;
     case 'mern-stack':
       return 5173; // Frontend port
+    case 'express-api':
+    case 'nestjs-api':
+      return 3000;
     default:
       return 3000;
   }
@@ -159,6 +177,40 @@ export function getRecommendedPlatforms(projectType) {
         name: 'Render',
         value: 'render',
         description: 'Free tier, database hosting included',
+      },
+    ],
+    'express-api': [
+      {
+        name: 'Railway (Recommended)',
+        value: 'railway',
+        description: 'Easy backend deployment, database support',
+      },
+      {
+        name: 'Render',
+        value: 'render',
+        description: 'Free tier, managed databases',
+      },
+      {
+        name: 'Fly.io',
+        value: 'fly',
+        description: 'Global deployment, edge locations',
+      },
+    ],
+    'nestjs-api': [
+      {
+        name: 'Railway (Recommended)',
+        value: 'railway',
+        description: 'Easy backend deployment, database support',
+      },
+      {
+        name: 'Render',
+        value: 'render',
+        description: 'Free tier, managed databases',
+      },
+      {
+        name: 'Fly.io',
+        value: 'fly',
+        description: 'Global deployment, edge locations',
       },
     ],
   };

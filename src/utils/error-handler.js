@@ -24,7 +24,7 @@ class ErrorHandler {
     }
 
     logger.info(
-      '\nFor help, visit: https://quickship.dev/docs/troubleshooting'
+      '\nFor help, visit: https://github.com/SeifElkadyy/QuickShip-CLI/docs/troubleshooting'
     );
   }
 

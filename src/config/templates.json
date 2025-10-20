@@ -46,6 +46,44 @@
         "platforms": ["ios", "android", "web"],
         "devCommand": "npx expo start"
       }
+    },
+    "backend": {
+      "express-api": {
+        "useManualScaffold": true,
+        "priority": 1,
+        "recommended": true,
+        "description": "RESTful API with Express.js, TypeScript, and your choice of database",
+        "features": [
+          "Express.js 4+",
+          "TypeScript",
+          "JWT Authentication (optional)",
+          "Prisma or Mongoose",
+          "Zod Validation",
+          "Swagger Documentation (optional)",
+          "Docker Support (optional)",
+          "Jest Testing",
+          "Rate Limiting & Security"
+        ],
+        "devCommand": "npm run dev"
+      },
+      "nestjs-api": {
+        "useManualScaffold": true,
+        "priority": 2,
+        "recommended": false,
+        "description": "Enterprise-grade API with NestJS, TypeScript, and modular architecture",
+        "features": [
+          "NestJS 10+",
+          "TypeScript",
+          "Passport.js Auth (optional)",
+          "Prisma or TypeORM",
+          "Class Validator",
+          "Swagger Auto-generation (optional)",
+          "Docker Support (optional)",
+          "Jest + Supertest",
+          "Microservices Ready"
+        ],
+        "devCommand": "npm run start:dev"
+      }
     }
   }
 }

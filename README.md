@@ -136,7 +136,7 @@ quickship build my-app --template vite -p yarn --no-git -y
 
 ## 🚀 Templates
 
-Choose from **5 production-ready templates** for web and mobile:
+Choose from **6 production-ready templates** for web, mobile, and backend:
 
 ### 🌐 Web Development
 
@@ -233,6 +233,55 @@ Cross-platform mobile apps for iOS, Android, and Web.
 quickship build my-app --template expo-react-native -y
 ```
 
+### 🔌 Backend / API Development
+
+#### Express + TypeScript API
+*Recommended*
+
+Fast, flexible RESTful API with TypeScript and **optional** ORM/ODM.
+
+**Stack:** Express.js • TypeScript • Your Choice of Database & ORM • JWT Auth (optional) • Swagger (optional)
+
+**Features:**
+- 🚀 Express.js 4+ with TypeScript
+- 💾 **Flexible Database Options:**
+  - PostgreSQL (with Prisma ORM or raw `pg` driver)
+  - MongoDB (with Mongoose ODM or raw `mongodb` driver)
+  - SQLite (with Prisma ORM or `better-sqlite3`)
+  - No database (API only)
+- 🔐 JWT Authentication (optional, requires database)
+- 📚 Swagger API Documentation (optional)
+- 🐳 Docker Support (optional)
+- ✅ Zod Validation
+- 🧪 Jest Testing
+
+```bash
+quickship build my-api --template express-api -y
+```
+
+#### NestJS API
+
+Enterprise-grade API with modular architecture, dependency injection, and **optional** ORM/ODM.
+
+**Stack:** NestJS • TypeScript • Your Choice of Database & ORM • Passport.js Auth (optional) • Swagger (optional)
+
+**Features:**
+- 🏗️  NestJS 10+ with TypeScript
+- 💾 **Flexible Database Options:**
+  - PostgreSQL (with Prisma ORM or raw `pg` driver)
+  - MongoDB (with Mongoose ODM or raw `mongodb` driver)
+  - SQLite (with Prisma ORM or `better-sqlite3`)
+  - No database (API only)
+- 🔐 Passport.js + JWT Authentication (optional, requires database)
+- 📚 Swagger API Documentation (auto-generated, optional)
+- 🐳 Docker Support (optional)
+- ✅ Class Validator & DTOs
+- 🧪 Jest Testing with NestJS utilities
+
+```bash
+quickship build my-api --template nestjs-api -y
+```
+
 ---
 
 ## 🛠️ Commands
@@ -313,10 +362,8 @@ quickship deploy
 
 | Platform | Best For | Features |
 |----------|----------|----------|
-| **Vercel** | Next.js, T3 Stack | Zero-config, Edge functions, CI/CD |
-| **Netlify** | Vite, Next.js | Fast CDN, Deploy previews, Forms |
-| **Railway** | MERN Stack | MongoDB support, $5 free credit |
-| **Render** | MERN Stack | Free tier, Managed databases |
+| **Vercel** | Next.js, T3 Stack, Express, NestJS | Zero-config, Edge functions, Serverless, CI/CD |
+| **Netlify** | Vite, React, Next.js | Fast CDN, Deploy previews, Forms, Functions |
 
 **What it does:**
 - 🔍 Auto-detects your project type
@@ -505,6 +552,7 @@ npm run start
 |---------|-----------|-----------------|-------------|-----------------|
 | **Web Templates** | ✅ 4 templates | ✅ 1 | ✅ Many | ❌ |
 | **Mobile Templates** | ✅ Expo | ❌ | ❌ | ✅ 1 |
+| **Backend Templates** | ✅ 2 APIs | ❌ | ❌ | ❌ |
 | **TypeScript** | ✅ Default | ✅ Optional | ✅ Optional | ✅ Optional |
 | **Tailwind CSS** | ✅ Pre-configured | ❌ Manual | ❌ Manual | ❌ Manual |
 | **Deployment** | ✅ One command | ❌ Manual | ❌ Manual | ❌ Manual |
@@ -535,7 +583,20 @@ npm run start
 - ✅ Health check and project info
 - ✅ Headless mode for CI/CD
 
-### 🚀 Coming Soon (v0.11+)
+### ✅ Released (v1.0.0) - 🎉 PRODUCTION READY
+- ✅ **Backend API Templates** - Express & NestJS
+- ✅ **Optional ORM/ODM** - Choose database first, then optionally add Prisma/Mongoose or use raw drivers
+- ✅ **6 Database Configurations** - PostgreSQL, MongoDB, SQLite (each with ORM or raw driver options)
+- ✅ **No Database Option** - Build APIs without database dependencies
+- ✅ Express.js + TypeScript API with flexible database choices
+- ✅ NestJS API with modular architecture and dependency injection
+- ✅ JWT Authentication & Swagger documentation (optional)
+- ✅ Docker support for APIs (optional)
+- ✅ Auto-generated `.env` files - Projects work immediately after creation
+- ✅ Fixed NestJS MongoDB dependency injection issues
+- ✅ Improved platform selection order and UX
+
+### 🚀 Coming Soon (v1.1+)
 - 🔜 More Expo templates (drawer, stack navigation)
 - 🔜 Supabase integration
 - 🔜 Component generator
@@ -543,7 +604,7 @@ npm run start
 - 🔜 More database integrations (PlanetScale, Supabase)
 - 🔜 Astro, SvelteKit, Remix templates
 
-### 🌟 Future (v1.0+)
+### 🌟 Future (v1.2+)
 - Browser extension templates
 - Desktop app templates (Electron, Tauri)
 - Visual project builder
@@ -638,6 +699,6 @@ QuickShip is **free and open-source**. If it saves you time:
 
 [Get Started](#-getting-started) • [View Templates](#-templates) • [Commands](#-commands)
 
-**Version 0.10.21** | **MIT License**
+**Version 1.0.0** | **MIT License**
 
 </div>

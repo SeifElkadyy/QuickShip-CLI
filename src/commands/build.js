@@ -2,6 +2,7 @@ import logger from '../utils/logger.js';
 import { selectPlatform } from '../prompts/platform-selector.js';
 import { websitePrompts } from '../prompts/website-prompts.js';
 import { mobilePrompts } from '../prompts/mobile-prompts.js';
+import { backendPrompts } from '../prompts/backend-prompts.js';
 import Engine from '../core/engine.js';
 import ErrorHandler from '../utils/error-handler.js';
 
@@ -21,6 +22,14 @@ export async function buildCommand(projectName, options) {
       platform = 'mobile';
     }
 
+    // Check if template is backend-related
+    if (
+      options.template === 'express-api' ||
+      options.template === 'nestjs-api'
+    ) {
+      platform = 'backend';
+    }
+
     if (!options.yes || !options.template) {
       platform = await selectPlatform();
     }
@@ -31,6 +40,8 @@ export async function buildCommand(projectName, options) {
       config = await websitePrompts(projectName, options);
     } else if (platform === 'mobile') {
       config = await mobilePrompts(projectName, options);
+    } else if (platform === 'backend') {
+      config = await backendPrompts(projectName, options);
     } else {
       logger.error('This platform is not yet supported');
       process.exit(1);

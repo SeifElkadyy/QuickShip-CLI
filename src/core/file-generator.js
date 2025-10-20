@@ -6,7 +6,7 @@ class FileGenerator {
   async generateReadme(projectPath, config) {
     const readme = `# ${config.projectName}
 
-Generated with [QuickShip](https://quickship.dev) 🚀
+Generated with [QuickShip](https://github.com/SeifElkadyy/QuickShip-CLI) 🚀
 
 ## Getting Started
 
@@ -33,7 +33,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ## Learn More
 
 - [Next.js Documentation](https://nextjs.org/docs)
-- [QuickShip Documentation](https://quickship.dev/docs)
+- [QuickShip Documentation](https://github.com/SeifElkadyy/QuickShip-CLI/docs)
 
 ## Deploy
 
