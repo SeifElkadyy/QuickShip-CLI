@@ -49,7 +49,7 @@ const logger = {
   welcome() {
     console.log(chalk.cyan(LOGOS.main));
     console.log(
-      boxen('Welcome to QuickShip! Build Fast. Ship Fast. 🚀', {
+      boxen('Welcome to QuickShip! Build Fast. Ship Faster. 🚀', {
         padding: 0,
         margin: { top: 1, bottom: 0, left: 0, right: 0 },
         borderStyle: 'round',
