@@ -20,8 +20,8 @@
 ## 🎥 See It In Action
 
 <div align="center">
-  <img src="./assets/Quckship-Demo.gif" alt="QuickShip Demo" width="700">
-  <p><em>From zero to production-ready in 60 seconds</em></p>
+  <img src="./assets/Quickship-Demo.jpg" alt="QuickShip Demo" width="700">
+  <p><em>Create production-ready projects in 60 seconds</em></p>
 </div>
 
 ---
@@ -126,7 +126,7 @@ quickship build my-app --template vite -p yarn --no-git -y
 | Flag | Description | Example |
 |------|-------------|---------|
 | `-y, --yes` | Skip all prompts | `quickship build my-app -y` |
-| `-t, --template <name>` | Choose template | `--template nextjs` |
+| `-t, --template <n>` | Choose template | `--template nextjs` |
 | `-p, --package-manager <pm>` | Choose package manager | `-p pnpm` |
 | `--no-git` | Skip Git initialization | `quickship build my-app --no-git` |
 | `--no-install` | Skip installing dependencies | `quickship build my-app --no-install` |
