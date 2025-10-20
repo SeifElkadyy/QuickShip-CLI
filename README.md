@@ -20,11 +20,9 @@
 ## 🎥 See It In Action
 
 <div align="center">
-  <img src="./assets/demo.gif" alt="QuickShip Demo" width="700">
+  <img src="./assets/Quckship-Demo.gif" alt="QuickShip Demo" width="700">
   <p><em>From zero to production-ready in 60 seconds</em></p>
 </div>
-
-> **Note:** Add your 1-2 minute demo video here showing the full workflow
 
 ---
 
