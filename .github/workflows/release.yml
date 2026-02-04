@@ -63,10 +63,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Publish to npm with provenance
-        run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Ensure npm CLI version supports OIDC
+        run: |
+          npm --version
+          npx npm@latest --version
+          echo "Installing latest npm for OIDC support..."
+          npm install -g npm@latest
+
+      - name: Publish to npm via trusted publishing
+        run: npm publish --access public
 
   create-github-release:
     name: Create GitHub Release
