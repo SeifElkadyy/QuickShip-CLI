@@ -392,12 +392,32 @@ cd my-app
 # Add shadcn/ui components
 quickship add shadcn
 
-# Add NextAuth.js authentication
+# Add authentication (choose from Clerk, Supabase, or NextAuth)
 quickship add auth
+
+# Or specify a provider directly
+quickship add auth --provider clerk
+quickship add auth --provider supabase
+quickship add auth --provider nextauth
 
 # Add Prisma database
 quickship add database
 ```
+
+**Authentication Providers:**
+
+| Provider | Best For | What You Get |
+|----------|----------|--------------|
+| **Clerk** | Quick MVPs, startups | Pre-built UI components, user management dashboard, social auth |
+| **Supabase** | Full-stack apps | Auth + PostgreSQL database + storage + real-time subscriptions |
+| **NextAuth** | Custom flows | Maximum flexibility, any database, custom providers |
+
+**What gets set up automatically:**
+- ✅ Package installation
+- ✅ Middleware configuration
+- ✅ Environment variables template
+- ✅ Auth utilities (client/server helpers for Supabase)
+- ✅ Protected routes setup
 
 ### Health Check
 

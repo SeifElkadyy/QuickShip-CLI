@@ -61,6 +61,7 @@ program
 program
   .command('add <feature>')
   .description('Add features to existing project (shadcn, auth, database)')
+  .option('-p, --provider <name>', 'auth provider (clerk, supabase, nextauth)')
   .option('-v, --verbose', 'show detailed logs')
   .action(async (feature, options) => {
     const { addCommand } = await import('../src/commands/add.js');

@@ -164,5 +164,70 @@
       "Creates initial commit with all files",
       "Ready to connect to GitHub/GitLab"
     ]
+  },
+  "auth": {
+    "title": "Authentication Providers",
+    "description": "Add authentication to your Next.js project with popular providers.",
+    "options": {
+      "clerk": {
+        "name": "Clerk",
+        "description": "Modern authentication with beautiful pre-built UI components",
+        "best_for": "Projects that need auth quickly with minimal setup",
+        "pros": [
+          "Pre-built UI components (SignIn, SignUp, UserButton)",
+          "Easy setup with 5 minutes",
+          "Built-in user management dashboard",
+          "Social providers included (Google, GitHub, etc.)",
+          "Webhooks and user metadata support"
+        ],
+        "includes": [
+          "@clerk/nextjs package",
+          "Middleware configuration",
+          "Environment variables template",
+          "Protected route setup"
+        ]
+      },
+      "supabase": {
+        "name": "Supabase",
+        "description": "Open-source Firebase alternative with auth, database, and storage",
+        "best_for": "Full-stack apps needing auth + database + storage in one",
+        "pros": [
+          "Auth + PostgreSQL database + Storage in one platform",
+          "Row Level Security (RLS) for data protection",
+          "Real-time subscriptions",
+          "Open-source and self-hostable",
+          "Built-in REST and GraphQL APIs"
+        ],
+        "includes": [
+          "@supabase/supabase-js and @supabase/ssr packages",
+          "Client and server utilities",
+          "Middleware for session management",
+          "Environment variables template"
+        ]
+      },
+      "nextauth": {
+        "name": "NextAuth.js",
+        "description": "Flexible authentication library designed for Next.js",
+        "best_for": "Custom auth flows and maximum flexibility",
+        "pros": [
+          "Highly customizable",
+          "Supports many OAuth providers",
+          "Can use any database",
+          "Email/passwordless auth",
+          "Session and JWT strategies"
+        ],
+        "includes": [
+          "next-auth package",
+          "Setup instructions for API route",
+          "Provider configuration guidance"
+        ]
+      }
+    },
+    "tips": [
+      "Clerk is the easiest for quick MVPs and prototypes",
+      "Supabase is great when you need database + auth together",
+      "NextAuth gives you the most control and flexibility",
+      "All providers work with Next.js App Router"
+    ]
   }
 }

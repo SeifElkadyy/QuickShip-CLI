@@ -5,6 +5,41 @@ All notable changes to QuickShip CLI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **🔐 Enhanced Authentication Providers** - Easy auth setup with multiple providers
+  - **Clerk Integration** - Modern auth with pre-built UI components
+    - ✅ Automatic @clerk/nextjs installation
+    - ✅ Middleware configuration with protected routes
+    - ✅ Environment variables template (.env.local)
+    - ✅ ClerkProvider setup instructions
+    - ✅ Ready-to-use auth components (SignIn, SignUp, UserButton)
+    - ✅ 5-minute setup for production-ready authentication
+
+  - **Supabase Integration** - Auth + Database + Storage all-in-one
+    - ✅ Automatic @supabase/supabase-js and @supabase/ssr installation
+    - ✅ Client and server utilities (utils/supabase/client.ts & server.ts)
+    - ✅ Middleware for session management
+    - ✅ Environment variables template
+    - ✅ Row Level Security (RLS) ready
+    - ✅ PostgreSQL database + auth + storage in one platform
+
+  - **NextAuth.js Support** - Flexible authentication (existing)
+    - ✅ Maximum customization options
+    - ✅ Multiple OAuth providers support
+    - ✅ Custom auth flows
+
+  - **Usage**: `quickship add auth --provider <clerk|supabase|nextauth>`
+  - **Interactive mode**: Choose provider from list when running `quickship add auth`
+
+### Changed
+
+- Enhanced `quickship add auth` command to support multiple providers via `--provider` flag
+- Added interactive provider selection when no provider specified
+- Updated help content with detailed auth provider comparisons
+
 ## [1.0.0] - 2025-10-20
 
 ### 🎉 MAJOR RELEASE: v1.0.0 - Production Ready
