@@ -704,6 +704,6 @@ QuickShip is **free and open-source**. If it saves you time:
 
 [Get Started](#-getting-started) • [View Templates](#-templates) • [Commands](#-commands)
 
-**Version 1.0.0** | **MIT License**
+**Version 1.0.3** | **MIT License**
 
 </div>
