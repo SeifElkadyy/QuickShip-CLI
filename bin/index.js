@@ -2,6 +2,7 @@
 
 import { Command } from 'commander';
 import logger from '../src/utils/logger.js';
+import { checkForUpdates } from '../src/utils/update-checker.js';
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -14,6 +15,15 @@ const packageJson = JSON.parse(
 );
 
 const program = new Command();
+
+// Check for updates in background (non-blocking)
+// Skip update check for 'update' command to avoid double-checking
+const isUpdateCommand = process.argv.includes('update');
+if (!isUpdateCommand) {
+  checkForUpdates({ silent: false }).catch(() => {
+    // Silently ignore errors - don't disrupt user experience
+  });
+}
 
 program
   .name('quickship')

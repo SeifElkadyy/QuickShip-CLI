@@ -2,28 +2,39 @@
 // This file contains all the helper methods for generating backend template files
 
 import { join } from 'path';
+import { getFallbackVersion } from '../utils/version-fetcher.js';
+
+/**
+ * Helper function to get version for a package
+ * Uses cached/fallback versions for fast synchronous access
+ * @param {string} packageName - Package name
+ * @returns {string} - Version string with ^ prefix
+ */
+function v(packageName) {
+  return getFallbackVersion(packageName);
+}
 
 export async function createExpressPackageJson(destinationPath, config) {
   const { writeFile } = await import('fs/promises');
 
   const dependencies = {
-    express: '^4.21.2',
-    helmet: '^8.0.0',
-    cors: '^2.8.5',
-    dotenv: '^16.4.7',
-    zod: '^3.24.1',
+    express: v('express'),
+    helmet: v('helmet'),
+    cors: v('cors'),
+    dotenv: v('dotenv'),
+    zod: v('zod'),
   };
 
   const devDependencies = {
-    '@types/express': '^5.0.0',
-    '@types/node': '^22.10.5',
-    typescript: '^5.7.3',
-    tsx: '^4.19.2',
-    jest: '^29.7.0',
-    '@types/jest': '^29.5.14',
-    eslint: '^9.18.0',
-    prettier: '^3.4.2',
-    '@types/cors': '^2.8.17',
+    '@types/express': v('@types/express'),
+    '@types/node': v('@types/node'),
+    typescript: v('typescript'),
+    tsx: v('tsx'),
+    jest: v('jest'),
+    '@types/jest': v('@types/jest'),
+    eslint: v('eslint'),
+    prettier: v('prettier'),
+    '@types/cors': v('@types/cors'),
   };
 
   // Add database-specific dependencies
@@ -31,35 +42,37 @@ export async function createExpressPackageJson(destinationPath, config) {
     config.database === 'postgresql-prisma' ||
     config.database === 'sqlite-prisma'
   ) {
-    dependencies['@prisma/client'] = '^6.2.1';
-    devDependencies.prisma = '^6.2.1';
+    dependencies['@prisma/client'] = v('@prisma/client');
+    devDependencies.prisma = v('prisma');
   } else if (config.database === 'mongodb-mongoose') {
-    dependencies.mongoose = '^8.9.3';
-    devDependencies['@types/mongoose'] = '^5.11.96';
+    dependencies.mongoose = v('mongoose');
+    devDependencies['@types/mongoose'] = v('@types/mongoose');
   } else if (config.database === 'postgresql-raw') {
-    dependencies.pg = '^8.13.1';
-    devDependencies['@types/pg'] = '^8.11.10';
+    dependencies.pg = v('pg');
+    devDependencies['@types/pg'] = v('@types/pg');
   } else if (config.database === 'mongodb-raw') {
-    dependencies.mongodb = '^6.12.0';
+    dependencies.mongodb = v('mongodb');
   } else if (config.database === 'sqlite-raw') {
-    dependencies['better-sqlite3'] = '^11.8.1';
-    devDependencies['@types/better-sqlite3'] = '^7.6.12';
+    dependencies['better-sqlite3'] = v('better-sqlite3');
+    devDependencies['@types/better-sqlite3'] = v('@types/better-sqlite3');
   }
 
   // Add auth dependencies
   if (config.includeAuth) {
-    dependencies.jsonwebtoken = '^9.0.2';
-    dependencies.bcryptjs = '^2.4.3';
-    devDependencies['@types/jsonwebtoken'] = '^9.0.7';
-    devDependencies['@types/bcryptjs'] = '^2.4.6';
+    dependencies.jsonwebtoken = v('jsonwebtoken');
+    dependencies.bcryptjs = v('bcryptjs');
+    devDependencies['@types/jsonwebtoken'] = v('@types/jsonwebtoken');
+    devDependencies['@types/bcryptjs'] = v('@types/bcryptjs');
   }
 
   // Add Swagger dependencies
   if (config.includeSwagger) {
-    dependencies['swagger-ui-express'] = '^5.0.1';
-    dependencies['swagger-jsdoc'] = '^6.2.8';
-    devDependencies['@types/swagger-ui-express'] = '^4.1.6';
-    devDependencies['@types/swagger-jsdoc'] = '^6.0.4';
+    dependencies['swagger-ui-express'] = v('swagger-ui-express');
+    dependencies['swagger-jsdoc'] = v('swagger-jsdoc');
+    devDependencies['@types/swagger-ui-express'] = v(
+      '@types/swagger-ui-express'
+    );
+    devDependencies['@types/swagger-jsdoc'] = v('@types/swagger-jsdoc');
   }
 
   const packageJson = {
@@ -95,32 +108,32 @@ export async function createNestPackageJson(destinationPath, config) {
   const { writeFile } = await import('fs/promises');
 
   const dependencies = {
-    '@nestjs/common': '^10.4.15',
-    '@nestjs/core': '^10.4.15',
-    '@nestjs/platform-express': '^10.4.15',
-    '@nestjs/config': '^3.3.0',
-    'class-validator': '^0.14.1',
-    'class-transformer': '^0.5.1',
-    'reflect-metadata': '^0.2.2',
-    rxjs: '^7.8.1',
+    '@nestjs/common': v('@nestjs/common'),
+    '@nestjs/core': v('@nestjs/core'),
+    '@nestjs/platform-express': v('@nestjs/platform-express'),
+    '@nestjs/config': v('@nestjs/config'),
+    'class-validator': v('class-validator'),
+    'class-transformer': v('class-transformer'),
+    'reflect-metadata': v('reflect-metadata'),
+    rxjs: v('rxjs'),
   };
 
   const devDependencies = {
-    '@nestjs/cli': '^10.0.0',
-    '@nestjs/schematics': '^10.0.0',
-    '@nestjs/testing': '^10.4.15',
-    '@types/express': '^5.0.0',
-    '@types/node': '^22.10.5',
-    '@types/jest': '^29.5.14',
-    typescript: '^5.7.3',
-    'ts-node': '^10.9.2',
-    'ts-loader': '^9.5.1',
-    'ts-jest': '^29.2.5',
-    jest: '^29.7.0',
-    supertest: '^7.0.0',
-    '@types/supertest': '^6.0.2',
-    eslint: '^9.18.0',
-    prettier: '^3.4.2',
+    '@nestjs/cli': v('@nestjs/cli'),
+    '@nestjs/schematics': v('@nestjs/schematics'),
+    '@nestjs/testing': v('@nestjs/testing'),
+    '@types/express': v('@types/express'),
+    '@types/node': v('@types/node'),
+    '@types/jest': v('@types/jest'),
+    typescript: v('typescript'),
+    'ts-node': v('ts-node'),
+    'ts-loader': v('ts-loader'),
+    'ts-jest': v('ts-jest'),
+    jest: v('jest'),
+    supertest: v('supertest'),
+    '@types/supertest': v('@types/supertest'),
+    eslint: v('eslint'),
+    prettier: v('prettier'),
   };
 
   // Add database dependencies
@@ -128,35 +141,35 @@ export async function createNestPackageJson(destinationPath, config) {
     config.database === 'postgresql-prisma' ||
     config.database === 'sqlite-prisma'
   ) {
-    dependencies['@prisma/client'] = '^6.2.1';
-    devDependencies.prisma = '^6.2.1';
+    dependencies['@prisma/client'] = v('@prisma/client');
+    devDependencies.prisma = v('prisma');
   } else if (config.database === 'mongodb-mongoose') {
-    dependencies['@nestjs/mongoose'] = '^10.1.0';
-    dependencies.mongoose = '^8.9.3';
+    dependencies['@nestjs/mongoose'] = v('@nestjs/mongoose');
+    dependencies.mongoose = v('mongoose');
   } else if (config.database === 'postgresql-raw') {
-    dependencies.pg = '^8.13.1';
-    devDependencies['@types/pg'] = '^8.11.10';
+    dependencies.pg = v('pg');
+    devDependencies['@types/pg'] = v('@types/pg');
   } else if (config.database === 'mongodb-raw') {
-    dependencies.mongodb = '^6.12.0';
+    dependencies.mongodb = v('mongodb');
   } else if (config.database === 'sqlite-raw') {
-    dependencies['better-sqlite3'] = '^11.8.1';
-    devDependencies['@types/better-sqlite3'] = '^7.6.12';
+    dependencies['better-sqlite3'] = v('better-sqlite3');
+    devDependencies['@types/better-sqlite3'] = v('@types/better-sqlite3');
   }
 
   // Add auth dependencies
   if (config.includeAuth) {
-    dependencies['@nestjs/passport'] = '^10.0.3';
-    dependencies['@nestjs/jwt'] = '^10.2.0';
-    dependencies.passport = '^0.7.0';
-    dependencies['passport-jwt'] = '^4.0.1';
-    dependencies.bcryptjs = '^2.4.3';
-    devDependencies['@types/passport-jwt'] = '^4.0.1';
-    devDependencies['@types/bcryptjs'] = '^2.4.6';
+    dependencies['@nestjs/passport'] = v('@nestjs/passport');
+    dependencies['@nestjs/jwt'] = v('@nestjs/jwt');
+    dependencies.passport = v('passport');
+    dependencies['passport-jwt'] = v('passport-jwt');
+    dependencies.bcryptjs = v('bcryptjs');
+    devDependencies['@types/passport-jwt'] = v('@types/passport-jwt');
+    devDependencies['@types/bcryptjs'] = v('@types/bcryptjs');
   }
 
   // Add Swagger dependencies
   if (config.includeSwagger) {
-    dependencies['@nestjs/swagger'] = '^8.0.7';
+    dependencies['@nestjs/swagger'] = v('@nestjs/swagger');
   }
 
   const packageJson = {

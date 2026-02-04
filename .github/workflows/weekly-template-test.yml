@@ -1,0 +1,180 @@
+name: Weekly Template Test
+
+on:
+  schedule:
+    # Run every Monday at 9:00 UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+
+jobs:
+  test-nextjs-template:
+    name: Test Next.js Template
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install CLI dependencies
+        run: npm ci
+
+      - name: Generate Next.js project
+        run: node bin/index.js build test-nextjs -t nextjs -y --no-git
+        timeout-minutes: 5
+
+      - name: Build Next.js project
+        run: |
+          cd test-nextjs
+          npm run build
+        timeout-minutes: 10
+
+      - name: Cleanup
+        run: rm -rf test-nextjs
+        if: always()
+
+  test-vite-template:
+    name: Test Vite Template
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install CLI dependencies
+        run: npm ci
+
+      - name: Generate Vite project
+        run: node bin/index.js build test-vite -t react-vite -y --no-git
+        timeout-minutes: 5
+
+      - name: Build Vite project
+        run: |
+          cd test-vite
+          npm run build
+        timeout-minutes: 10
+
+      - name: Cleanup
+        run: rm -rf test-vite
+        if: always()
+
+  test-express-template:
+    name: Test Express API Template
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install CLI dependencies
+        run: npm ci
+
+      - name: Generate Express API project
+        run: node bin/index.js build test-express -t express-api -y --no-git
+        timeout-minutes: 5
+
+      - name: Build Express project
+        run: |
+          cd test-express
+          npm run build
+        timeout-minutes: 5
+
+      - name: Cleanup
+        run: rm -rf test-express
+        if: always()
+
+  test-nestjs-template:
+    name: Test NestJS API Template
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install CLI dependencies
+        run: npm ci
+
+      - name: Generate NestJS API project
+        run: node bin/index.js build test-nestjs -t nestjs-api -y --no-git
+        timeout-minutes: 5
+
+      - name: Build NestJS project
+        run: |
+          cd test-nestjs
+          npm run build
+        timeout-minutes: 5
+
+      - name: Cleanup
+        run: rm -rf test-nestjs
+        if: always()
+
+  notify-failure:
+    name: Notify on Failure
+    runs-on: ubuntu-latest
+    needs:
+      [
+        test-nextjs-template,
+        test-vite-template,
+        test-express-template,
+        test-nestjs-template,
+      ]
+    if: failure()
+    steps:
+      - name: Create Issue on Failure
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = `Weekly Template Test Failed - ${new Date().toISOString().split('T')[0]}`;
+            const body = `
+            ## Weekly Template Test Failure
+
+            One or more template tests failed during the weekly automated test.
+
+            **Run URL:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            Please investigate and fix any issues with template generation or dependencies.
+
+            ### Checklist
+            - [ ] Check which templates failed
+            - [ ] Review error logs
+            - [ ] Update dependencies if needed
+            - [ ] Test fixes locally
+            - [ ] Push updates
+            `;
+
+            // Check if similar issue exists
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'template-test-failure'
+            });
+
+            if (issues.data.length === 0) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: body,
+                labels: ['bug', 'template-test-failure', 'automated']
+              });
+            }
