@@ -130,9 +130,15 @@ async function addAuth(projectType, options) {
         name: 'provider',
         message: 'Which authentication provider would you like to use?',
         choices: [
-          { name: 'Clerk - Easiest auth setup with UI components', value: 'clerk' },
+          {
+            name: 'Clerk - Easiest auth setup with UI components',
+            value: 'clerk',
+          },
           { name: 'Supabase - Auth + Database + Storage', value: 'supabase' },
-          { name: 'NextAuth.js - Flexible auth for Next.js', value: 'nextauth' },
+          {
+            name: 'NextAuth.js - Flexible auth for Next.js',
+            value: 'nextauth',
+          },
         ],
       },
     ]);
@@ -200,8 +206,12 @@ export const config = {
 `;
 
     if (middlewareExists) {
-      logger.warning('\nmiddleware.ts already exists. Skipping middleware creation.');
-      logger.info('Please manually add Clerk middleware to your existing middleware.ts');
+      logger.warning(
+        '\nmiddleware.ts already exists. Skipping middleware creation.'
+      );
+      logger.info(
+        'Please manually add Clerk middleware to your existing middleware.ts'
+      );
     } else {
       await writeFile(middlewarePath, middlewareContent, 'utf-8');
       spinner.succeed('Middleware created!');
@@ -228,7 +238,9 @@ NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
 
     logger.success('\n✅ Clerk authentication is now set up!\n');
     logger.info('Next steps:\n');
-    logger.info('1. Get your Clerk API keys from: https://dashboard.clerk.com/');
+    logger.info(
+      '1. Get your Clerk API keys from: https://dashboard.clerk.com/'
+    );
     logger.info('2. Add your keys to .env.local\n');
     logger.info('3. Wrap your app with ClerkProvider in app/layout.tsx:\n');
     logger.dim('   import { ClerkProvider } from "@clerk/nextjs";\n');
@@ -242,8 +254,12 @@ NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
     logger.dim('     );');
     logger.dim('   }\n');
     logger.info('4. Use Clerk components in your pages:\n');
-    logger.dim('   import { SignIn, SignUp, UserButton } from "@clerk/nextjs";\n');
-    logger.info('5. Protect routes by updating the isProtectedRoute matcher in middleware.ts\n');
+    logger.dim(
+      '   import { SignIn, SignUp, UserButton } from "@clerk/nextjs";\n'
+    );
+    logger.info(
+      '5. Protect routes by updating the isProtectedRoute matcher in middleware.ts\n'
+    );
     logger.info('📚 Documentation: https://clerk.com/docs/quickstarts/nextjs');
   } catch (error) {
     spinner.fail('Failed to set up Clerk');
@@ -377,8 +393,12 @@ export const config = {
 `;
 
     if (middlewareExists) {
-      logger.warning('\nmiddleware.ts already exists. Skipping middleware creation.');
-      logger.info('Please manually add Supabase middleware to your existing middleware.ts');
+      logger.warning(
+        '\nmiddleware.ts already exists. Skipping middleware creation.'
+      );
+      logger.info(
+        'Please manually add Supabase middleware to your existing middleware.ts'
+      );
     } else {
       await writeFile(middlewarePath, middlewareContent, 'utf-8');
       spinner.succeed('Configuration files created!');
@@ -401,7 +421,9 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
     logger.success('\n✅ Supabase is now set up!\n');
     logger.info('Next steps:\n');
-    logger.info('1. Create a Supabase project at: https://supabase.com/dashboard');
+    logger.info(
+      '1. Create a Supabase project at: https://supabase.com/dashboard'
+    );
     logger.info('2. Get your project URL and anon key from the API settings');
     logger.info('3. Add them to .env.local\n');
     logger.info('4. Use Supabase in your app:\n');
