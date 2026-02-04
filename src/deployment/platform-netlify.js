@@ -79,8 +79,8 @@ export class NetlifyDeployment {
       // Build before deploy
       deployArgs.push('--build');
 
-      // Capture output to extract URL
-      const result = await execa('npx', deployArgs, {
+      // Deploy to Netlify
+      await execa('npx', deployArgs, {
         cwd: this.projectPath,
         stdio: 'inherit',
       });

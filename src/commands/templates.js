@@ -1,12 +1,6 @@
 import logger from '../utils/logger.js';
 import chalk from 'chalk';
-import { readFileSync } from 'fs';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
 import { showStackComparison } from '../utils/help-system.js';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 /**
  * Templates command - List available templates with details

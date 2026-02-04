@@ -35,8 +35,8 @@ export async function infoCommand() {
     // Get package manager
     const packageManager = await detectPackageManager();
 
-    // Get Git status
-    const gitInitialized = existsSync(path.join(process.cwd(), '.git'));
+    // Get Git status (checked in detectFeatures)
+    const _gitInitialized = existsSync(path.join(process.cwd(), '.git'));
 
     // Show info
     logger.log(chalk.bold('\n🔍 Detected Project: ') + chalk.cyan(projectType));

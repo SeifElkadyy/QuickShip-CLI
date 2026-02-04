@@ -190,9 +190,6 @@ Your cross-platform mobile app will run on iOS, Android, and Web!
           : this.config.database.startsWith('sqlite')
             ? 'SQLite'
             : 'None';
-      const useOrm =
-        this.config.database.includes('prisma') ||
-        this.config.database.includes('mongoose');
       message += `
 🔌 Express API Ready!
 ${this.config.database !== 'none' ? `💾 Database: ${dbName}\n` : ''}${this.config.includeAuth ? '🔐 Auth: JWT Authentication\n' : ''}${this.config.includeSwagger ? '📚 Docs: Swagger/OpenAPI\n' : ''}${this.config.includeDocker ? '🐳 Docker: Ready to containerize\n' : ''}
@@ -257,9 +254,6 @@ ${
           : this.config.database.startsWith('sqlite')
             ? 'SQLite'
             : 'None';
-      const useOrm =
-        this.config.database.includes('prisma') ||
-        this.config.database.includes('mongoose');
       message += `
 🏗️  NestJS API Ready!
 ${this.config.database !== 'none' ? `💾 Database: ${dbName}\n` : ''}${this.config.includeAuth ? '🔐 Auth: Passport.js + JWT\n' : ''}${this.config.includeSwagger ? '📚 Docs: Swagger/OpenAPI (auto-generated)\n' : ''}${this.config.includeDocker ? '🐳 Docker: Ready to containerize\n' : ''}

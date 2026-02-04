@@ -50,7 +50,7 @@ export function showHelp(topic) {
 
   if (content.options) {
     logger.header('🎯 Available Options:', 'white');
-    Object.entries(content.options).forEach(([key, option]) => {
+    Object.entries(content.options).forEach(([_key, option]) => {
       logger.log(chalk.cyan(`  ${option.name}`));
       logger.dim('    ' + option.description);
       if (option.best_for) {

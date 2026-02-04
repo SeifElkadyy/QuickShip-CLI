@@ -282,7 +282,7 @@ export default {
     }
   }
 
-  async createT3App(destinationPath, config) {
+  async createT3App(destinationPath, _config) {
     this.spinner.start('Creating T3 Stack app...');
 
     try {
@@ -313,8 +313,7 @@ export default {
   }
 
   async createMERNApp(destinationPath, config) {
-    const { mkdir, writeFile } = await import('fs/promises');
-    const packageManager = config.packageManager || 'npm';
+    const { mkdir } = await import('fs/promises');
 
     try {
       // Create main project directory
@@ -456,7 +455,6 @@ JWT_SECRET=your_jwt_secret_here_change_in_production
   }
 
   async createMERNFrontend(projectPath, config) {
-    const { basename, dirname } = await import('path');
     const packageManager = config.packageManager || 'npm';
     const clientPath = join(projectPath, 'client');
 
@@ -635,7 +633,7 @@ ${config.styling === 'tailwind' ? '- Tailwind CSS' : ''}
   }
 
   async createExpressApp(destinationPath, config, options = {}) {
-    const { mkdir, writeFile } = await import('fs/promises');
+    const { mkdir } = await import('fs/promises');
     const packageManager = config.packageManager || 'npm';
 
     try {
@@ -831,7 +829,7 @@ ${config.styling === 'tailwind' ? '- Tailwind CSS' : ''}
     }
   }
 
-  async createExpoApp(destinationPath, config, options = {}) {
+  async createExpoApp(destinationPath, config, _options = {}) {
     this.spinner.start('Creating Expo React Native app...');
 
     try {
@@ -998,7 +996,7 @@ module.exports = withNativeWind(config, { input: './global.css' });`;
             await writeFile(layoutPath, layoutContent, 'utf-8');
             break; // Successfully updated, exit loop
           }
-        } catch (layoutError) {
+        } catch (_layoutError) {
           // Try next path
           continue;
         }

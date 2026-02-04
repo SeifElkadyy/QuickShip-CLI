@@ -1,4 +1,3 @@
-import { execa } from 'execa';
 import logger from '../utils/logger.js';
 import ora from 'ora';
 import { resolve } from 'path';

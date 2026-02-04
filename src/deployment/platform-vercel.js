@@ -83,8 +83,8 @@ export class VercelDeployment {
       // Skip confirmation prompts
       deployArgs.push('--yes');
 
-      // Show deployment progress
-      const result = await execa('npx', deployArgs, {
+      // Deploy to Vercel
+      await execa('npx', deployArgs, {
         cwd: this.projectPath,
         stdio: 'inherit',
       });

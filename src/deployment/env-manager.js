@@ -121,7 +121,7 @@ export class EnvironmentVariableManager {
     const answers = {};
 
     for (const varConfig of requiredVars) {
-      const { key, defaultValue, description } = varConfig;
+      const { key, defaultValue } = varConfig;
 
       // Check if we already have this value
       if (existingVars[key]) {

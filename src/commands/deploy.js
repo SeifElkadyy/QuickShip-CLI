@@ -340,7 +340,7 @@ ${result.message || ''}
 /**
  * Test build locally before deployment
  */
-async function testBuild(projectPath, packageManager) {
+async function _testBuild(projectPath, packageManager) {
   const spinner = ora('Testing build...').start();
 
   try {

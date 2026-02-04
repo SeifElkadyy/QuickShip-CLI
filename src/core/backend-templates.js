@@ -2097,8 +2097,6 @@ export class JwtAuthGuard extends AuthGuard('jwt') {}
 }
 
 export async function createNestDocker(destinationPath, config) {
-  const { writeFile } = await import('fs/promises');
-
   // Same as Express Docker
   await createExpressDocker(destinationPath, config);
 }
