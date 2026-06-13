@@ -1,29 +1,24 @@
 import simpleGit from 'simple-git';
+import { pathExists } from 'fs-extra';
+import { join } from 'path';
 import Spinner from '../../utils/spinner.js';
 
 class GitManager {
   constructor(projectPath) {
-    this.git = simpleGit(projectPath);
+    // baseDir + --no-walking prevents simple-git from ascending to parent repos
+    this.git = simpleGit({ baseDir: projectPath, binary: 'git', maxConcurrentProcesses: 1 });
+    this.projectPath = projectPath;
     this.spinner = new Spinner();
   }
 
   async isGitRepo() {
-    try {
-      await this.git.status();
-      return true;
-    } catch {
-      return false;
-    }
+    // Check for .git directly — simple-git.status() walks upward and finds parent repos
+    return pathExists(join(this.projectPath, '.git'));
   }
 
   async init() {
-    // Check if already a git repo
     const isRepo = await this.isGitRepo();
-    if (isRepo) {
-      this.spinner.start('Git repository already initialized');
-      this.spinner.succeed('Git repository already initialized');
-      return;
-    }
+    if (isRepo) return;
 
     this.spinner.start('Initializing Git repository');
 
@@ -40,16 +35,6 @@ class GitManager {
     this.spinner.start('Creating initial commit');
 
     try {
-      // Check if there are any commits already
-      try {
-        await this.git.log();
-        // If log succeeds, there are already commits
-        this.spinner.succeed('Initial commit already exists');
-        return;
-      } catch {
-        // No commits yet, create initial commit
-      }
-
       await this.git.add('.');
       await this.git.commit('Initial commit from QuickShip 🚀');
       this.spinner.succeed('Initial commit created');

@@ -1,6 +1,6 @@
 import logger from './logger.js';
 import chalk from 'chalk';
-import inquirer from 'inquirer';
+import { confirm, isCancel } from '@clack/prompts';
 
 /**
  * Generate project preview
@@ -43,16 +43,12 @@ export async function showPreview(config) {
 
   logger.log('');
 
-  // Confirm
-  const { proceed } = await inquirer.prompt([
-    {
-      type: 'confirm',
-      name: 'proceed',
-      message: 'Proceed with project creation?',
-      default: true,
-    },
-  ]);
+  const proceed = await confirm({
+    message: 'Proceed with project creation?',
+    initialValue: true,
+  });
 
+  if (isCancel(proceed)) return false;
   return proceed;
 }
 

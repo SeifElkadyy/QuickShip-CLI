@@ -1,8 +1,16 @@
-import inquirer from 'inquirer';
+import { text, select, confirm, isCancel, cancel, note } from '@clack/prompts';
 import validator from '../utils/validator.js';
+import { analyzeProjectName } from '../utils/smart-defaults.js';
+
+function handleCancel(value) {
+  if (isCancel(value)) {
+    cancel('Operation cancelled.');
+    process.exit(0);
+  }
+  return value;
+}
 
 export async function websitePrompts(projectName, options = {}) {
-  // If -y flag is set, use defaults
   if (options.yes) {
     return {
       projectName: projectName || 'my-awesome-project',
@@ -15,110 +23,105 @@ export async function websitePrompts(projectName, options = {}) {
     };
   }
 
-  const questions = [];
-
-  // Project name
-  if (!projectName) {
-    questions.push({
-      type: 'input',
-      name: 'projectName',
-      message: 'Project name:',
-      default: 'my-awesome-project',
-      validate: (input) => {
-        const validation = validator.validateProjectName(input);
-        if (!validation.valid) {
-          return `Invalid project name: ${validation.errors.join(', ')}`;
-        }
-        return true;
-      },
-    });
+  let name = projectName;
+  if (!name) {
+    name = handleCancel(
+      await text({
+        message: 'Project name',
+        placeholder: 'my-awesome-project',
+        defaultValue: 'my-awesome-project',
+        validate(input) {
+          const v = validator.validateProjectName(input);
+          if (!v.valid) return v.errors.join(', ');
+        },
+      })
+    );
   }
 
-  // Stack selection
-  questions.push({
-    type: 'list',
-    name: 'stack',
-    message: 'Choose your stack:',
-    choices: [
-      {
-        name: 'Next.js (Recommended - Full-stack React framework)',
-        value: 'nextjs',
-      },
-      {
-        name: 'Next.js + T3 Stack (tRPC + Prisma + NextAuth)',
-        value: 't3-stack',
-      },
-      {
-        name: 'React + Vite (Fast SPA development)',
-        value: 'react-vite',
-      },
-      {
-        name: 'MERN Stack (MongoDB + Express + React + Node.js)',
-        value: 'mern-stack',
-      },
-    ],
-  });
+  // Smart defaults: analyze project name to pre-select best stack
+  const smartDefaults = analyzeProjectName(name);
+  const defaultStack = smartDefaults?.stack
+    ? { nextjs: 'nextjs', t3: 't3-stack', vite: 'react-vite', mern: 'mern-stack' }[smartDefaults.stack] ?? 'nextjs'
+    : 'nextjs';
 
-  // TypeScript
-  questions.push({
-    type: 'confirm',
-    name: 'typescript',
-    message: 'Use TypeScript?',
-    default: true,
-  });
-
-  // Styling (conditional based on stack)
-  questions.push({
-    type: 'list',
-    name: 'styling',
-    message: 'Choose styling framework:',
-    choices: [
-      { name: 'Tailwind CSS', value: 'tailwind' },
-      { name: 'CSS Modules', value: 'css-modules' },
-      { name: 'Styled Components', value: 'styled-components' },
-    ],
-    default: 'tailwind',
-    when: (answers) => answers.stack !== 't3-stack', // T3 has Tailwind by default
-  });
-
-  // shadcn/ui option for Next.js projects
-  questions.push({
-    type: 'confirm',
-    name: 'shadcn',
-    message: 'Add shadcn/ui components?',
-    default: false,
-    when: (answers) =>
-      (answers.stack === 'nextjs' || answers.stack === 't3-stack') &&
-      answers.styling === 'tailwind',
-  });
-
-  // Package Manager
-  questions.push({
-    type: 'list',
-    name: 'packageManager',
-    message: 'Choose package manager:',
-    choices: [
-      { name: 'npm', value: 'npm' },
-      { name: 'pnpm (faster)', value: 'pnpm' },
-      { name: 'yarn', value: 'yarn' },
-      { name: 'bun (fastest)', value: 'bun' },
-    ],
-    default: 'npm',
-  });
-
-  // Git
-  questions.push({
-    type: 'confirm',
-    name: 'git',
-    message: 'Initialize Git repository?',
-    default: true,
-  });
-
-  const answers = await inquirer.prompt(questions);
-
-  if (projectName) {
-    answers.projectName = projectName;
+  if (smartDefaults?.reason) {
+    note(smartDefaults.reason, '✨ Smart suggestion');
   }
 
-  return answers;
+  const stack = handleCancel(
+    await select({
+      message: 'Choose your stack',
+      initialValue: defaultStack,
+      options: [
+        {
+          value: 'nextjs',
+          label: 'Next.js',
+          hint: 'Recommended — full-stack React framework',
+        },
+        {
+          value: 't3-stack',
+          label: 'T3 Stack',
+          hint: 'tRPC + Prisma + NextAuth',
+        },
+        { value: 'react-vite', label: 'React + Vite', hint: 'Fast SPA development' },
+        {
+          value: 'mern-stack',
+          label: 'MERN Stack',
+          hint: 'MongoDB + Express + React + Node.js',
+        },
+      ],
+    })
+  );
+
+  const typescript = handleCancel(
+    await confirm({
+      message: 'Use TypeScript?',
+      initialValue: true,
+    })
+  );
+
+  let styling = 'tailwind';
+  if (stack !== 't3-stack') {
+    styling = handleCancel(
+      await select({
+        message: 'Styling framework',
+        options: [
+          { value: 'tailwind', label: 'Tailwind CSS', hint: 'Recommended' },
+          { value: 'css-modules', label: 'CSS Modules' },
+          { value: 'styled-components', label: 'Styled Components' },
+        ],
+      })
+    );
+  }
+
+  let shadcn = false;
+  if ((stack === 'nextjs' || stack === 't3-stack') && styling === 'tailwind') {
+    shadcn = handleCancel(
+      await confirm({
+        message: 'Add shadcn/ui components?',
+        initialValue: false,
+      })
+    );
+  }
+
+  const packageManager = handleCancel(
+    await select({
+      message: 'Package manager',
+      options: [
+        { value: 'npm', label: 'npm' },
+        { value: 'pnpm', label: 'pnpm', hint: 'faster' },
+        { value: 'yarn', label: 'yarn' },
+        { value: 'bun', label: 'bun', hint: 'fastest' },
+      ],
+    })
+  );
+
+  const git = handleCancel(
+    await confirm({
+      message: 'Initialize Git repository?',
+      initialValue: true,
+    })
+  );
+
+  return { projectName: name, stack, typescript, styling, shadcn, packageManager, git };
 }

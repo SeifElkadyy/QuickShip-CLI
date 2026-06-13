@@ -5,11 +5,29 @@ import { mobilePrompts } from '../prompts/mobile-prompts.js';
 import { backendPrompts } from '../prompts/backend-prompts.js';
 import Engine from '../core/engine.js';
 import ErrorHandler from '../utils/error-handler.js';
+import ci from 'ci-info';
+import { loadProjectConfig } from '../utils/config-loader.js';
 
 export async function buildCommand(projectName, options) {
   try {
+    // CI mode: force non-interactive defaults
+    if (ci.isCI) {
+      options.yes = true;
+      options.git = options.git !== false;
+    }
+
+    // Load .quickshiprc / quickship.config.js if present — merged under CLI flags
+    const fileConfig = await loadProjectConfig();
+    if (fileConfig) {
+      options = { ...fileConfig, ...options };
+    }
+
     // Show welcome banner
-    logger.welcome();
+    if (options.ascii) {
+      logger.showAsciiLogo();
+    } else {
+      logger.welcome();
+    }
 
     // Step 1: Select platform (skip if -y flag and template provided)
     let platform = 'website'; // Default platform

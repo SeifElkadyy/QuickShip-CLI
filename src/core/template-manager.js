@@ -1,4 +1,4 @@
-import degit from 'degit';
+import { downloadTemplate } from 'giget';
 import { execa } from 'execa';
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
@@ -77,12 +77,10 @@ class TemplateManager {
     this.spinner.start(`Cloning template: ${templateName}`);
 
     try {
-      const emitter = degit(template.repo, {
-        cache: false,
+      await downloadTemplate(template.repo, {
+        dir: destinationPath,
         force: true,
       });
-
-      await emitter.clone(destinationPath);
       this.spinner.succeed('Template cloned successfully');
     } catch (error) {
       this.spinner.fail('Failed to clone template');
@@ -217,7 +215,6 @@ class TemplateManager {
 
       // Install Tailwind v4 PostCSS plugin and dependencies
       this.spinner.succeed('Tailwind CSS setup started');
-      console.log('\n📦 Installing Tailwind CSS packages...\n');
       await execa(
         packageManager,
         [
@@ -229,11 +226,10 @@ class TemplateManager {
         ],
         {
           cwd: destinationPath,
-          stdio: 'inherit',
+          stdio: 'pipe',
         }
       );
 
-      console.log('');
 
       // Create Tailwind and PostCSS config files manually
       const { writeFile } = await import('fs/promises');
@@ -302,7 +298,7 @@ export default {
       ];
 
       await execa('npx', args, {
-        stdio: 'inherit',
+        stdio: 'pipe',
       });
 
       this.spinner.succeed('T3 Stack app created successfully');
@@ -443,15 +439,11 @@ JWT_SECRET=your_jwt_secret_here_change_in_production
 
     // Install backend dependencies
     this.spinner.succeed('Backend files created');
-    console.log(
-      '\n📦 Installing backend dependencies (this may take a minute)...\n'
-    );
     await execa(packageManager, ['install'], {
       cwd: serverPath,
-      stdio: 'inherit',
+      stdio: 'pipe',
     });
 
-    console.log('');
   }
 
   async createMERNFrontend(projectPath, config) {
@@ -479,31 +471,23 @@ JWT_SECRET=your_jwt_secret_here_change_in_production
 
     // Install frontend dependencies
     this.spinner.succeed('Frontend files created');
-    console.log(
-      '\n📦 Installing frontend dependencies (this may take a minute)...\n'
-    );
     await execa(packageManager, ['install'], {
       cwd: clientPath,
-      stdio: 'inherit',
+      stdio: 'pipe',
     });
 
     // Install additional frontend packages
-    console.log(
-      '\n📦 Installing additional packages (axios, react-router-dom)...\n'
-    );
     const installCmd = packageManager === 'npm' ? 'install' : 'add';
     await execa(packageManager, [installCmd, 'axios', 'react-router-dom'], {
       cwd: clientPath,
-      stdio: 'inherit',
+      stdio: 'pipe',
     });
 
     // Setup Tailwind if selected
     if (config.styling === 'tailwind') {
-      console.log('');
       await this.setupTailwindForVite(clientPath, config);
     }
 
-    console.log('');
   }
 
   async createMERNRootFiles(projectPath, config) {
@@ -621,15 +605,13 @@ ${config.styling === 'tailwind' ? '- Tailwind CSS' : ''}
     await writeFile(join(projectPath, 'README.md'), readme);
 
     // Install concurrently in root
-    console.log('\n📦 Installing root dependencies (concurrently)...\n');
     const installCmd = packageManager === 'npm' ? 'install' : 'add';
     const devFlag = packageManager === 'npm' ? '--save-dev' : '-D';
     await execa(packageManager, [installCmd, devFlag, 'concurrently'], {
       cwd: projectPath,
-      stdio: 'inherit',
+      stdio: 'pipe',
     });
 
-    console.log('');
   }
 
   async createExpressApp(destinationPath, config, options = {}) {
@@ -714,14 +696,10 @@ ${config.styling === 'tailwind' ? '- Tailwind CSS' : ''}
 
       // Install dependencies
       if (options.install !== false) {
-        console.log(
-          '\n📦 Installing dependencies (this may take a minute)...\n'
-        );
         await execa(packageManager, ['install'], {
           cwd: destinationPath,
-          stdio: 'inherit',
+          stdio: 'pipe',
         });
-        console.log('');
       }
     } catch (error) {
       this.spinner.fail('Failed to create Express API project');
@@ -797,14 +775,10 @@ ${config.styling === 'tailwind' ? '- Tailwind CSS' : ''}
 
       // Install dependencies
       if (options.install !== false) {
-        console.log(
-          '\n📦 Installing dependencies (this may take a minute)...\n'
-        );
         await execa(packageManager, ['install'], {
           cwd: destinationPath,
-          stdio: 'inherit',
+          stdio: 'pipe',
         });
-        console.log('');
       }
     } catch (error) {
       this.spinner.fail('Failed to create NestJS API project');
@@ -813,19 +787,14 @@ ${config.styling === 'tailwind' ? '- Tailwind CSS' : ''}
   }
 
   async initShadcn(projectPath) {
-    this.spinner.start('Initializing shadcn/ui...');
-
     try {
-      // Use inherit to show the actual shadcn prompts and progress
-      await execa('npx', ['shadcn@latest', 'init', '-d', '-y'], {
-        cwd: projectPath,
-        stdio: 'inherit',
-      });
-
-      this.spinner.succeed('shadcn/ui initialized successfully');
+      await execa(
+        'npx',
+        ['shadcn@latest', 'init', '--defaults'],
+        { cwd: projectPath, stdio: 'pipe' }
+      );
     } catch (error) {
-      this.spinner.fail('Failed to initialize shadcn/ui');
-      throw error;
+      throw new Error(`shadcn/ui init failed: ${error.stderr || error.message}`);
     }
   }
 

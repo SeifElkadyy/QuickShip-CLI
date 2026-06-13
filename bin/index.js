@@ -42,6 +42,7 @@ program
   .option('-y, --yes', 'skip prompts and use defaults')
   .option('--no-git', 'skip git initialization')
   .option('--no-install', 'skip dependency installation')
+  .option('--ascii', 'show classic ASCII logo instead of gradient')
   .option('-v, --verbose', 'show detailed logs')
   .action(async (projectName, options) => {
     const { buildCommand } = await import('../src/commands/build.js');
@@ -121,14 +122,6 @@ program
   .action(async (options) => {
     const { deployCommand } = await import('../src/commands/deploy.js');
     await deployCommand(options);
-  });
-
-// Config command
-program
-  .command('config')
-  .description('Configure CLI settings')
-  .action(() => {
-    logger.info('Config command coming soon...');
   });
 
 program.parse(process.argv);

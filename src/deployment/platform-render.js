@@ -1,5 +1,6 @@
 import logger from '../utils/logger.js';
-import ora from 'ora';
+import Spinner from '../utils/spinner.js';
+
 import { resolve } from 'path';
 import pkg from 'fs-extra';
 const { pathExists, writeFile } = pkg;
@@ -8,7 +9,7 @@ export class RenderDeployment {
   constructor(projectPath, options = {}) {
     this.projectPath = projectPath;
     this.options = options;
-    this.spinner = ora();
+    this.spinner = new Spinner();
   }
 
   /**

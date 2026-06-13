@@ -4,7 +4,17 @@ import Spinner from '../utils/spinner.js';
 import pkg from 'fs-extra';
 const { pathExists, readJson, writeFile, ensureDir } = pkg;
 import { join } from 'path';
-import inquirer from 'inquirer';
+import { select, isCancel, cancel } from '@clack/prompts';
+import { detectPackageManager } from '../utils/project-detector.js';
+
+async function getPackageManager() {
+  return detectPackageManager(process.cwd());
+}
+
+function handleCancel(value) {
+  if (isCancel(value)) { cancel('Operation cancelled.'); process.exit(0); }
+  return value;
+}
 
 const spinner = new Spinner();
 
@@ -124,25 +134,14 @@ async function addAuth(projectType, options) {
 
   // If no provider specified, ask the user
   if (!provider) {
-    const answers = await inquirer.prompt([
-      {
-        type: 'list',
-        name: 'provider',
-        message: 'Which authentication provider would you like to use?',
-        choices: [
-          {
-            name: 'Clerk - Easiest auth setup with UI components',
-            value: 'clerk',
-          },
-          { name: 'Supabase - Auth + Database + Storage', value: 'supabase' },
-          {
-            name: 'NextAuth.js - Flexible auth for Next.js',
-            value: 'nextauth',
-          },
-        ],
-      },
-    ]);
-    provider = answers.provider;
+    provider = handleCancel(await select({
+      message: 'Which authentication provider?',
+      options: [
+        { value: 'clerk', label: 'Clerk', hint: 'Easiest — pre-built UI components' },
+        { value: 'supabase', label: 'Supabase', hint: 'Auth + Database + Storage' },
+        { value: 'nextauth', label: 'NextAuth.js', hint: 'Flexible auth for Next.js' },
+      ],
+    }));
   }
 
   // Call the appropriate function based on provider
@@ -169,9 +168,11 @@ async function addClerk() {
 
   try {
     const cwd = process.cwd();
+    const pm = await getPackageManager();
+    const addCmd = pm === 'npm' ? 'install' : 'add';
 
     // Install Clerk
-    await execa('npm', ['install', '@clerk/nextjs'], {
+    await execa(pm, [addCmd, '@clerk/nextjs'], {
       stdio: 'pipe',
       cwd,
     });
@@ -272,9 +273,11 @@ async function addSupabase() {
 
   try {
     const cwd = process.cwd();
+    const pm = await getPackageManager();
+    const addCmd = pm === 'npm' ? 'install' : 'add';
 
     // Install Supabase packages
-    await execa('npm', ['install', '@supabase/supabase-js', '@supabase/ssr'], {
+    await execa(pm, [addCmd, '@supabase/supabase-js', '@supabase/ssr'], {
       stdio: 'pipe',
       cwd,
     });
@@ -446,8 +449,8 @@ async function addNextAuth() {
   spinner.start('Installing NextAuth.js...');
 
   try {
-    // Install NextAuth
-    await execa('npm', ['install', 'next-auth'], {
+    const pm = await getPackageManager();
+    await execa(pm, [pm === 'npm' ? 'install' : 'add', 'next-auth'], {
       stdio: 'pipe',
     });
 
@@ -474,14 +477,11 @@ async function addDatabase(projectType) {
   spinner.start('Installing Prisma...');
 
   try {
-    // Install Prisma
-    await execa('npm', ['install', '@prisma/client'], {
-      stdio: 'pipe',
-    });
+    const pm = await getPackageManager();
+    const addCmd = pm === 'npm' ? 'install' : 'add';
 
-    await execa('npm', ['install', '-D', 'prisma'], {
-      stdio: 'pipe',
-    });
+    await execa(pm, [addCmd, '@prisma/client'], { stdio: 'pipe' });
+    await execa(pm, [addCmd, '-D', 'prisma'], { stdio: 'pipe' });
 
     spinner.succeed('Prisma installed successfully!');
 

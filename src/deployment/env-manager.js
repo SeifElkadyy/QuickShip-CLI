@@ -1,7 +1,7 @@
 import pkg from 'fs-extra';
 const { pathExists, readFile } = pkg;
 import { resolve } from 'path';
-import inquirer from 'inquirer';
+import { text, isCancel } from '@clack/prompts';
 import logger from '../utils/logger.js';
 
 export class EnvironmentVariableManager {
@@ -130,22 +130,19 @@ export class EnvironmentVariableManager {
         continue;
       }
 
-      // Prompt for the value
-      const { value } = await inquirer.prompt([
-        {
-          type: 'input',
-          name: 'value',
-          message: `${key}:`,
-          default: defaultValue,
-          validate: (input) => {
-            // Don't allow empty values for required vars
-            if (!input || input.trim() === '') {
-              return 'This environment variable is required';
-            }
-            return true;
-          },
+      const value = await text({
+        message: `${key}:`,
+        placeholder: defaultValue || '',
+        defaultValue: defaultValue || '',
+        validate: (input) => {
+          if (!input || input.trim() === '') return 'This variable is required';
         },
-      ]);
+      });
+
+      if (isCancel(value)) {
+        logger.warning('Env setup cancelled — skipping remaining variables');
+        break;
+      }
 
       answers[key] = value;
     }

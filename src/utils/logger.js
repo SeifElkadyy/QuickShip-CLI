@@ -1,57 +1,27 @@
 import chalk from 'chalk';
 import boxen from 'boxen';
+import gradient from 'gradient-string';
 
-const LOGOS = {
-  main: `
- ██████╗ ██╗   ██╗██╗ ██████╗██╗  ██╗███████╗██╗  ██╗██╗██████╗
-██╔═══██╗██║   ██║██║██╔════╝██║ ██╔╝██╔════╝██║  ██║██║██╔══██╗
-██║   ██║██║   ██║██║██║     █████╔╝ ███████╗███████║██║██████╔╝
-██║▄▄ ██║██║   ██║██║██║     ██╔═██╗ ╚════██║██╔══██║██║██╔═══╝
-╚██████╔╝╚██████╔╝██║╚██████╗██║  ██╗███████║██║  ██║██║██║
- ╚══▀▀═╝  ╚═════╝ ╚═╝ ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝╚═╝`,
-
-  small: `
-          ▝▀▚▄     ▄▄▄█▀▀▀▀▀▀▀█▄▄
-         ▀▙▄▄  ▝▜▌  ▗▄▄▙▄▟▟██▄▄▀█▖
-              ▟▘▄▛▀▘       ▘▝▜██▌
-           ▗█▘▟▛ ▗▄▟██▙▄      ▀▜▌
-          ▄█▚▟▘ ▄████▜▀▜▀▛▛▛▜▜▀▀█▙▄▄
-      ▄▟▟█▀▀▀   ▝▝            ▝▘▀█▛
-         ▜▙▄▗                 ▄▛▘
-      ▝█▀▀▀▜▀▀▀██▙▄▄▄▄▄▖    ▄▛▀
-       ▀▛▙▙▄▄▗      ▘▀▀▀▀█▜▛▘`,
-
-  full: `
-                             ▄▄▖
-                             ███
-      ▗▄                      █▖
-       ▝▜▟▄                ▗▗▄▟▙
-          ▝▀▚▄     ▄▄▄█▀▀▀▀▀▀▀▀▀▀▀█▄▄
-    ▄▄▖▖          ▐▙▞               ▀▜▄
-     ▝▀▀▀▙▄▄       ▝▜▌  ▗▄▄▙▄▟▟███▄▄▄▄▀█▖
-                    ▟▘▄▛▀▘▘         ▘▝▜██▌
-   ▗▄▄▄▄▄▄▄       ▗█▘▟▛ ▗▄▟██▙▄         ▀▜▌
-    ▝            ▄█▚▟▘ ▄██████▜▀▜▀▛▛▛▛▛▛▜▜▜▀▀▀█▙▄▄▄▄▗▖
-        ▄▄▄▟▟▟▟█▀▀▀▀   ▝▝                         ▝▝▘▀█▛
-       ▝█▘                                          ▄▛▘
-        ▜▙▄▗                                      ▄▛▘
-     ▗▄▖▝█▀▀▀▀▀▜▀▀▀▀▀██▙▄▄▄▄▄▄▄▄▄▄▄▖            ▄▛▀
-      ▝▀▀▛▙▙▄▄▗            ▝▝ ▘  ▘▀▀▀▀▀▀█▜▚▜▞█▟▛▘
-             ▀▀▀▜█▟▄▄▖                    ▗▄▟▀▘
-                    ▀▀▀▛▜▄▄▖▖         ▗▗▄▛▀
-                      ▄▄▄▖▝▀▀▀█▙▙▟▄▟▛▀▀▀
-                        ▀▀▀▀▟▄▄▗ ▝▀▀▜▄▄▗
-                              ▝▀▀▜▄   ▝▀▀`,
-};
+const quickshipGradient = gradient(['#00d4ff', '#7b2ff7']);
 
 const logger = {
-  // Show main welcome banner with boxen for rounded corners
   welcome() {
-    console.log(chalk.cyan(LOGOS.main));
+    const ascii = [
+      '',
+      '  ██████╗ ██╗   ██╗██╗ ██████╗██╗  ██╗███████╗██╗  ██╗██╗██████╗',
+      ' ██╔═══██╗██║   ██║██║██╔════╝██║ ██╔╝██╔════╝██║  ██║██║██╔══██╗',
+      ' ██║   ██║██║   ██║██║██║     █████╔╝ ███████╗███████║██║██████╔╝',
+      ' ██║▄▄ ██║██║   ██║██║██║     ██╔═██╗ ╚════██║██╔══██║██║██╔═══╝',
+      ' ╚██████╔╝╚██████╔╝██║╚██████╗██║  ██╗███████║██║  ██║██║██║',
+      '  ╚══▀▀═╝  ╚═════╝ ╚═╝ ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝╚═╝',
+      '',
+    ].join('\n');
+    const banner = quickshipGradient.multiline(ascii);
+    console.log(banner);
     console.log(
-      boxen('Welcome to QuickShip! Build Fast. Ship Faster. 🚀', {
-        padding: 0,
-        margin: { top: 1, bottom: 0, left: 0, right: 0 },
+      boxen(chalk.bold('Build Fast. Ship Faster. ⚡'), {
+        padding: { top: 0, bottom: 0, left: 2, right: 2 },
+        margin: { top: 0, bottom: 1, left: 0, right: 0 },
         borderStyle: 'round',
         borderColor: 'cyan',
         textAlignment: 'center',
@@ -60,29 +30,26 @@ const logger = {
     );
   },
 
-  // Show small logo for loading, processing, etc.
-  showLogo(color = 'cyan') {
-    console.log(chalk[color](LOGOS.small));
-  },
-
-  // Show small logo with a message below it
-  logoWithMessage(message, color = 'cyan') {
-    console.log(chalk[color](LOGOS.small));
-    console.log(chalk.white(`\n    ${message}\n`));
+  showAsciiLogo() {
+    const ascii = `
+ ██████╗ ██╗   ██╗██╗ ██████╗██╗  ██╗███████╗██╗  ██╗██╗██████╗
+██╔═══██╗██║   ██║██║██╔════╝██║ ██╔╝██╔════╝██║  ██║██║██╔══██╗
+██║   ██║██║   ██║██║██║     █████╔╝ ███████╗███████║██║██████╔╝
+██║▄▄ ██║██║   ██║██║██║     ██╔═██╗ ╚════██║██╔══██║██║██╔═══╝
+╚██████╔╝╚██████╔╝██║╚██████╗██║  ██╗███████║██║  ██║██║██║
+ ╚══▀▀═╝  ╚═════╝ ╚═╝ ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝╚═╝`;
+    console.log(chalk.cyan(ascii));
   },
 
   success(message) {
     console.log(chalk.green('✓'), message);
   },
-
   error(message) {
     console.log(chalk.red('✗'), message);
   },
-
   info(message) {
     console.log(chalk.blue('ℹ'), message);
   },
-
   warning(message) {
     console.log(chalk.yellow('⚠'), message);
   },
@@ -99,27 +66,18 @@ const logger = {
     );
   },
 
-  // Divider for visual separation
   divider() {
     console.log(chalk.gray('─'.repeat(60)));
   },
-
-  // Styled header text
   header(text, color = 'cyan') {
     console.log(chalk[color].bold(`\n${text}\n`));
   },
-
-  // Dim/muted text for less important info
   dim(message) {
     console.log(chalk.gray(message));
   },
-
-  // Highlight important text
   highlight(message) {
     console.log(chalk.cyan.bold(message));
   },
-
-  // Plain console.log wrapper for consistency
   log(message) {
     console.log(message);
   },

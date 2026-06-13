@@ -1,4 +1,4 @@
-import inquirer from 'inquirer';
+import { confirm, select, isCancel, cancel } from '@clack/prompts';
 import logger from '../utils/logger.js';
 import {
   detectProjectType,
@@ -12,7 +12,14 @@ import { RailwayDeployment } from '../deployment/platform-railway.js';
 import { RenderDeployment } from '../deployment/platform-render.js';
 import { EnvironmentVariableManager } from '../deployment/env-manager.js';
 import { execa } from 'execa';
-import ora from 'ora';
+
+function handleCancel(value) {
+  if (isCancel(value)) {
+    cancel('Deployment cancelled.');
+    process.exit(0);
+  }
+  return value;
+}
 
 export async function deployCommand(options = {}) {
   try {
@@ -58,14 +65,9 @@ export async function deployCommand(options = {}) {
       });
       logger.log('');
 
-      const { shouldContinue } = await inquirer.prompt([
-        {
-          type: 'confirm',
-          name: 'shouldContinue',
-          message: 'Continue anyway?',
-          default: false,
-        },
-      ]);
+      const shouldContinue = handleCancel(
+        await confirm({ message: 'Continue anyway?', initialValue: false })
+      );
 
       if (!shouldContinue) {
         logger.info('Deployment cancelled');
@@ -82,16 +84,16 @@ export async function deployCommand(options = {}) {
     if (!platform) {
       const platforms = getRecommendedPlatforms(projectType);
 
-      const { selectedPlatform } = await inquirer.prompt([
-        {
-          type: 'list',
-          name: 'selectedPlatform',
+      platform = handleCancel(
+        await select({
           message: 'Select deployment platform:',
-          choices: platforms,
-        },
-      ]);
-
-      platform = selectedPlatform;
+          options: platforms.map((p) =>
+            typeof p === 'string'
+              ? { value: p, label: p }
+              : { value: p.value ?? p.name, label: p.name ?? p.value }
+          ),
+        })
+      );
     }
 
     logger.log('');
@@ -124,14 +126,9 @@ export async function deployCommand(options = {}) {
       if (!cliInstalled) {
         logger.warning('Railway CLI is not installed');
 
-        const { shouldInstall } = await inquirer.prompt([
-          {
-            type: 'confirm',
-            name: 'shouldInstall',
-            message: 'Install Railway CLI now?',
-            default: true,
-          },
-        ]);
+        const shouldInstall = handleCancel(
+          await confirm({ message: 'Install Railway CLI now?', initialValue: true })
+        );
 
         if (shouldInstall) {
           const installed = await platformHandler.installCli();
@@ -153,14 +150,12 @@ export async function deployCommand(options = {}) {
     if (!isAuthenticated) {
       logger.info(`You need to log in to ${platform}`);
 
-      const { shouldLogin } = await inquirer.prompt([
-        {
-          type: 'confirm',
-          name: 'shouldLogin',
+      const shouldLogin = handleCancel(
+        await confirm({
           message: `Log in to ${platform} now?`,
-          default: true,
-        },
-      ]);
+          initialValue: true,
+        })
+      );
 
       if (!shouldLogin) {
         logger.error('Authentication required for deployment');
@@ -181,14 +176,13 @@ export async function deployCommand(options = {}) {
 
       if (requiredVars.length > 0) {
         logger.log('');
-        const { setupEnv } = await inquirer.prompt([
-          {
-            type: 'confirm',
-            name: 'setupEnv',
+
+        const setupEnv = handleCancel(
+          await confirm({
             message: 'Configure environment variables for deployment?',
-            default: true,
-          },
-        ]);
+            initialValue: true,
+          })
+        );
 
         if (setupEnv) {
           envVars = await envManager.interactiveSetup(projectType);
@@ -202,14 +196,10 @@ export async function deployCommand(options = {}) {
       const isLinked = await platformHandler.isLinked();
       if (!isLinked) {
         logger.info('Netlify site not linked yet');
-        const { shouldInit } = await inquirer.prompt([
-          {
-            type: 'confirm',
-            name: 'shouldInit',
-            message: 'Initialize Netlify site now?',
-            default: true,
-          },
-        ]);
+
+        const shouldInit = handleCancel(
+          await confirm({ message: 'Initialize Netlify site now?', initialValue: true })
+        );
 
         if (shouldInit) {
           await platformHandler.init();
@@ -218,12 +208,10 @@ export async function deployCommand(options = {}) {
     }
 
     if (platform === 'railway') {
-      // Railway might need project initialization
       logger.dim('Checking Railway project status...\n');
     }
 
     if (platform === 'render') {
-      // Check if project has Git
       const hasGit = await platformHandler.hasGit();
       if (!hasGit) {
         logger.warning('Render requires a Git repository');
@@ -235,14 +223,13 @@ export async function deployCommand(options = {}) {
     // Step 9: Final confirmation
     if (!options.yes) {
       logger.log('');
-      const { confirmDeploy } = await inquirer.prompt([
-        {
-          type: 'confirm',
-          name: 'confirmDeploy',
+
+      const confirmDeploy = handleCancel(
+        await confirm({
           message: `Ready to deploy to ${platform}?`,
-          default: true,
-        },
-      ]);
+          initialValue: true,
+        })
+      );
 
       if (!confirmDeploy) {
         logger.info('Deployment cancelled');
@@ -256,9 +243,10 @@ export async function deployCommand(options = {}) {
     // Step 10: Run deployment
     let result;
 
-    if (projectType === 'mern-stack' && platform === 'railway') {
-      result = await platformHandler.deployMERN(envVars);
-    } else if (projectType === 'mern-stack' && platform === 'render') {
+    if (
+      (projectType === 'mern-stack' && platform === 'railway') ||
+      (projectType === 'mern-stack' && platform === 'render')
+    ) {
       result = await platformHandler.deployMERN(envVars);
     } else {
       result = await platformHandler.deploy(envVars);
@@ -283,7 +271,6 @@ ${result.message || ''}
         '🎉 Success'
       );
 
-      // Show platform-specific tips
       const tips = platformHandler.getDeploymentTips();
       if (tips && tips.length > 0) {
         logger.log('\n');
@@ -298,7 +285,6 @@ ${result.message || ''}
       logger.error('❌ Deployment Failed\n');
       logger.log(`Error: ${result.error}\n`);
 
-      // Show troubleshooting tips
       logger.header('🔧 Troubleshooting');
       logger.log('');
       logger.log('1. Check that your build command works locally:');
@@ -309,15 +295,13 @@ ${result.message || ''}
       logger.log('2. Verify all environment variables are set correctly');
       logger.log('');
       logger.log('3. Check platform status:');
-      if (platform === 'vercel') {
-        logger.log('   https://www.vercel-status.com');
-      } else if (platform === 'netlify') {
-        logger.log('   https://www.netlifystatus.com');
-      } else if (platform === 'railway') {
-        logger.log('   https://railway.statuspage.io');
-      } else if (platform === 'render') {
-        logger.log('   https://status.render.com');
-      }
+      const statusUrls = {
+        vercel: 'https://www.vercel-status.com',
+        netlify: 'https://www.netlifystatus.com',
+        railway: 'https://railway.statuspage.io',
+        render: 'https://status.render.com',
+      };
+      if (statusUrls[platform]) logger.log(`   ${statusUrls[platform]}`);
       logger.log('');
 
       process.exit(1);
@@ -337,29 +321,13 @@ ${result.message || ''}
   }
 }
 
-/**
- * Test build locally before deployment
- */
 async function _testBuild(projectPath, packageManager) {
-  const spinner = ora('Testing build...').start();
-
   try {
     const buildCmd = packageManager === 'npm' ? 'npm' : packageManager;
     const buildArgs = packageManager === 'npm' ? ['run', 'build'] : ['build'];
-
-    await execa(buildCmd, buildArgs, {
-      cwd: projectPath,
-      stdio: 'pipe',
-    });
-
-    spinner.succeed('Build test passed');
+    await execa(buildCmd, buildArgs, { cwd: projectPath, stdio: 'pipe' });
     return true;
-  } catch (error) {
-    spinner.fail('Build test failed');
-    logger.error('Your project does not build successfully');
-    logger.log('');
-    logger.log('Fix build errors before deploying:');
-    logger.log(error.message);
+  } catch {
     return false;
   }
 }

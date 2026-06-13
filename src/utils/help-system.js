@@ -1,5 +1,6 @@
 import logger from './logger.js';
 import chalk from 'chalk';
+import boxen from 'boxen';
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
