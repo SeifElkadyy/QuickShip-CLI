@@ -17,21 +17,8 @@ export function analyzeProjectName(projectName) {
     reason: '',
   };
 
-  // SaaS/App patterns
+  // E-commerce patterns (checked before generic 'app' to avoid false matches on 'cart-app')
   if (
-    name.includes('saas') ||
-    name.includes('app') ||
-    name.includes('platform') ||
-    name.includes('dashboard')
-  ) {
-    recommendations.stack = 'nextjs';
-    recommendations.shadcn = true;
-    recommendations.reason =
-      'SaaS/App projects work great with Next.js + shadcn/ui';
-  }
-
-  // E-commerce patterns
-  else if (
     name.includes('shop') ||
     name.includes('store') ||
     name.includes('ecommerce') ||
@@ -41,6 +28,44 @@ export function analyzeProjectName(projectName) {
     recommendations.shadcn = true;
     recommendations.reason =
       'E-commerce needs database & auth - T3 Stack includes Prisma + NextAuth';
+  }
+
+  // Admin/Dashboard patterns (before 'app' — 'admin-app' should be Vite SPA)
+  else if (
+    name.includes('admin') ||
+    name.includes('panel') ||
+    name.includes('console') ||
+    name.includes('backoffice')
+  ) {
+    recommendations.stack = 'vite';
+    recommendations.shadcn = false;
+    recommendations.reason = 'Admin panels work well as SPAs with React + Vite';
+  }
+
+  // API/Backend patterns (before 'app' — 'rest-api' should be MERN)
+  else if (
+    name.includes('api') ||
+    name.includes('backend') ||
+    name.includes('server') ||
+    name.includes('rest')
+  ) {
+    recommendations.stack = 'mern';
+    recommendations.shadcn = false;
+    recommendations.reason =
+      'APIs benefit from MERN Stack with Express backend';
+  }
+
+  // SaaS/App patterns
+  else if (
+    name.includes('saas') ||
+    name.includes('app') ||
+    name.includes('platform') ||
+    name.includes('dashboard')
+  ) {
+    recommendations.stack = 'nextjs';
+    recommendations.shadcn = true;
+    recommendations.reason =
+      'SaaS/App projects work great with Next.js + shadcn/ui';
   }
 
   // Blog/Content patterns
@@ -67,31 +92,6 @@ export function analyzeProjectName(projectName) {
     recommendations.shadcn = false;
     recommendations.reason =
       'Marketing sites are perfect for Next.js with great SEO';
-  }
-
-  // Admin/Dashboard patterns
-  else if (
-    name.includes('admin') ||
-    name.includes('panel') ||
-    name.includes('console') ||
-    name.includes('backoffice')
-  ) {
-    recommendations.stack = 'vite';
-    recommendations.shadcn = false;
-    recommendations.reason = 'Admin panels work well as SPAs with React + Vite';
-  }
-
-  // API/Backend patterns
-  else if (
-    name.includes('api') ||
-    name.includes('backend') ||
-    name.includes('server') ||
-    name.includes('rest')
-  ) {
-    recommendations.stack = 'mern';
-    recommendations.shadcn = false;
-    recommendations.reason =
-      'APIs benefit from MERN Stack with Express backend';
   }
 
   // Database-heavy patterns

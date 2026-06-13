@@ -48,7 +48,7 @@ export async function buildCommand(projectName, options) {
       platform = 'backend';
     }
 
-    if (!options.yes || !options.template) {
+    if (!options.yes && !options.template) {
       platform = await selectPlatform();
     }
 

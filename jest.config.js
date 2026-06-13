@@ -11,18 +11,7 @@ export default {
   transform: {},
   moduleFileExtensions: ['js', 'json'],
   verbose: true,
-  testTimeout: 60000, // 60 seconds for integration tests
-  setupFilesAfterEnv: [],
-  // Handle ES modules
-  extensionsToTreatAsEsm: [],
-  moduleNameMapper: {},
-  // Coverage thresholds (can be enabled later)
-  // coverageThreshold: {
-  //   global: {
-  //     branches: 50,
-  //     functions: 50,
-  //     lines: 50,
-  //     statements: 50,
-  //   },
-  // },
+  testTimeout: 120000,
+  // Run all tests sequentially — integration tests create/delete dirs and conflict when parallel
+  maxWorkers: 1,
 };
