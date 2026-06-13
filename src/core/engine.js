@@ -27,9 +27,13 @@ class Engine {
       try {
         if (await pathExists(this.projectPath)) {
           await remove(this.projectPath);
-          process.stdout.write(`\n  Cleaned up partial project at ${this.projectPath}\n`);
+          process.stdout.write(
+            `\n  Cleaned up partial project at ${this.projectPath}\n`
+          );
         }
-      } catch { /* best effort */ }
+      } catch {
+        /* best effort */
+      }
       process.exit(130);
     };
     process.on('SIGINT', this._sigintHandler);
@@ -65,14 +69,21 @@ class Engine {
           title: 'Generate project files',
           enabled: () => !toolsWithAutoInstall,
           task: async () => {
-            await this.fileGenerator.updatePackageJson(this.projectPath, this.config);
-            await this.fileGenerator.generateReadme(this.projectPath, this.config);
+            await this.fileGenerator.updatePackageJson(
+              this.projectPath,
+              this.config
+            );
+            await this.fileGenerator.generateReadme(
+              this.projectPath,
+              this.config
+            );
             await this.fileGenerator.generateGitignore(this.projectPath);
           },
         },
         {
           title: 'Install dependencies',
-          enabled: () => !toolsWithAutoInstall && this.options.install !== false,
+          enabled: () =>
+            !toolsWithAutoInstall && this.options.install !== false,
           task: async () => {
             await this.dependencyInstaller.install(this.projectPath);
           },
@@ -123,9 +134,13 @@ class Engine {
   }
 
   async validatePath() {
-    const nameValidation = validator.validateProjectName(this.config.projectName);
+    const nameValidation = validator.validateProjectName(
+      this.config.projectName
+    );
     if (!nameValidation.valid) {
-      throw new Error(`Invalid project name: ${nameValidation.errors.join(', ')}`);
+      throw new Error(
+        `Invalid project name: ${nameValidation.errors.join(', ')}`
+      );
     }
 
     const cwd = resolve(process.cwd());
@@ -372,11 +387,17 @@ Happy coding! 💻
 
     // Detect available editors
     const editors = [];
-    for (const [cmd, label] of [['code', 'VS Code'], ['cursor', 'Cursor'], ['zed', 'Zed']]) {
+    for (const [cmd, label] of [
+      ['code', 'VS Code'],
+      ['cursor', 'Cursor'],
+      ['zed', 'Zed'],
+    ]) {
       try {
         await execa(cmd, ['--version'], { stdio: 'pipe' });
         editors.push({ cmd, label });
-      } catch { /* not installed */ }
+      } catch {
+        /* not installed */
+      }
     }
     if (editors.length === 0) return;
 

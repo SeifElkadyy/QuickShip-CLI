@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
-import logger from '../src/utils/logger.js';
 import { checkForUpdates } from '../src/utils/update-checker.js';
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';

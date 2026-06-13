@@ -41,7 +41,12 @@ export async function websitePrompts(projectName, options = {}) {
   // Smart defaults: analyze project name to pre-select best stack
   const smartDefaults = analyzeProjectName(name);
   const defaultStack = smartDefaults?.stack
-    ? { nextjs: 'nextjs', t3: 't3-stack', vite: 'react-vite', mern: 'mern-stack' }[smartDefaults.stack] ?? 'nextjs'
+    ? ({
+        nextjs: 'nextjs',
+        t3: 't3-stack',
+        vite: 'react-vite',
+        mern: 'mern-stack',
+      }[smartDefaults.stack] ?? 'nextjs')
     : 'nextjs';
 
   if (smartDefaults?.reason) {
@@ -63,7 +68,11 @@ export async function websitePrompts(projectName, options = {}) {
           label: 'T3 Stack',
           hint: 'tRPC + Prisma + NextAuth',
         },
-        { value: 'react-vite', label: 'React + Vite', hint: 'Fast SPA development' },
+        {
+          value: 'react-vite',
+          label: 'React + Vite',
+          hint: 'Fast SPA development',
+        },
         {
           value: 'mern-stack',
           label: 'MERN Stack',
@@ -123,5 +132,13 @@ export async function websitePrompts(projectName, options = {}) {
     })
   );
 
-  return { projectName: name, stack, typescript, styling, shadcn, packageManager, git };
+  return {
+    projectName: name,
+    stack,
+    typescript,
+    styling,
+    shadcn,
+    packageManager,
+    git,
+  };
 }

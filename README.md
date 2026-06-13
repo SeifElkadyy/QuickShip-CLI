@@ -6,10 +6,11 @@
   ### Ship production-ready projects in 60 seconds
 
 [![npm version](https://img.shields.io/npm/v/quickship-cli?color=blue&style=flat-square)](https://www.npmjs.com/package/quickship-cli)
+[![CI](https://img.shields.io/github/actions/workflow/status/SeifElkadyy/QuickShip-CLI/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/SeifElkadyy/QuickShip-CLI/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen?style=flat-square)](https://nodejs.org)
 
-**Stop wasting hours on boilerplate.** Create production-ready web and mobile apps with TypeScript, Tailwind CSS, and modern tooling - fully configured in under 60 seconds.
+**Stop wasting hours on boilerplate.** Create production-ready web, mobile, and backend apps with TypeScript, Tailwind CSS, and modern tooling — fully configured in under 60 seconds.
 
 [Getting Started](#-getting-started) • [Templates](#-templates) • [Commands](#-commands) • [Deploy](#-deployment)
 
@@ -26,7 +27,7 @@
   <br>
 
   <img src="./assets/Quickship-Demo.jpg" alt="QuickShip Demo Screenshot" width="700">
-  <p><em>Wide range of templates: Web, Mobile, and Backend with flexible database options</em></p>
+  <p><em>Web, Mobile, and Backend templates with flexible database options</em></p>
 </div>
 
 ---
@@ -35,8 +36,8 @@
 
 | Traditional Setup | With QuickShip |
 |-------------------|----------------|
-| ❌ 30-60 minutes setup | ✅ **60 seconds** |
-| ❌ Manual configuration | ✅ **Fully automated** |
+| ❌ 30–60 minutes of setup | ✅ **60 seconds** |
+| ❌ Manual config files | ✅ **Fully automated** |
 | ❌ Version conflicts | ✅ **Latest stable versions** |
 | ❌ Missing best practices | ✅ **Production-ready** |
 | ❌ Complex deployment | ✅ **One command deploy** |
@@ -47,17 +48,13 @@
 
 ### Installation
 
-**Option 1: No Installation (Recommended)**
-
-Use `npx` to run QuickShip without installing:
+**Option 1: No installation (recommended)**
 
 ```bash
 npx quickship-cli@latest build my-app
 ```
 
-**Option 2: Global Install**
-
-Install once, use everywhere:
+**Option 2: Global install**
 
 ```bash
 npm install -g quickship-cli
@@ -65,38 +62,43 @@ npm install -g quickship-cli
 
 ---
 
-### Basic Usage
-
-The simplest way to create a project:
+### Basic usage
 
 ```bash
 quickship build my-app
 ```
 
-QuickShip will ask you a few questions and create your project. That's it!
+QuickShip prompts a few questions and creates your project. That's it.
 
 **What you get:**
 - ✅ TypeScript configured
 - ✅ Tailwind CSS ready
-- ✅ Git initialized
+- ✅ Git initialized with initial commit
 - ✅ Dependencies installed
-- ✅ ESLint + Prettier setup
 - ✅ Development server ready
-
-**Then start coding:**
+- ✅ shadcn/ui (if selected) — fully initialized
 
 ```bash
 cd my-app
 npm run dev
 ```
 
-Your app is now running! 🎉
+---
+
+### Smart suggestions
+
+QuickShip analyzes your project name and pre-selects the best stack:
+
+```bash
+quickship build my-saas-dashboard   # → suggests Next.js + shadcn/ui
+quickship build my-shop             # → suggests T3 Stack (auth + DB)
+quickship build my-rest-api         # → suggests Express API
+quickship build my-admin-panel      # → suggests React + Vite SPA
+```
 
 ---
 
-### Skip the Questions (Headless Mode)
-
-Want to skip all prompts? Use the `-y` flag:
+### Skip the questions (headless mode)
 
 ```bash
 # Uses sensible defaults (Next.js, TypeScript, Tailwind, npm, Git)
@@ -105,45 +107,59 @@ quickship build my-app -y
 
 ---
 
-### Advanced Usage
+### CI/CD mode
 
-Customize with flags:
+QuickShip **auto-detects CI environments** (GitHub Actions, CircleCI, Railway, etc.) and runs fully non-interactively — no flags needed:
 
 ```bash
-# Specify template
-quickship build my-app --template nextjs -y
-
-# Choose package manager
-quickship build my-app -p pnpm -y
-
-# Skip Git initialization
-quickship build my-app --no-git -y
-
-# Skip dependency installation (for CI/CD)
-quickship build my-app --no-install -y
-
-# Combine options
-quickship build my-app --template vite -p yarn --no-git -y
+# In GitHub Actions / any CI — prompts are skipped automatically
+quickship build my-app --template nextjs --no-install --no-git
 ```
 
-**Available flags:**
+---
 
-| Flag | Description | Example |
-|------|-------------|---------|
-| `-y, --yes` | Skip all prompts | `quickship build my-app -y` |
-| `-t, --template <n>` | Choose template | `--template nextjs` |
-| `-p, --package-manager <pm>` | Choose package manager | `-p pnpm` |
-| `--no-git` | Skip Git initialization | `quickship build my-app --no-git` |
-| `--no-install` | Skip installing dependencies | `quickship build my-app --no-install` |
-| `-v, --verbose` | Show detailed logs | `quickship build my-app -v` |
+### Team config file
+
+Commit a `.quickshiprc.json` to your repo so every developer gets the same defaults:
+
+```json
+{
+  "packageManager": "pnpm",
+  "git": true
+}
+```
+
+QuickShip picks it up automatically via `cosmiconfig` — supports `.quickshiprc`, `.quickshiprc.json`, `quickship.config.js`, or a `quickship` key in `package.json`.
+
+---
+
+### Advanced flags
+
+```bash
+quickship build my-app --template nextjs -y          # specific template
+quickship build my-app -p pnpm -y                    # choose package manager
+quickship build my-app --no-git -y                   # skip git
+quickship build my-app --no-install -y               # skip npm install
+quickship build my-app --ascii                       # classic ASCII logo
+```
+
+**All flags:**
+
+| Flag | Description |
+|------|-------------|
+| `-y, --yes` | Skip all prompts, use defaults |
+| `-t, --template <name>` | Choose template directly |
+| `-p, --package-manager <pm>` | `npm` / `pnpm` / `yarn` / `bun` |
+| `--no-git` | Skip Git initialization |
+| `--no-install` | Skip dependency installation |
+| `--ascii` | Show classic ASCII logo |
+| `-v, --verbose` | Show detailed logs |
 
 ---
 
 ## 🚀 Templates
 
-Choose from **6 production-ready templates** for web, mobile, and backend:
-
-### 🌐 Web Development
+### 🌐 Web
 
 <table>
 <tr>
@@ -152,13 +168,12 @@ Choose from **6 production-ready templates** for web, mobile, and backend:
 #### Next.js
 *Recommended*
 
-Full-stack React framework with server components and API routes.
+Full-stack React with server components and API routes.
 
-**Stack:**
-- Next.js 15+
+- Next.js 16
 - React 19
 - TypeScript
-- Tailwind CSS
+- Tailwind CSS v4
 - App Router
 
 ```bash
@@ -171,15 +186,13 @@ quickship build my-app \
 
 #### T3 Stack
 
-Type-safe full-stack with tRPC, Prisma, and NextAuth.
+Type-safe full-stack with tRPC, Prisma, NextAuth.
 
-**Stack:**
 - Next.js
 - tRPC
 - Prisma
 - NextAuth
 - TypeScript
-- Tailwind CSS
 
 ```bash
 quickship build my-app \
@@ -191,18 +204,16 @@ quickship build my-app \
 
 #### React + Vite
 
-Lightning-fast React SPA development.
+Fast SPA development.
 
-**Stack:**
 - React 18+
 - Vite 7+
 - TypeScript
 - Tailwind CSS v4
-- React Router
 
 ```bash
 quickship build my-app \
-  --template vite -y
+  --template react-vite -y
 ```
 
 </td>
@@ -211,54 +222,43 @@ quickship build my-app \
 
 #### MERN Stack
 
-Full-stack with MongoDB, Express, React, and Node.js.
-
-**Stack:** MongoDB • Express • React • Node.js • TypeScript • Tailwind CSS
+Full-stack MongoDB + Express + React + Node.js with TypeScript.
 
 ```bash
 quickship build my-app --template mern-stack -y
 ```
 
-### 📱 Mobile Development
+---
+
+### 📱 Mobile
 
 #### Expo React Native
 
-Cross-platform mobile apps for iOS, Android, and Web.
+Cross-platform iOS, Android, and Web.
 
-**Stack:** Expo SDK 52+ • React Native • TypeScript • Expo Router
-
-**Features:**
-- 📂 Tabs or Blank template
-- 🎨 StyleSheet (default) or NativeWind (Tailwind CSS)
-- 🧭 File-based routing with Expo Router
-- 📱 Test instantly with Expo Go
-- 🌐 Runs on iOS, Android, and Web
+- Expo SDK 52+
+- React Native + TypeScript
+- Expo Router (file-based routing)
+- StyleSheet or NativeWind (Tailwind CSS)
 
 ```bash
 quickship build my-app --template expo-react-native -y
 ```
 
-### 🔌 Backend / API Development
+---
+
+### 🔌 Backend / API
 
 #### Express + TypeScript API
-*Recommended*
 
-Fast, flexible RESTful API with TypeScript and **optional** ORM/ODM.
+Fast REST API with flexible database options.
 
-**Stack:** Express.js • TypeScript • Your Choice of Database & ORM • JWT Auth (optional) • Swagger (optional)
-
-**Features:**
-- 🚀 Express.js 4+ with TypeScript
-- 💾 **Flexible Database Options:**
-  - PostgreSQL (with Prisma ORM or raw `pg` driver)
-  - MongoDB (with Mongoose ODM or raw `mongodb` driver)
-  - SQLite (with Prisma ORM or `better-sqlite3`)
-  - No database (API only)
-- 🔐 JWT Authentication (optional, requires database)
-- 📚 Swagger API Documentation (optional)
-- 🐳 Docker Support (optional)
-- ✅ Zod Validation
-- 🧪 Jest Testing
+- Express.js + TypeScript
+- PostgreSQL / MongoDB / SQLite / None
+- Prisma ORM or raw drivers (your choice)
+- JWT auth (optional)
+- Swagger docs (optional)
+- Docker (optional)
 
 ```bash
 quickship build my-api --template express-api -y
@@ -266,22 +266,13 @@ quickship build my-api --template express-api -y
 
 #### NestJS API
 
-Enterprise-grade API with modular architecture, dependency injection, and **optional** ORM/ODM.
+Enterprise-grade modular API.
 
-**Stack:** NestJS • TypeScript • Your Choice of Database & ORM • Passport.js Auth (optional) • Swagger (optional)
-
-**Features:**
-- 🏗️  NestJS 10+ with TypeScript
-- 💾 **Flexible Database Options:**
-  - PostgreSQL (with Prisma ORM or raw `pg` driver)
-  - MongoDB (with Mongoose ODM or raw `mongodb` driver)
-  - SQLite (with Prisma ORM or `better-sqlite3`)
-  - No database (API only)
-- 🔐 Passport.js + JWT Authentication (optional, requires database)
-- 📚 Swagger API Documentation (auto-generated, optional)
-- 🐳 Docker Support (optional)
-- ✅ Class Validator & DTOs
-- 🧪 Jest Testing with NestJS utilities
+- NestJS 10+ + TypeScript
+- Same database options as Express
+- Passport.js + JWT (optional)
+- Swagger auto-generated (optional)
+- Docker (optional)
 
 ```bash
 quickship build my-api --template nestjs-api -y
@@ -291,299 +282,92 @@ quickship build my-api --template nestjs-api -y
 
 ## 🛠️ Commands
 
-### Core Commands
-
 ```bash
-# Create a new project (interactive)
-quickship build
-
-# Create with a name (interactive)
-quickship build my-app
-
-# Create with defaults (no prompts)
-quickship build my-app -y
+# Create a new project
+quickship build [project-name]
 
 # List all available templates
 quickship list
 
-# Add features to existing project
-quickship add <feature>
-```
-
-### Project Management
-
-```bash
-# Show detailed project information
-quickship info
-
-# Check project and environment health
-quickship doctor
-
-# View all templates with details
+# Show detailed template info
 quickship templates
 
-# Update CLI to latest version
-quickship update
-```
+# Add features to existing project
+quickship add shadcn
+quickship add auth          # prompts for Clerk / Supabase / NextAuth
+quickship add auth --provider clerk
+quickship add database
 
-### Deployment
+# Check environment + project health
+quickship doctor
 
-```bash
-# Deploy to production (interactive)
+# Show project info
+quickship info
+
+# Deploy to production
 quickship deploy
-
-# Deploy to specific platform
 quickship deploy --platform vercel
 
-# Skip confirmations
-quickship deploy -y
-```
+# Update CLI
+quickship update
 
-### Get Help
-
-```bash
-# Show all commands
+# Help
 quickship --help
-
-# Show help for specific command
 quickship build --help
-
-# Show CLI version
-quickship --version
 ```
 
 ---
 
 ## 🚢 Deployment
 
-Deploy your project with a single command:
-
 ```bash
 cd my-app
 quickship deploy
 ```
 
-**Supported Platforms:**
-
-| Platform | Best For | Features |
-|----------|----------|----------|
-| **Vercel** | Next.js, T3 Stack, Express, NestJS | Zero-config, Edge functions, Serverless, CI/CD |
-| **Netlify** | Vite, React, Next.js | Fast CDN, Deploy previews, Forms, Functions |
-
-**What it does:**
-- 🔍 Auto-detects your project type
-- ✅ Validates build setup
-- 🔐 Handles platform authentication
-- 🔑 Manages environment variables
-- 🚀 Deploys to production
-- 🌐 Returns live URL
+| Platform | Best For |
+|----------|----------|
+| **Vercel** | Next.js, T3 Stack, Express, NestJS |
+| **Netlify** | Vite, React, Next.js |
+| **Railway** | MERN Stack, APIs |
+| **Render** | MERN Stack, APIs |
 
 ---
 
-## ✨ Features
-
-### Add Features After Creation
-
-Enhance your Next.js projects:
+## ✨ Add Features
 
 ```bash
 cd my-app
 
-# Add shadcn/ui components
-quickship add shadcn
-
-# Add authentication (choose from Clerk, Supabase, or NextAuth)
-quickship add auth
-
-# Or specify a provider directly
-quickship add auth --provider clerk
-quickship add auth --provider supabase
-quickship add auth --provider nextauth
-
-# Add Prisma database
-quickship add database
+quickship add shadcn      # shadcn/ui component library
+quickship add auth        # authentication (Clerk / Supabase / NextAuth)
+quickship add database    # Prisma database
 ```
 
-**Authentication Providers:**
-
-| Provider | Best For | What You Get |
-|----------|----------|--------------|
-| **Clerk** | Quick MVPs, startups | Pre-built UI components, user management dashboard, social auth |
-| **Supabase** | Full-stack apps | Auth + PostgreSQL database + storage + real-time subscriptions |
-| **NextAuth** | Custom flows | Maximum flexibility, any database, custom providers |
-
-**What gets set up automatically:**
-- ✅ Package installation
-- ✅ Middleware configuration
-- ✅ Environment variables template
-- ✅ Auth utilities (client/server helpers for Supabase)
-- ✅ Protected routes setup
-
-### Health Check
-
-Verify your environment and project setup:
-
-```bash
-quickship doctor
-```
-
-**Checks:**
-- Node.js version
-- Package managers
-- Git installation
-- Project structure
-- Dependencies
-- Environment variables
-- TypeScript config
-
-### Project Info
-
-Get detailed project information:
-
-```bash
-quickship info
-```
-
-**Shows:**
-- Project type
-- Tech stack
-- Available commands
-- Features to add
+| Auth Provider | Best For |
+|--------------|----------|
+| **Clerk** | Quick MVPs — pre-built UI, user management |
+| **Supabase** | Full-stack — auth + PostgreSQL + storage |
+| **NextAuth** | Custom flows — maximum flexibility |
 
 ---
 
-## 📚 Examples
-
-### Example 1: Quick Next.js App
+## 🧪 Testing
 
 ```bash
-# Fastest way - uses defaults
-quickship build my-saas -y
-
-cd my-saas
-npm run dev
-# ✨ App running at http://localhost:3000
+npm test              # all tests (unit + integration)
+npm run test:unit     # unit tests only
+npm run test:integration  # scaffold + CLI integration tests
+npm run test:coverage # coverage report
 ```
 
-### Example 2: Interactive Setup
-
-```bash
-# Answer a few questions
-quickship build my-app
-
-# QuickShip asks:
-# ? What do you want to build? Website
-# ? Choose your stack: Next.js
-# ? Add shadcn/ui? Yes
-# ? Package manager: npm
-# ? Initialize Git? Yes
-
-cd my-app
-npm run dev
-```
-
-### Example 3: Add Features After Creation
-
-```bash
-# Create a basic Next.js app
-quickship build my-saas -y
-
-cd my-saas
-
-# Add shadcn/ui components
-quickship add shadcn
-
-# Add authentication with NextAuth.js
-quickship add auth
-
-# Add database with Prisma
-quickship add database
-
-# ✨ Now you have a full-stack app with auth and database!
-npm run dev
-```
-
-### Example 4: MERN Stack with Custom Options
-
-```bash
-# Full control with flags
-quickship build my-api \
-  --template mern-stack \
-  -p pnpm \
-  -y
-
-# Configure MongoDB
-cd my-api/server
-cp .env.example .env
-# Edit .env with your MongoDB URI
-
-# Run both client and server
-cd ..
-pnpm dev
-```
-
-### Example 5: Mobile App
-
-```bash
-# Create Expo app
-quickship build my-mobile-app
-
-# Choose:
-# ? What do you want to build? Mobile App
-# ? Choose mobile stack: Expo React Native
-# ? Choose template: Tabs
-# ? Styling: StyleSheet
-
-cd my-mobile-app
-npx expo start
-
-# Scan QR code with Expo Go app! 📱
-```
-
-### Example 6: Deploy to Production
-
-```bash
-# Create app
-quickship build my-next-app -y
-
-cd my-next-app
-
-# Deploy in one command
-quickship deploy --platform vercel
-
-# ✨ Your app is live!
-```
-
-### Example 7: CI/CD Pipeline
-
-```bash
-# Perfect for automated deployments
-quickship build production-app \
-  --template nextjs \
-  -p npm \
-  --no-git \
-  -y
-
-cd production-app
-npm run build
-npm run start
-```
-
----
-
-## 🎯 Comparison
-
-| Feature | QuickShip | create-next-app | create-vite | create-expo-app |
-|---------|-----------|-----------------|-------------|-----------------|
-| **Web Templates** | ✅ 4 templates | ✅ 1 | ✅ Many | ❌ |
-| **Mobile Templates** | ✅ Expo | ❌ | ❌ | ✅ 1 |
-| **Backend Templates** | ✅ 2 APIs | ❌ | ❌ | ❌ |
-| **TypeScript** | ✅ Default | ✅ Optional | ✅ Optional | ✅ Optional |
-| **Tailwind CSS** | ✅ Pre-configured | ❌ Manual | ❌ Manual | ❌ Manual |
-| **Deployment** | ✅ One command | ❌ Manual | ❌ Manual | ❌ Manual |
-| **Add Features** | ✅ CLI commands | ❌ Manual | ❌ Manual | ❌ Manual |
-| **Health Check** | ✅ Built-in | ❌ | ❌ | ❌ |
-| **Project Info** | ✅ Built-in | ❌ | ❌ | ❌ |
+**75 tests** covering:
+- Project name validation + path traversal protection
+- Smart stack suggestions
+- Git isolation (prevents parent-repo detection)
+- Config file loading
+- No-op spinner (zero stdout bleed into listr2)
+- Full scaffold: Next.js + Vite, CI mode, input rejection
 
 ---
 
@@ -598,91 +382,77 @@ npm run start
 
 ## 🗺️ Roadmap
 
-### ✅ Released (v0.10)
-- ✅ Next.js, Vite, T3 Stack, MERN templates
-- ✅ Expo React Native mobile development
-- ✅ shadcn/ui integration
-- ✅ NextAuth.js integration (`quickship add auth`)
-- ✅ Prisma database integration (`quickship add database`)
-- ✅ One-command deployment (Vercel, Netlify, Railway, Render)
-- ✅ Health check and project info
-- ✅ Headless mode for CI/CD
+### ✅ v1.0.0 — Production ready
+- Next.js, Vite, T3 Stack, MERN templates
+- Express + NestJS API templates with flexible DB options
+- Expo React Native mobile
+- shadcn/ui, auth (Clerk/Supabase/NextAuth), Prisma database
+- One-command deploy (Vercel, Netlify, Railway, Render)
+- Headless `-y` mode, doctor, info, update commands
 
-### ✅ Released (v1.0.0) - 🎉 PRODUCTION READY
-- ✅ **Backend API Templates** - Express & NestJS
-- ✅ **Optional ORM/ODM** - Choose database first, then optionally add Prisma/Mongoose or use raw drivers
-- ✅ **6 Database Configurations** - PostgreSQL, MongoDB, SQLite (each with ORM or raw driver options)
-- ✅ **No Database Option** - Build APIs without database dependencies
-- ✅ Express.js + TypeScript API with flexible database choices
-- ✅ NestJS API with modular architecture and dependency injection
-- ✅ JWT Authentication & Swagger documentation (optional)
-- ✅ Docker support for APIs (optional)
-- ✅ Auto-generated `.env` files - Projects work immediately after creation
-- ✅ Fixed NestJS MongoDB dependency injection issues
-- ✅ Improved platform selection order and UX
+### ✅ v1.2.0 — Modern CLI stack
+- **@clack/prompts** — modern prompt UX (replaced Inquirer.js)
+- **listr2** — structured task list with timers (replaced ora spinners)
+- **gradient-string** — gradient ASCII banner (+ `--ascii` fallback)
+- **giget** — faster template download (replaced unmaintained degit)
+- **CI auto-detection** — no interactive prompts in GitHub Actions / any CI
+- **Smart defaults** — project name → pre-selected best stack + hint
+- **.quickshiprc team config** — cosmiconfig-based, commit to repo
+- **Git isolation fix** — `isGitRepo()` no longer walks up to parent repos
+- **shadcn/ui v4** — updated init command (`--defaults`, auto-detects framework)
+- **"Open in editor"** — offers VS Code / Cursor / Zed after scaffold
+- **75 tests** — unit + integration + cross-platform CI (Ubuntu/macOS/Windows)
 
-### 🚀 Coming Soon (v1.1+)
-- 🔜 More Expo templates (drawer, stack navigation)
-- 🔜 Supabase integration
-- 🔜 Component generator
-- 🔜 More auth provider integrations (Clerk, Auth0)
-- 🔜 More database integrations (PlanetScale, Supabase)
-- 🔜 Astro, SvelteKit, Remix templates
-
-### 🌟 Future (v1.2+)
-- Browser extension templates
-- Desktop app templates (Electron, Tauri)
-- Visual project builder
-- Custom template marketplace
-- Team collaboration features
+### 🔜 v1.3.0
+- Plugin registry — `quickship add stripe` / `quickship add resend`
+- `quickship migrate` — Next.js / Prisma codemod runner
+- Astro, SvelteKit, Remix templates
+- Monorepo mode
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Here's how you can help:
+1. **Star this repo** ⭐
+2. **Report bugs** — [Open an issue](https://github.com/SeifElkadyy/QuickShip-CLI/issues)
+3. **Request features** — [Start a discussion](https://github.com/SeifElkadyy/QuickShip-CLI/discussions)
+4. **Submit PRs** — fork, code, submit
 
-1. **Star this repo** ⭐ - Show your support
-2. **Report bugs** 🐛 - [Open an issue](https://github.com/SeifElkadyy/QuickShip-CLI/issues)
-3. **Request features** 💡 - [Start a discussion](https://github.com/SeifElkadyy/QuickShip-CLI/discussions)
-4. **Submit PRs** 🔧 - Fork, code, and submit
-
-### Development Setup
+### Development setup
 
 ```bash
-# Clone the repo
 git clone https://github.com/SeifElkadyy/QuickShip-CLI.git
 cd QuickShip-CLI
-
-# Install dependencies
 npm install
-
-# Link for local testing
-npm link
-
-# Test it out
+npm link          # makes 'quickship' available globally
 quickship build test-app
+npm test          # run all tests
 ```
 
 ---
 
 ## 📝 License
 
-MIT License - see [LICENSE](LICENSE) file for details.
+MIT — see [LICENSE](LICENSE)
 
 ---
 
 ## 🙏 Acknowledgments
 
-Built with these amazing tools:
-- [Commander.js](https://github.com/tj/commander.js) - CLI framework
-- [Inquirer.js](https://github.com/SBoudrias/Inquirer.js) - Interactive prompts
-- [Chalk](https://github.com/chalk/chalk) - Terminal styling
-- [Ora](https://github.com/sindresorhus/ora) - Spinners
-- [Boxen](https://github.com/sindresorhus/boxen) - Boxes
-- [execa](https://github.com/sindresorhus/execa) - Process execution
+Built with:
+- [Commander.js](https://github.com/tj/commander.js) — CLI framework
+- [@clack/prompts](https://github.com/bombshell-dev/clack) — modern prompts
+- [listr2](https://github.com/listr2/listr2) — task list renderer
+- [gradient-string](https://github.com/bokub/gradient-string) — terminal gradients
+- [giget](https://github.com/unjs/giget) — template downloader
+- [Chalk](https://github.com/chalk/chalk) — terminal colors
+- [Boxen](https://github.com/sindresorhus/boxen) — terminal boxes
+- [execa](https://github.com/sindresorhus/execa) — process execution
+- [simple-git](https://github.com/steveukx/git-js) — git operations
+- [cosmiconfig](https://github.com/cosmiconfig/cosmiconfig) — config file discovery
+- [ci-info](https://github.com/watson/ci-info) — CI environment detection
 
-Inspired by create-next-app, create-t3-app, create-vite, and create-expo-app.
+Inspired by create-next-app, create-t3-app, create-vite, shadcn/ui CLI, and Astro CLI.
 
 ---
 
@@ -694,17 +464,9 @@ QuickShip is **free and open-source**. If it saves you time:
 
 [![Star on GitHub](https://img.shields.io/github/stars/SeifElkadyy/QuickShip-CLI?style=social)](https://github.com/SeifElkadyy/QuickShip-CLI)
 
-**Support development:**
-
 <a href="https://paypal.me/destoyt">
   <img src="https://img.shields.io/badge/Donate-PayPal-blue.svg?style=for-the-badge&logo=paypal" alt="Donate" />
 </a>
-
-**Your support helps:**
-- 🚀 Add more templates
-- 🐛 Fix bugs faster
-- ✨ Build new features
-- 📚 Improve documentation
 
 </div>
 
@@ -712,9 +474,9 @@ QuickShip is **free and open-source**. If it saves you time:
 
 ## 📞 Get Help
 
-- **Issues:** [Report bugs or request features](https://github.com/SeifElkadyy/QuickShip-CLI/issues)
-- **Discussions:** [Ask questions and share ideas](https://github.com/SeifElkadyy/QuickShip-CLI/discussions)
-- **NPM:** [Package information](https://www.npmjs.com/package/quickship-cli)
+- **Issues:** [github.com/SeifElkadyy/QuickShip-CLI/issues](https://github.com/SeifElkadyy/QuickShip-CLI/issues)
+- **Discussions:** [github.com/SeifElkadyy/QuickShip-CLI/discussions](https://github.com/SeifElkadyy/QuickShip-CLI/discussions)
+- **NPM:** [npmjs.com/package/quickship-cli](https://www.npmjs.com/package/quickship-cli)
 
 ---
 
@@ -722,8 +484,8 @@ QuickShip is **free and open-source**. If it saves you time:
 
 **Built with ❤️ for developers who want to ship fast**
 
-[Get Started](#-getting-started) • [View Templates](#-templates) • [Commands](#-commands)
+[Get Started](#-getting-started) • [Templates](#-templates) • [Commands](#-commands)
 
-**Version 1.0.3** | **MIT License**
+**v1.2.0** | MIT License
 
 </div>

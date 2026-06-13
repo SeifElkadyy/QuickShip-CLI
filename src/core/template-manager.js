@@ -230,7 +230,6 @@ class TemplateManager {
         }
       );
 
-
       // Create Tailwind and PostCSS config files manually
       const { writeFile } = await import('fs/promises');
 
@@ -443,7 +442,6 @@ JWT_SECRET=your_jwt_secret_here_change_in_production
       cwd: serverPath,
       stdio: 'pipe',
     });
-
   }
 
   async createMERNFrontend(projectPath, config) {
@@ -487,7 +485,6 @@ JWT_SECRET=your_jwt_secret_here_change_in_production
     if (config.styling === 'tailwind') {
       await this.setupTailwindForVite(clientPath, config);
     }
-
   }
 
   async createMERNRootFiles(projectPath, config) {
@@ -611,7 +608,6 @@ ${config.styling === 'tailwind' ? '- Tailwind CSS' : ''}
       cwd: projectPath,
       stdio: 'pipe',
     });
-
   }
 
   async createExpressApp(destinationPath, config, options = {}) {
@@ -788,13 +784,14 @@ ${config.styling === 'tailwind' ? '- Tailwind CSS' : ''}
 
   async initShadcn(projectPath) {
     try {
-      await execa(
-        'npx',
-        ['shadcn@latest', 'init', '--defaults'],
-        { cwd: projectPath, stdio: 'pipe' }
-      );
+      await execa('npx', ['shadcn@latest', 'init', '--defaults'], {
+        cwd: projectPath,
+        stdio: 'pipe',
+      });
     } catch (error) {
-      throw new Error(`shadcn/ui init failed: ${error.stderr || error.message}`);
+      throw new Error(
+        `shadcn/ui init failed: ${error.stderr || error.message}`
+      );
     }
   }
 

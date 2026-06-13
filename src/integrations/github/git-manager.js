@@ -6,7 +6,11 @@ import Spinner from '../../utils/spinner.js';
 class GitManager {
   constructor(projectPath) {
     // baseDir + --no-walking prevents simple-git from ascending to parent repos
-    this.git = simpleGit({ baseDir: projectPath, binary: 'git', maxConcurrentProcesses: 1 });
+    this.git = simpleGit({
+      baseDir: projectPath,
+      binary: 'git',
+      maxConcurrentProcesses: 1,
+    });
     this.projectPath = projectPath;
     this.spinner = new Spinner();
   }
