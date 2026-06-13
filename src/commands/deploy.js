@@ -127,7 +127,10 @@ export async function deployCommand(options = {}) {
         logger.warning('Railway CLI is not installed');
 
         const shouldInstall = handleCancel(
-          await confirm({ message: 'Install Railway CLI now?', initialValue: true })
+          await confirm({
+            message: 'Install Railway CLI now?',
+            initialValue: true,
+          })
         );
 
         if (shouldInstall) {
@@ -198,7 +201,10 @@ export async function deployCommand(options = {}) {
         logger.info('Netlify site not linked yet');
 
         const shouldInit = handleCancel(
-          await confirm({ message: 'Initialize Netlify site now?', initialValue: true })
+          await confirm({
+            message: 'Initialize Netlify site now?',
+            initialValue: true,
+          })
         );
 
         if (shouldInit) {

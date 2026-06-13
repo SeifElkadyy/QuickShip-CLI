@@ -5,12 +5,24 @@ export { Listr };
 // Internal methods in template-manager / git-manager call this;
 // silencing them prevents interleaved output with listr2's renderer.
 class Spinner {
-  start() { return this; }
-  succeed() { return this; }
-  fail() { return this; }
-  update() { return this; }
-  stop() { return this; }
-  info() { return this; }
+  start() {
+    return this;
+  }
+  succeed() {
+    return this;
+  }
+  fail() {
+    return this;
+  }
+  update() {
+    return this;
+  }
+  stop() {
+    return this;
+  }
+  info() {
+    return this;
+  }
 }
 
 export default Spinner;

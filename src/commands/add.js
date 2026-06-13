@@ -12,7 +12,10 @@ async function getPackageManager() {
 }
 
 function handleCancel(value) {
-  if (isCancel(value)) { cancel('Operation cancelled.'); process.exit(0); }
+  if (isCancel(value)) {
+    cancel('Operation cancelled.');
+    process.exit(0);
+  }
   return value;
 }
 
@@ -134,14 +137,28 @@ async function addAuth(projectType, options) {
 
   // If no provider specified, ask the user
   if (!provider) {
-    provider = handleCancel(await select({
-      message: 'Which authentication provider?',
-      options: [
-        { value: 'clerk', label: 'Clerk', hint: 'Easiest — pre-built UI components' },
-        { value: 'supabase', label: 'Supabase', hint: 'Auth + Database + Storage' },
-        { value: 'nextauth', label: 'NextAuth.js', hint: 'Flexible auth for Next.js' },
-      ],
-    }));
+    provider = handleCancel(
+      await select({
+        message: 'Which authentication provider?',
+        options: [
+          {
+            value: 'clerk',
+            label: 'Clerk',
+            hint: 'Easiest — pre-built UI components',
+          },
+          {
+            value: 'supabase',
+            label: 'Supabase',
+            hint: 'Auth + Database + Storage',
+          },
+          {
+            value: 'nextauth',
+            label: 'NextAuth.js',
+            hint: 'Flexible auth for Next.js',
+          },
+        ],
+      })
+    );
   }
 
   // Call the appropriate function based on provider

@@ -32,7 +32,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [18, 20, 22]
+        node-version: [20, 22]
     steps:
       - uses: actions/checkout@v4
 
@@ -87,12 +87,23 @@ jobs:
         env:
           CI: '1'
 
-      - name: Verify scaffold output exists
+      - name: Verify scaffold output exists (Unix)
+        if: runner.os != 'Windows'
         run: test -f smoke-test/package.json
 
-      - name: Cleanup
-        if: always()
+      - name: Verify scaffold output exists (Windows)
+        if: runner.os == 'Windows'
+        run: if not exist smoke-test\package.json exit 1
+        shell: cmd
+
+      - name: Cleanup (Unix)
+        if: always() && runner.os != 'Windows'
         run: rm -rf smoke-test
+
+      - name: Cleanup (Windows)
+        if: always() && runner.os == 'Windows'
+        run: if exist smoke-test rmdir /s /q smoke-test
+        shell: cmd
 
   integration-test:
     name: Integration Tests

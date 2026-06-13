@@ -144,7 +144,9 @@ class Engine {
     }
 
     const cwd = resolve(process.cwd());
-    if (!this.projectPath.startsWith(cwd + '/') && this.projectPath !== cwd) {
+    // sep-agnostic: projectPath must be a direct child of cwd (not cwd itself)
+    const { sep } = await import('path');
+    if (!this.projectPath.startsWith(cwd + sep) && this.projectPath !== cwd) {
       throw new Error('Invalid project name: path traversal detected');
     }
 

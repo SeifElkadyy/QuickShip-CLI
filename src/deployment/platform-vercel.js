@@ -2,7 +2,6 @@ import { execa } from 'execa';
 import logger from '../utils/logger.js';
 import Spinner from '../utils/spinner.js';
 
-
 export class VercelDeployment {
   constructor(projectPath, options = {}) {
     this.projectPath = projectPath;

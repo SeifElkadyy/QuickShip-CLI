@@ -63,8 +63,16 @@ export async function backendPrompts(projectName, options = {}) {
     await select({
       message: 'Database',
       options: [
-        { value: 'postgresql', label: 'PostgreSQL', hint: 'Recommended — relational' },
-        { value: 'mongodb', label: 'MongoDB', hint: 'NoSQL — flexible schemas' },
+        {
+          value: 'postgresql',
+          label: 'PostgreSQL',
+          hint: 'Recommended — relational',
+        },
+        {
+          value: 'mongodb',
+          label: 'MongoDB',
+          hint: 'NoSQL — flexible schemas',
+        },
         { value: 'sqlite', label: 'SQLite', hint: 'Local dev — zero config' },
         { value: 'none', label: 'None' },
       ],
@@ -79,19 +87,31 @@ export async function backendPrompts(projectName, options = {}) {
         initialValue: true,
       })
     );
-    if (dbBase === 'postgresql') database = useOrm ? 'postgresql-prisma' : 'postgresql-raw';
-    else if (dbBase === 'mongodb') database = useOrm ? 'mongodb-mongoose' : 'mongodb-raw';
-    else if (dbBase === 'sqlite') database = useOrm ? 'sqlite-prisma' : 'sqlite-raw';
+    if (dbBase === 'postgresql')
+      database = useOrm ? 'postgresql-prisma' : 'postgresql-raw';
+    else if (dbBase === 'mongodb')
+      database = useOrm ? 'mongodb-mongoose' : 'mongodb-raw';
+    else if (dbBase === 'sqlite')
+      database = useOrm ? 'sqlite-prisma' : 'sqlite-raw';
   }
 
   const includeAuth = handleCancel(
-    await confirm({ message: 'Include JWT authentication?', initialValue: true })
+    await confirm({
+      message: 'Include JWT authentication?',
+      initialValue: true,
+    })
   );
   const includeSwagger = handleCancel(
-    await confirm({ message: 'Include Swagger/OpenAPI docs?', initialValue: true })
+    await confirm({
+      message: 'Include Swagger/OpenAPI docs?',
+      initialValue: true,
+    })
   );
   const includeDocker = handleCancel(
-    await confirm({ message: 'Include Docker configuration?', initialValue: true })
+    await confirm({
+      message: 'Include Docker configuration?',
+      initialValue: true,
+    })
   );
 
   const packageManager = handleCancel(

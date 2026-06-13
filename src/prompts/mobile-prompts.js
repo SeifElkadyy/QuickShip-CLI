@@ -29,7 +29,8 @@ export async function mobilePrompts(projectName, options = {}) {
         defaultValue: 'my-mobile-app',
         validate(v) {
           if (!v) return 'Name required';
-          if (!/^[a-z0-9-_]+$/i.test(v)) return 'Letters, numbers, hyphens, underscores only';
+          if (!/^[a-z0-9-_]+$/i.test(v))
+            return 'Letters, numbers, hyphens, underscores only';
         },
       })
     );
@@ -53,8 +54,16 @@ export async function mobilePrompts(projectName, options = {}) {
     await select({
       message: 'Styling approach',
       options: [
-        { value: 'stylesheet', label: 'StyleSheet', hint: "Expo's default — recommended" },
-        { value: 'nativewind', label: 'NativeWind', hint: 'Tailwind CSS for React Native' },
+        {
+          value: 'stylesheet',
+          label: 'StyleSheet',
+          hint: "Expo's default — recommended",
+        },
+        {
+          value: 'nativewind',
+          label: 'NativeWind',
+          hint: 'Tailwind CSS for React Native',
+        },
       ],
     })
   );
