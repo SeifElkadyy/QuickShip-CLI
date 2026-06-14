@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "type": "module",
   "bin": {
-    "quickship": "./bin/index.js"
+    "quickship": "bin/index.js"
   },
   "scripts": {
     "dev": "node bin/index.js",
@@ -93,7 +93,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/SeifElkadyy/QuickShip-CLI.git"
+    "url": "git+https://github.com/SeifElkadyy/QuickShip-CLI.git"
   },
   "bugs": {
     "url": "https://github.com/SeifElkadyy/QuickShip-CLI/issues"
