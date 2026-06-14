@@ -8,7 +8,7 @@
 [![npm version](https://img.shields.io/npm/v/quickship-cli?color=blue&style=flat-square)](https://www.npmjs.com/package/quickship-cli)
 [![CI](https://img.shields.io/github/actions/workflow/status/SeifElkadyy/QuickShip-CLI/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/SeifElkadyy/QuickShip-CLI/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
-[![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen?style=flat-square)](https://nodejs.org)
+[![Node](https://img.shields.io/badge/node-%3E%3D20.12.0-brightgreen?style=flat-square)](https://nodejs.org)
 
 **Stop wasting hours on boilerplate.** Create production-ready web, mobile, and backend apps with TypeScript, Tailwind CSS, and modern tooling — fully configured in under 60 seconds.
 
@@ -373,7 +373,7 @@ npm run test:coverage # coverage report
 
 ## 💻 Requirements
 
-- **Node.js:** 18.0.0 or higher
+- **Node.js:** 20.12.0 or higher
 - **npm:** 9.0.0 or higher (or pnpm, yarn, bun)
 - **Git:** Any recent version (optional)
 - **OS:** Windows, macOS, or Linux
