@@ -999,9 +999,7 @@ export default getRequestConfig(async () => {
     logger.info(
       '5. For multiple locales with routing, see the [locale] segment guide:\n'
     );
-    logger.dim(
-      '   https://next-intl.dev/docs/getting-started/app-router\n'
-    );
+    logger.dim('   https://next-intl.dev/docs/getting-started/app-router\n');
     logger.info('📚 Documentation: https://next-intl.dev/docs');
   } catch (error) {
     spinner.fail('Failed to set up i18n');
