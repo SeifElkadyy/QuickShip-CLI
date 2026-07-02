@@ -359,21 +359,38 @@ quickship deploy
 ```bash
 cd my-app
 
-quickship add shadcn      # shadcn/ui component library (Next.js)
-quickship add auth        # authentication (Clerk / Supabase / NextAuth) (Next.js)
-quickship add database    # Prisma database (Next.js, Vite, Express, NestJS)
-quickship add stripe      # Stripe payments (Next.js, Vite, Express, NestJS)
-quickship add resend      # Resend transactional email (Next.js, Vite, Express, NestJS)
-quickship add sentry      # Sentry error tracking (Next.js, Vite, Express, NestJS, Expo)
+quickship add shadcn       # shadcn/ui component library (Next.js)
+quickship add auth         # authentication (Clerk / Supabase / NextAuth) (Next.js)
+quickship add database     # pick a provider interactively (Supabase / Neon / MongoDB / Firebase / Prisma)
+quickship add database --provider neon
+quickship add prisma       # Prisma ORM directly, skip the picker
+quickship add stripe       # Stripe payments
+quickship add resend       # Resend transactional email
+quickship add sentry       # Sentry error tracking
+quickship add posthog      # PostHog analytics + feature flags
+quickship add i18n         # next-intl internationalization (Next.js)
+quickship add vitest       # Vitest unit testing
+quickship add playwright   # Playwright e2e testing (Next.js, Vite)
+quickship add trpc         # tRPC type-safe API layer (Next.js, Vite)
 ```
 
-`quickship add` auto-detects your project type (Next.js, React + Vite, Express, NestJS, Expo) and installs/configures the feature accordingly.
+`quickship add` auto-detects your project type (Next.js, React + Vite, Express, NestJS, Expo) and installs/configures the feature accordingly — writing real client files (`lib/*.ts` or `src/config/*.ts`), not just instructions.
 
 | Auth Provider | Best For |
 |--------------|----------|
 | **Clerk** | Quick MVPs — pre-built UI, user management |
 | **Supabase** | Full-stack — auth + PostgreSQL + storage |
 | **NextAuth** | Custom flows — maximum flexibility |
+
+| Database Provider | Best For |
+|--------------------|----------|
+| **Supabase** | Postgres + auth + storage in one platform |
+| **Neon** | Serverless Postgres, generous free tier |
+| **MongoDB** | NoSQL, flexible schemas |
+| **Firebase** | Firestore + Google Cloud ecosystem |
+| **Prisma** | ORM on top of your own Postgres connection string |
+
+You'll also be asked "Add a database?" during initial `quickship build` setup for Next.js / Vite projects — same providers, set up before your first `cd`.
 
 ---
 

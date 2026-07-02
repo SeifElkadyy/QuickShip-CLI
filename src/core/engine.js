@@ -10,6 +10,7 @@ import FileGenerator from './file-generator.js';
 import GitManager from '../integrations/github/git-manager.js';
 import logger from '../utils/logger.js';
 import validator from '../utils/validator.js';
+import { setupDatabase } from '../commands/database-providers.js';
 
 class Engine {
   constructor(config, options = {}) {
@@ -105,6 +106,22 @@ class Engine {
           enabled: () => !!this.config.shadcn && this.options.install !== false,
           task: async () => {
             await this.templateManager.initShadcn(this.projectPath);
+          },
+        },
+        {
+          title: `Set up ${this.config.database} database`,
+          enabled: () =>
+            !!this.config.database &&
+            this.config.database !== 'none' &&
+            this.options.install !== false,
+          task: async () => {
+            const projectType =
+              this.config.stack === 'react-vite' ? 'react-vite' : 'nextjs';
+            await setupDatabase(
+              this.config.database,
+              projectType,
+              this.projectPath
+            );
           },
         },
         {

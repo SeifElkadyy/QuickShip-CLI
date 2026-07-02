@@ -65,9 +65,12 @@ program
 program
   .command('add <feature>')
   .description(
-    'Add features to existing project (shadcn, auth, database, stripe, resend, sentry)'
+    'Add features to existing project (shadcn, auth, database, stripe, resend, sentry, posthog, i18n, vitest, playwright, trpc)'
   )
-  .option('-p, --provider <name>', 'auth provider (clerk, supabase, nextauth)')
+  .option(
+    '-p, --provider <name>',
+    'provider for auth (clerk, supabase, nextauth) or database (supabase, neon, mongodb, firebase, prisma)'
+  )
   .option('-v, --verbose', 'show detailed logs')
   .action(async (feature, options) => {
     const { addCommand } = await import('../src/commands/add.js');

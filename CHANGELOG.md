@@ -5,6 +5,30 @@ All notable changes to QuickShip CLI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-07-02
+
+### Added
+
+- **🗄️ Database provider choice** - `quickship add database` now prompts for a provider instead of jumping straight to Prisma
+  - Supabase (Postgres + auth + storage)
+  - Neon (serverless Postgres)
+  - MongoDB (Atlas-hosted)
+  - Firebase (Firestore)
+  - Prisma (bring your own Postgres URL)
+  - `quickship add database --provider <name>` for non-interactive use
+  - `quickship add prisma` kept as a direct shortcut (interactive `prisma init`)
+- **🏗️ "Add a database?" question during initial `quickship build`** - Next.js and Vite projects can now set up a database provider at scaffold time, same picker as `add database`
+- **🛍️ New `add` integrations**: `posthog` (analytics/flags), `i18n` (next-intl, Next.js), `vitest` (unit testing), `playwright` (e2e testing), `trpc` (type-safe API layer)
+
+### Fixed
+
+- **🔧 `add stripe` / `add resend` / `add sentry` now write real client files** - previously only installed the SDK and printed a code snippet; now writes `lib/<name>.ts` (or `src/config/<name>.ts` for Express/NestJS) with a working client, same pattern as the existing Clerk/Supabase auth setup
+
+### Changed
+
+- Extracted shared `add` helpers (`getPackageManager`, `libDir`, `writeClientFile`, `appendEnvVars`) into `src/utils/add-helpers.js` so both `quickship add` and the scaffold-time database task can reuse them
+- Verified all new `add` integrations against current official docs; fixed `add i18n` writing to the wrong path (`lib/i18n.ts` → correct `i18n/request.ts` convention, plus missing `NextIntlClientProvider` step) and added the current recommended `defaults` flag to the PostHog browser init snippet
+
 ## [1.3.0] - 2026-07-02
 
 ### Changed

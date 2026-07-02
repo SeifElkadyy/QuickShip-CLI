@@ -2,15 +2,21 @@ import logger from '../utils/logger.js';
 import { execa } from 'execa';
 import Spinner from '../utils/spinner.js';
 import pkg from 'fs-extra';
-const { pathExists, readJson, writeFile, ensureDir, readFile, appendFile } =
-  pkg;
+const { pathExists, readJson, writeFile, ensureDir } = pkg;
 import { join } from 'path';
 import { select, isCancel, cancel } from '@clack/prompts';
-import { detectPackageManager } from '../utils/project-detector.js';
-
-async function getPackageManager() {
-  return detectPackageManager(process.cwd());
-}
+import {
+  getPackageManager,
+  libDir,
+  writeClientFile,
+  appendEnvVars,
+} from '../utils/add-helpers.js';
+import {
+  addSupabaseDatabase,
+  addNeon,
+  addMongoDatabase,
+  addFirebase,
+} from './database-providers.js';
 
 function handleCancel(value) {
   if (isCancel(value)) {
@@ -51,8 +57,11 @@ export async function addCommand(feature, options) {
 
       case 'database':
       case 'db':
+        await addDatabase(projectType, options);
+        break;
+
       case 'prisma':
-        await addDatabase(projectType);
+        await addPrisma(projectType);
         break;
 
       case 'stripe':
@@ -67,9 +76,29 @@ export async function addCommand(feature, options) {
         await addSentry(projectType);
         break;
 
+      case 'posthog':
+        await addPosthog(projectType);
+        break;
+
+      case 'i18n':
+        await addI18n(projectType);
+        break;
+
+      case 'vitest':
+        await addVitest(projectType);
+        break;
+
+      case 'playwright':
+        await addPlaywright(projectType);
+        break;
+
+      case 'trpc':
+        await addTrpc(projectType);
+        break;
+
       default:
         logger.error(
-          `Unknown feature: ${feature}\n\nAvailable features:\n  - shadcn (shadcn/ui components)\n  - auth (NextAuth.js)\n  - database (Prisma)\n  - stripe (Stripe payments)\n  - resend (Resend transactional email)\n  - sentry (Sentry error tracking)`
+          `Unknown feature: ${feature}\n\nAvailable features:\n  - shadcn (shadcn/ui components)\n  - auth (Clerk / Supabase / NextAuth)\n  - database (Supabase / Neon / MongoDB / Firebase / Prisma)\n  - prisma (Prisma ORM directly)\n  - stripe (Stripe payments)\n  - resend (Resend transactional email)\n  - sentry (Sentry error tracking)\n  - posthog (PostHog analytics)\n  - i18n (next-intl internationalization)\n  - vitest (Vitest unit testing)\n  - playwright (Playwright e2e testing)\n  - trpc (tRPC type-safe API layer)`
         );
         process.exit(1);
     }
@@ -513,7 +542,67 @@ async function addNextAuth() {
   }
 }
 
-async function addDatabase(projectType) {
+async function addDatabase(projectType, options = {}) {
+  const supported = ['nextjs', 'react-vite', 'express', 'nestjs'];
+  if (!supported.includes(projectType)) {
+    logger.error(`Database is supported for: ${supported.join(', ')} projects`);
+    process.exit(1);
+  }
+
+  let provider = options.provider;
+  if (!provider) {
+    provider = handleCancel(
+      await select({
+        message: 'Which database?',
+        options: [
+          {
+            value: 'supabase',
+            label: 'Supabase',
+            hint: 'Postgres + auth + storage',
+          },
+          { value: 'neon', label: 'Neon', hint: 'Serverless Postgres' },
+          { value: 'mongodb', label: 'MongoDB', hint: 'NoSQL, Atlas-hosted' },
+          {
+            value: 'firebase',
+            label: 'Firebase',
+            hint: 'Firestore + Google Cloud',
+          },
+          {
+            value: 'prisma',
+            label: 'Prisma',
+            hint: 'ORM — bring your own Postgres URL',
+          },
+        ],
+      })
+    );
+  }
+
+  switch (provider.toLowerCase()) {
+    case 'supabase':
+      await addSupabaseDatabase(projectType);
+      return;
+    case 'neon':
+      await addNeon(projectType);
+      return;
+    case 'mongodb':
+    case 'mongo':
+      await addMongoDatabase(projectType);
+      return;
+    case 'firebase':
+      await addFirebase(projectType);
+      return;
+    case 'prisma':
+      await addPrisma(projectType);
+      return;
+    default:
+      logger.error(
+        `Unknown database provider: ${provider}\n\nAvailable providers:\n  - supabase\n  - neon\n  - mongodb\n  - firebase\n  - prisma`
+      );
+      process.exit(1);
+  }
+}
+
+async function addPrisma(projectType) {
   const supported = ['nextjs', 'react-vite', 'express', 'nestjs'];
   if (!supported.includes(projectType)) {
     logger.error(`Prisma is supported for: ${supported.join(', ')} projects`);
@@ -551,27 +640,6 @@ async function addDatabase(projectType) {
   }
 }
 
-/**
- * Append env vars to .env.local (or .env for backend projects) if not already present
- */
-async function appendEnvVars(projectType, content) {
-  const cwd = process.cwd();
-  const envFile = projectType === 'nextjs' ? '.env.local' : '.env';
-  const envPath = join(cwd, envFile);
-  const envExists = await pathExists(envPath);
-
-  if (envExists) {
-    const existing = await readFile(envPath, 'utf-8');
-    if (existing.includes(content.split('\n')[0])) {
-      return false;
-    }
-    await appendFile(envPath, `\n${content}`);
-  } else {
-    await writeFile(envPath, content, 'utf-8');
-  }
-  return true;
-}
-
 const STRIPE_SUPPORTED = ['nextjs', 'react-vite', 'express', 'nestjs'];
 
 async function addStripe(projectType) {
@@ -598,17 +666,31 @@ async function addStripe(projectType) {
     );
     if (wrote) logger.success('Environment variables added!');
 
+    const clientContent = `import Stripe from 'stripe';
+
+export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: '2025-08-27.basil',
+});
+`;
+    const client = await writeClientFile(
+      projectType,
+      'stripe.ts',
+      clientContent
+    );
+    if (client.written) {
+      logger.success(`Created ${client.path}`);
+    } else {
+      logger.dim(`Skipped ${client.path} (already exists)`);
+    }
+
     logger.success('\n✅ Stripe is now set up!\n');
     logger.info('Next steps:\n');
     logger.info(
       '1. Get your API keys from: https://dashboard.stripe.com/apikeys'
     );
     logger.info('2. Add your keys to your env file\n');
-    logger.info('3. Create a Stripe client:\n');
-    logger.dim("   import Stripe from 'stripe';");
-    logger.dim(
-      '   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);\n'
-    );
+    logger.info('3. Use the Stripe client:\n');
+    logger.dim(`   import { stripe } from '${libDir(projectType)}/stripe';\n`);
     logger.info('4. Set up webhooks: https://dashboard.stripe.com/webhooks\n');
     logger.info('📚 Documentation: https://stripe.com/docs/api');
   } catch (error) {
@@ -643,13 +725,27 @@ async function addResend(projectType) {
     );
     if (wrote) logger.success('Environment variables added!');
 
+    const clientContent = `import { Resend } from 'resend';
+
+export const resend = new Resend(process.env.RESEND_API_KEY);
+`;
+    const client = await writeClientFile(
+      projectType,
+      'resend.ts',
+      clientContent
+    );
+    if (client.written) {
+      logger.success(`Created ${client.path}`);
+    } else {
+      logger.dim(`Skipped ${client.path} (already exists)`);
+    }
+
     logger.success('\n✅ Resend is now set up!\n');
     logger.info('Next steps:\n');
     logger.info('1. Get your API key from: https://resend.com/api-keys');
     logger.info('2. Add your key to your env file\n');
     logger.info('3. Send an email:\n');
-    logger.dim("   import { Resend } from 'resend';");
-    logger.dim('   const resend = new Resend(process.env.RESEND_API_KEY);');
+    logger.dim(`   import { resend } from '${libDir(projectType)}/resend';\n`);
     logger.dim('   await resend.emails.send({');
     logger.dim("     from: 'you@yourdomain.com',");
     logger.dim("     to: 'user@example.com',");
@@ -703,18 +799,428 @@ async function addSentry(projectType) {
     );
     if (wrote) logger.success('Environment variables added!');
 
+    const initContent = `import * as Sentry from '${sentryPackage}';
+
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+  tracesSampleRate: 1.0,
+});
+`;
+
+    if (projectType === 'expo') {
+      // Expo has no lib/ convention by default; write to project root instead
+      const cwd = process.cwd();
+      const rootPath = join(cwd, 'sentry.ts');
+      if (!(await pathExists(rootPath))) {
+        await writeFile(rootPath, initContent, 'utf-8');
+        logger.success(`Created ${rootPath}`);
+        logger.info('Import it once at your app entry point (e.g. App.tsx):');
+        logger.dim("   import './sentry';\n");
+      } else {
+        logger.dim(`Skipped ${rootPath} (already exists)`);
+      }
+    } else {
+      const client = await writeClientFile(
+        projectType,
+        'sentry.ts',
+        initContent
+      );
+      if (client.written) {
+        logger.success(`Created ${client.path}`);
+        logger.info('Import it once at your app entry point:');
+        logger.dim(`   import '${libDir(projectType)}/sentry';\n`);
+      } else {
+        logger.dim(`Skipped ${client.path} (already exists)`);
+      }
+    }
+
     logger.success('\n✅ Sentry is now set up!\n');
     logger.info('Next steps:\n');
     logger.info('1. Create a project at: https://sentry.io/');
     logger.info('2. Add your DSN to your env file\n');
-    logger.info('3. Initialize Sentry at your app entry point:\n');
-    logger.dim(`   import * as Sentry from '${sentryPackage}';`);
-    logger.dim('   Sentry.init({ dsn: process.env.SENTRY_DSN });\n');
     logger.info(
       `📚 Documentation: https://docs.sentry.io/platforms/javascript/guides/${projectType === 'expo' ? 'react-native' : 'node'}/`
     );
   } catch (error) {
     spinner.fail('Failed to set up Sentry');
+    throw error;
+  }
+}
+
+const POSTHOG_SUPPORTED = ['nextjs', 'react-vite', 'express', 'nestjs'];
+
+async function addPosthog(projectType) {
+  if (!POSTHOG_SUPPORTED.includes(projectType)) {
+    logger.error(
+      `PostHog is supported for: ${POSTHOG_SUPPORTED.join(', ')} projects`
+    );
+    process.exit(1);
+  }
+
+  const isBackend = projectType === 'express' || projectType === 'nestjs';
+  const pkgName = isBackend ? 'posthog-node' : 'posthog-js';
+
+  spinner.start('Installing PostHog...');
+
+  try {
+    const pm = await getPackageManager();
+    const addCmd = pm === 'npm' ? 'install' : 'add';
+
+    await execa(pm, [addCmd, pkgName], { stdio: 'pipe' });
+
+    spinner.succeed('PostHog installed successfully!');
+
+    const wrote = await appendEnvVars(
+      projectType,
+      isBackend
+        ? `# PostHog\n# Get this from: https://app.posthog.com/project/settings\nPOSTHOG_API_KEY=your_posthog_project_api_key\nPOSTHOG_HOST=https://app.posthog.com\n`
+        : `# PostHog\n# Get this from: https://app.posthog.com/project/settings\nNEXT_PUBLIC_POSTHOG_KEY=your_posthog_project_api_key\nNEXT_PUBLIC_POSTHOG_HOST=https://app.posthog.com\n`
+    );
+    if (wrote) logger.success('Environment variables added!');
+
+    const clientContent = isBackend
+      ? `import { PostHog } from 'posthog-node';
+
+export const posthog = new PostHog(process.env.POSTHOG_API_KEY!, {
+  host: process.env.POSTHOG_HOST,
+});
+`
+      : `import posthog from 'posthog-js';
+
+if (typeof window !== 'undefined') {
+  posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
+    api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
+    defaults: '2026-05-30',
+    person_profiles: 'identified_only',
+  });
+}
+
+export { posthog };
+`;
+    const client = await writeClientFile(
+      projectType,
+      'posthog.ts',
+      clientContent
+    );
+    if (client.written) {
+      logger.success(`Created ${client.path}`);
+    } else {
+      logger.dim(`Skipped ${client.path} (already exists)`);
+    }
+
+    logger.success('\n✅ PostHog is now set up!\n');
+    logger.info('Next steps:\n');
+    logger.info(
+      '1. Get your project API key from: https://app.posthog.com/project/settings'
+    );
+    logger.info('2. Add it to your env file\n');
+    logger.info('3. Use the client:\n');
+    logger.dim(
+      `   import { posthog } from '${libDir(projectType)}/posthog';\n`
+    );
+    if (isBackend) {
+      logger.info('4. Call posthog.shutdown() before your process exits\n');
+    }
+    logger.info('📚 Documentation: https://posthog.com/docs');
+  } catch (error) {
+    spinner.fail('Failed to set up PostHog');
+    throw error;
+  }
+}
+
+async function addI18n(projectType) {
+  if (projectType !== 'nextjs') {
+    logger.error('i18n is only supported for Next.js projects');
+    process.exit(1);
+  }
+
+  spinner.start('Installing next-intl...');
+
+  try {
+    const pm = await getPackageManager();
+    const addCmd = pm === 'npm' ? 'install' : 'add';
+
+    await execa(pm, [addCmd, 'next-intl'], { stdio: 'pipe' });
+
+    spinner.succeed('next-intl installed successfully!');
+
+    const cwd = process.cwd();
+    const messagesDir = join(cwd, 'messages');
+    await ensureDir(messagesDir);
+
+    const enPath = join(messagesDir, 'en.json');
+    if (!(await pathExists(enPath))) {
+      await writeFile(
+        enPath,
+        JSON.stringify({ HomePage: { title: 'Hello world!' } }, null, 2) + '\n',
+        'utf-8'
+      );
+      logger.success(`Created ${enPath}`);
+    } else {
+      logger.dim(`Skipped ${enPath} (already exists)`);
+    }
+
+    const i18nDir = join(cwd, 'i18n');
+    await ensureDir(i18nDir);
+    const requestConfigPath = join(i18nDir, 'request.ts');
+    const requestConfigContent = `import { getRequestConfig } from 'next-intl/server';
+
+// Single-locale starter — for multiple locales, derive this from a
+// [locale] route segment or cookie instead of hardcoding 'en'.
+export default getRequestConfig(async () => {
+  const locale = 'en';
+
+  return {
+    locale,
+    messages: (await import(\`../messages/\${locale}.json\`)).default,
+  };
+});
+`;
+    if (!(await pathExists(requestConfigPath))) {
+      await writeFile(requestConfigPath, requestConfigContent, 'utf-8');
+      logger.success(`Created ${requestConfigPath}`);
+    } else {
+      logger.dim(`Skipped ${requestConfigPath} (already exists)`);
+    }
+
+    logger.success('\n✅ i18n is now set up!\n');
+    logger.info('Next steps:\n');
+    logger.info('1. Add the next-intl plugin in next.config.ts:\n');
+    logger.dim("   import createNextIntlPlugin from 'next-intl/plugin';");
+    logger.dim('   const withNextIntl = createNextIntlPlugin();');
+    logger.dim('   export default withNextIntl(nextConfig);\n');
+    logger.info(
+      '2. Wrap app/layout.tsx children in <NextIntlClientProvider> to expose translations to Client Components\n'
+    );
+    logger.info('3. Add more locales under messages/ (e.g. messages/fr.json)');
+    logger.info('4. Use translations in your components:\n');
+    logger.dim("   import { useTranslations } from 'next-intl';");
+    logger.dim("   const t = useTranslations('HomePage');\n");
+    logger.info(
+      '5. For multiple locales with routing, see the [locale] segment guide:\n'
+    );
+    logger.dim(
+      '   https://next-intl.dev/docs/getting-started/app-router\n'
+    );
+    logger.info('📚 Documentation: https://next-intl.dev/docs');
+  } catch (error) {
+    spinner.fail('Failed to set up i18n');
+    throw error;
+  }
+}
+
+const VITEST_SUPPORTED = ['nextjs', 'react-vite', 'express', 'nestjs'];
+
+async function addVitest(projectType) {
+  if (!VITEST_SUPPORTED.includes(projectType)) {
+    logger.error(
+      `Vitest is supported for: ${VITEST_SUPPORTED.join(', ')} projects`
+    );
+    process.exit(1);
+  }
+
+  spinner.start('Installing Vitest...');
+
+  try {
+    const pm = await getPackageManager();
+    const addCmd = pm === 'npm' ? 'install' : 'add';
+    const devFlag = pm === 'npm' ? '--save-dev' : '-D';
+
+    await execa(pm, [addCmd, devFlag, 'vitest'], { stdio: 'pipe' });
+
+    spinner.succeed('Vitest installed successfully!');
+
+    const cwd = process.cwd();
+
+    const configContent = `import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+  test: {
+    environment: 'node',
+    globals: true,
+  },
+});
+`;
+    const configPath = join(cwd, 'vitest.config.ts');
+    if (!(await pathExists(configPath))) {
+      await writeFile(configPath, configContent, 'utf-8');
+      logger.success(`Created ${configPath}`);
+    } else {
+      logger.dim(`Skipped ${configPath} (already exists)`);
+    }
+
+    const testDir = join(cwd, 'tests');
+    await ensureDir(testDir);
+    const examplePath = join(testDir, 'example.test.ts');
+    if (!(await pathExists(examplePath))) {
+      await writeFile(
+        examplePath,
+        `import { describe, it, expect } from 'vitest';
+
+describe('example', () => {
+  it('works', () => {
+    expect(1 + 1).toBe(2);
+  });
+});
+`,
+        'utf-8'
+      );
+      logger.success(`Created ${examplePath}`);
+    } else {
+      logger.dim(`Skipped ${examplePath} (already exists)`);
+    }
+
+    logger.success('\n✅ Vitest is now set up!\n');
+    logger.info('Next steps:\n');
+    logger.info('1. Add a test script to package.json:\n');
+    logger.dim('   "test": "vitest"\n');
+    logger.info('2. Run tests: npx vitest\n');
+    logger.info('📚 Documentation: https://vitest.dev/guide/');
+  } catch (error) {
+    spinner.fail('Failed to set up Vitest');
+    throw error;
+  }
+}
+
+const PLAYWRIGHT_SUPPORTED = ['nextjs', 'react-vite'];
+
+async function addPlaywright(projectType) {
+  if (!PLAYWRIGHT_SUPPORTED.includes(projectType)) {
+    logger.error(
+      `Playwright is supported for: ${PLAYWRIGHT_SUPPORTED.join(', ')} projects`
+    );
+    process.exit(1);
+  }
+
+  spinner.start('Installing Playwright...');
+
+  try {
+    const pm = await getPackageManager();
+    const addCmd = pm === 'npm' ? 'install' : 'add';
+    const devFlag = pm === 'npm' ? '--save-dev' : '-D';
+
+    await execa(pm, [addCmd, devFlag, '@playwright/test'], { stdio: 'pipe' });
+
+    spinner.succeed('Playwright installed successfully!');
+
+    spinner.start('Installing Playwright browsers...');
+    await execa('npx', ['playwright', 'install', '--with-deps', 'chromium'], {
+      stdio: 'pipe',
+    });
+    spinner.succeed('Playwright browsers installed!');
+
+    const cwd = process.cwd();
+    const port = projectType === 'react-vite' ? 5173 : 3000;
+
+    const configContent = `import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  testDir: './e2e',
+  use: {
+    baseURL: 'http://localhost:${port}',
+  },
+});
+`;
+    const configPath = join(cwd, 'playwright.config.ts');
+    if (!(await pathExists(configPath))) {
+      await writeFile(configPath, configContent, 'utf-8');
+      logger.success(`Created ${configPath}`);
+    } else {
+      logger.dim(`Skipped ${configPath} (already exists)`);
+    }
+
+    const e2eDir = join(cwd, 'e2e');
+    await ensureDir(e2eDir);
+    const examplePath = join(e2eDir, 'example.spec.ts');
+    if (!(await pathExists(examplePath))) {
+      await writeFile(
+        examplePath,
+        `import { test, expect } from '@playwright/test';
+
+test('homepage loads', async ({ page }) => {
+  await page.goto('/');
+  await expect(page).toHaveTitle(/./);
+});
+`,
+        'utf-8'
+      );
+      logger.success(`Created ${examplePath}`);
+    } else {
+      logger.dim(`Skipped ${examplePath} (already exists)`);
+    }
+
+    logger.success('\n✅ Playwright is now set up!\n');
+    logger.info('Next steps:\n');
+    logger.info('1. Start your dev server, then run: npx playwright test\n');
+    logger.info('📚 Documentation: https://playwright.dev/docs/intro');
+  } catch (error) {
+    spinner.fail('Failed to set up Playwright');
+    throw error;
+  }
+}
+
+const TRPC_SUPPORTED = ['nextjs', 'react-vite'];
+
+async function addTrpc(projectType) {
+  if (!TRPC_SUPPORTED.includes(projectType)) {
+    logger.error(
+      `tRPC is supported for: ${TRPC_SUPPORTED.join(', ')} projects`
+    );
+    process.exit(1);
+  }
+
+  spinner.start('Installing tRPC...');
+
+  try {
+    const pm = await getPackageManager();
+    const addCmd = pm === 'npm' ? 'install' : 'add';
+
+    await execa(pm, [addCmd, '@trpc/server', '@trpc/client', 'zod'], {
+      stdio: 'pipe',
+    });
+
+    spinner.succeed('tRPC installed successfully!');
+
+    const routerContent = `import { initTRPC } from '@trpc/server';
+
+const t = initTRPC.create();
+
+export const router = t.router;
+export const publicProcedure = t.procedure;
+
+export const appRouter = router({
+  hello: publicProcedure.query(() => 'Hello from tRPC!'),
+});
+
+export type AppRouter = typeof appRouter;
+`;
+    const router = await writeClientFile(projectType, 'trpc.ts', routerContent);
+    if (router.written) {
+      logger.success(`Created ${router.path}`);
+    } else {
+      logger.dim(`Skipped ${router.path} (already exists)`);
+    }
+
+    logger.success('\n✅ tRPC is now set up!\n');
+    logger.info('Next steps:\n');
+    logger.info('1. Add procedures to your router:\n');
+    logger.dim(`   ${libDir(projectType)}/trpc.ts\n`);
+    if (projectType === 'nextjs') {
+      logger.info(
+        '2. Expose it via an API route (app/api/trpc/[trpc]/route.ts)'
+      );
+      logger.info(
+        '3. Set up the client with @trpc/client or @trpc/react-query\n'
+      );
+    } else {
+      logger.info(
+        '2. Set up an HTTP adapter (@trpc/server/adapters) to serve it'
+      );
+      logger.info('3. Set up the client with @trpc/client\n');
+    }
+    logger.info('📚 Documentation: https://trpc.io/docs');
+  } catch (error) {
+    spinner.fail('Failed to set up tRPC');
     throw error;
   }
 }

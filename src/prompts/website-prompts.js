@@ -18,6 +18,7 @@ export async function websitePrompts(projectName, options = {}) {
       typescript: true,
       styling: 'tailwind',
       shadcn: false,
+      database: 'none',
       packageManager: options.packageManager || 'npm',
       git: options.git !== false,
     };
@@ -113,6 +114,48 @@ export async function websitePrompts(projectName, options = {}) {
     );
   }
 
+  // T3 Stack already ships with Prisma + Postgres — skip the extra question
+  let database = 'none';
+  if (stack !== 't3-stack') {
+    const wantsDatabase = handleCancel(
+      await confirm({
+        message: 'Add a database?',
+        initialValue: false,
+      })
+    );
+
+    if (wantsDatabase) {
+      database = handleCancel(
+        await select({
+          message: 'Which database?',
+          options: [
+            {
+              value: 'supabase',
+              label: 'Supabase',
+              hint: 'Postgres + auth + storage',
+            },
+            { value: 'neon', label: 'Neon', hint: 'Serverless Postgres' },
+            {
+              value: 'mongodb',
+              label: 'MongoDB',
+              hint: 'NoSQL, Atlas-hosted',
+            },
+            {
+              value: 'firebase',
+              label: 'Firebase',
+              hint: 'Firestore + Google Cloud',
+            },
+            {
+              value: 'prisma',
+              label: 'Prisma',
+              hint: 'ORM — bring your own Postgres URL',
+            },
+          ],
+        })
+      );
+    }
+  }
+
   const packageManager = handleCancel(
     await select({
       message: 'Package manager',
@@ -138,6 +181,7 @@ export async function websitePrompts(projectName, options = {}) {
     typescript,
     styling,
     shadcn,
+    database,
     packageManager,
     git,
   };
