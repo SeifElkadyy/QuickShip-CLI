@@ -32,6 +32,8 @@ program
 // Build command
 program
   .command('build [project-name]')
+  .alias('create')
+  .alias('new')
   .description('Create a new project')
   .option('-t, --template <name>', 'template to use')
   .option(
@@ -43,6 +45,8 @@ program
   .option('--no-install', 'skip dependency installation')
   .option('--ascii', 'show classic ASCII logo instead of gradient')
   .option('-v, --verbose', 'show detailed logs')
+  .option('--json', 'output machine-readable JSON instead of interactive UI')
+  .option('--dry-run', 'preview what would be created without writing files')
   .action(async (projectName, options) => {
     const { buildCommand } = await import('../src/commands/build.js');
     await buildCommand(projectName, options);
@@ -60,7 +64,9 @@ program
 // Add command
 program
   .command('add <feature>')
-  .description('Add features to existing project (shadcn, auth, database)')
+  .description(
+    'Add features to existing project (shadcn, auth, database, stripe, resend, sentry)'
+  )
   .option('-p, --provider <name>', 'auth provider (clerk, supabase, nextauth)')
   .option('-v, --verbose', 'show detailed logs')
   .action(async (feature, options) => {
@@ -72,7 +78,7 @@ program
 program
   .command('doctor')
   .description('Check project health and environment')
-  .option('--fix', 'auto-fix common issues (coming soon)')
+  .option('--fix', 'auto-fix common issues (install deps, create .env.local)')
   .action(async (options) => {
     const { doctorCommand } = await import('../src/commands/doctor.js');
     await doctorCommand(options);
@@ -95,6 +101,44 @@ program
   .action(async (options) => {
     const { templatesCommand } = await import('../src/commands/templates.js');
     await templatesCommand(options);
+  });
+
+// Template command (custom template registry)
+const templateCmd = program
+  .command('template')
+  .description('Manage custom templates');
+
+templateCmd
+  .command('add <repo>')
+  .description('Add a custom template from a GitHub repo (user/repo)')
+  .option('-n, --name <name>', 'name to register the template under')
+  .option(
+    '-c, --category <category>',
+    'category (website, mobile, backend, custom)',
+    'custom'
+  )
+  .option('-d, --description <description>', 'template description')
+  .action(async (repo, options) => {
+    const { templateAddCommand } = await import('../src/commands/template.js');
+    await templateAddCommand(repo, options);
+  });
+
+templateCmd
+  .command('remove <name>')
+  .description('Remove a custom template')
+  .action(async (name) => {
+    const { templateRemoveCommand } = await import(
+      '../src/commands/template.js'
+    );
+    await templateRemoveCommand(name);
+  });
+
+templateCmd
+  .command('list')
+  .description('List custom templates')
+  .action(async () => {
+    const { templateListCommand } = await import('../src/commands/template.js');
+    await templateListCommand();
   });
 
 // Update command

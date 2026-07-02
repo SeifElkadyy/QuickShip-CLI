@@ -7,7 +7,7 @@
       "Check directory permissions: ls -la && chmod 755 .",
       "Change to a directory where you have write permissions",
       "Fix npm permissions: sudo chown -R $USER /usr/local/lib/node_modules",
-      "Use npx instead: npx quickship-cli@latest build my-app"
+      "Use npx instead: npx quickship@latest build my-app"
     ],
     "docs": "https://github.com/SeifElkadyy/QuickShip-CLI#troubleshooting"
   },

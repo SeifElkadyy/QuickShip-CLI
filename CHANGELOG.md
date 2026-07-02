@@ -5,6 +5,40 @@ All notable changes to QuickShip CLI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-07-02
+
+### Changed
+
+- **📦 Renamed package: `quickship-cli` → `quickship`** — install with `npm install -g quickship`, run with `npx quickship@latest build my-app`
+  - Old `quickship-cli` package deprecated, points to `quickship`
+  - All internal update-checker/registry URLs updated to new package name
+
+### Added
+
+- **🧩 Custom template registry** - `quickship template add <user/repo>` to register any GitHub repo as a reusable template
+  - `quickship template add <repo> [--name] [--category] [--description]`
+  - `quickship template remove <name>`
+  - `quickship template list`
+  - Registered templates work directly with `quickship build my-app --template <name>`
+- **🔧 Working `doctor --fix`** - auto-fixes common issues instead of "coming soon" stub
+  - Installs missing dependencies (`node_modules` not found)
+  - Creates `.env.local` from `.env.example` when missing
+- **🛍️ `add` marketplace integrations** - `quickship add stripe`, `quickship add resend`, `quickship add sentry`
+  - Installs SDK, scaffolds env vars, prints setup instructions
+- **🔌 `add` now supports Express, NestJS, and Expo projects** (previously Next.js/React only)
+- **🤖 `AGENTS.md` generated for every new project** - stack, commands, and conventions for AI coding agents
+- **⚙️ `--json` and `--dry-run` flags on `build`** - machine-readable output and preview mode for CI/agent use
+- **✨ `create` / `new` aliases for `build`** - `quickship create my-app` works same as `quickship build my-app`
+
+### Fixed
+
+- **🐛 SIGINT/SIGTERM cleanup race** - handler now registers only after confirming the target directory doesn't already exist, so Ctrl-C can no longer delete a pre-existing directory
+- **🗑️ Removed dead remote template registry fetch** - was silently failing against a 404 endpoint on every `build`/`list` call
+
+### Removed
+
+- Duplicate hardcoded template comparison data in `quickship templates` — now shares the same data source as `quickship list`
+
 ## [1.1.0] - 2025-02-04
 
 ### Added

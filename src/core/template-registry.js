@@ -11,27 +11,12 @@ const registryCache = new Conf({
   projectName: 'quickship-cli',
   configName: 'template-registry',
   schema: {
-    templates: {
-      type: 'object',
-      default: {},
-    },
-    lastFetch: {
-      type: 'number',
-      default: 0,
-    },
     customTemplates: {
       type: 'object',
       default: {},
     },
   },
 });
-
-// Cache duration: 24 hours
-const CACHE_DURATION = 24 * 60 * 60 * 1000;
-
-// Remote registry URL (for future use)
-const REGISTRY_URL =
-  'https://raw.githubusercontent.com/SeifElkadyy/quickship-templates/main/registry.json';
 
 /**
  * Template definition interface
@@ -61,37 +46,10 @@ function getBuiltInTemplates() {
 }
 
 /**
- * Fetch remote template registry
- * @returns {Promise<Object|null>} Remote templates or null if failed
- */
-async function fetchRemoteRegistry() {
-  try {
-    const response = await fetch(REGISTRY_URL, {
-      signal: AbortSignal.timeout(5000),
-    });
-
-    if (!response.ok) {
-      return null;
-    }
-
-    const data = await response.json();
-    return data.templates;
-  } catch (error) {
-    // Remote registry not available yet - this is expected
-    return null;
-  }
-}
-
-/**
- * Get all available templates (built-in + remote + custom)
- * @param {Object} options - Options
- * @param {boolean} options.force - Force refresh from remote
- * @param {boolean} options.includeRemote - Include remote templates
+ * Get all available templates (built-in + custom)
  * @returns {Promise<Object>} All templates grouped by category
  */
-export async function getAllTemplates(options = {}) {
-  const { force = false, includeRemote = true } = options;
-
+export async function getAllTemplates() {
   // Start with built-in templates
   const templates = getBuiltInTemplates();
 
@@ -103,34 +61,6 @@ export async function getAllTemplates(options = {}) {
       templates[category] = {};
     }
     templates[category][name] = template;
-  }
-
-  // Optionally fetch remote templates
-  if (includeRemote) {
-    const now = Date.now();
-    const lastFetch = registryCache.get('lastFetch');
-    let remoteTemplates = registryCache.get('templates');
-
-    if (force || now - lastFetch > CACHE_DURATION) {
-      const freshRemote = await fetchRemoteRegistry();
-      if (freshRemote) {
-        remoteTemplates = freshRemote;
-        registryCache.set('templates', freshRemote);
-        registryCache.set('lastFetch', now);
-      }
-    }
-
-    // Merge remote templates (remote overrides built-in for same name)
-    if (remoteTemplates && typeof remoteTemplates === 'object') {
-      for (const [category, categoryTemplates] of Object.entries(
-        remoteTemplates
-      )) {
-        if (!templates[category]) {
-          templates[category] = {};
-        }
-        Object.assign(templates[category], categoryTemplates);
-      }
-    }
   }
 
   return templates;
@@ -199,14 +129,6 @@ export function removeCustomTemplate(name) {
  */
 export function getCustomTemplates() {
   return registryCache.get('customTemplates');
-}
-
-/**
- * Clear template cache
- */
-export function clearTemplateCache() {
-  registryCache.set('templates', {});
-  registryCache.set('lastFetch', 0);
 }
 
 /**
@@ -280,7 +202,6 @@ export default {
   addCustomTemplate,
   removeCustomTemplate,
   getCustomTemplates,
-  clearTemplateCache,
   validateTemplate,
   getTemplateStats,
 };

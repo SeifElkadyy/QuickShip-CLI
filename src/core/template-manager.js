@@ -7,6 +7,7 @@ import Spinner from '../utils/spinner.js';
 import pkg from 'fs-extra';
 const { writeFile } = pkg;
 import * as backendTemplates from './backend-templates.js';
+import { getCustomTemplates } from './template-registry.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -1029,6 +1030,12 @@ module.exports = withNativeWind(config, { input: './global.css' });`;
     // Check in backend templates
     if (this.templates.backend && this.templates.backend[templateName]) {
       return this.templates.backend[templateName];
+    }
+
+    // Check custom templates (added via `quickship template add`)
+    const customTemplates = getCustomTemplates();
+    if (customTemplates[templateName]) {
+      return customTemplates[templateName];
     }
 
     return null;

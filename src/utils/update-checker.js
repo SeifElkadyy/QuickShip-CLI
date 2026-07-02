@@ -44,7 +44,7 @@ export function getCurrentVersion() {
 async function fetchLatestVersion() {
   try {
     const response = await fetch(
-      'https://registry.npmjs.org/quickship-cli/latest',
+      'https://registry.npmjs.org/quickship/latest',
       {
         timeout: 3000, // 3 second timeout
       }
@@ -145,7 +145,7 @@ function displayUpdateNotification(currentVersion, latestVersion) {
 ${chalk.yellow('╭─────────────────────────────────────────────────────────╮')}
 ${chalk.yellow('│')}  ${chalk.bold('Update available!')} ${chalk.dim(currentVersion)} → ${chalk.green(latestVersion)}              ${chalk.yellow('│')}
 ${chalk.yellow('│')}                                                         ${chalk.yellow('│')}
-${chalk.yellow('│')}  Run ${chalk.cyan('npm update -g quickship-cli')} to update         ${chalk.yellow('│')}
+${chalk.yellow('│')}  Run ${chalk.cyan('npm update -g quickship')} to update            ${chalk.yellow('│')}
 ${chalk.yellow('│')}  Or run ${chalk.cyan('quickship update')} for guided update         ${chalk.yellow('│')}
 ${chalk.yellow('╰─────────────────────────────────────────────────────────╯')}
 `;

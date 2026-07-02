@@ -3,8 +3,10 @@ import chalk from 'chalk';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { existsSync, readFileSync } from 'fs';
+import { copyFile } from 'fs/promises';
 import path from 'path';
 import semver from 'semver';
+import { detectPackageManager } from '../utils/project-detector.js';
 
 const execAsync = promisify(exec);
 
@@ -102,13 +104,33 @@ export async function doctorCommand(options = {}) {
 
   logger.log(chalk.bold('\n📊 Overall Health: ') + getHealthBadge(healthScore));
 
+  const fixableIssues = [...warnings, ...errors].filter((c) => c.autoFix);
+
   if (options.fix) {
-    logger.warning('⚠️  Auto-fix is not yet implemented');
-    logger.dim('Please fix issues manually using the suggestions above\n');
+    if (fixableIssues.length === 0) {
+      logger.dim('\nNothing to auto-fix.\n');
+    } else {
+      logger.log(chalk.bold('\n🔧 Applying fixes:\n'));
+      for (const issue of fixableIssues) {
+        try {
+          await issue.autoFix();
+          logger.log(chalk.green(`  ✔ Fixed: ${issue.name}`));
+        } catch (error) {
+          logger.log(chalk.red(`  ✘ Could not fix: ${issue.name}`));
+          logger.dim(`    ${error.message}`);
+        }
+      }
+      logger.log('');
+    }
+
+    const unfixable = [...warnings, ...errors].filter((c) => !c.autoFix);
+    if (unfixable.length > 0) {
+      logger.dim(
+        'Remaining issues need manual fixes (see suggestions above)\n'
+      );
+    }
   } else if (warnings.length > 0 || errors.length > 0) {
-    logger.dim(
-      '\n💡 Run with --fix flag to auto-fix common issues (coming soon)\n'
-    );
+    logger.dim('\n💡 Run with --fix flag to auto-fix common issues\n');
   } else {
     logger.log(chalk.green('\n✨ Everything looks good!\n'));
   }
@@ -238,6 +260,10 @@ async function checkDependencies() {
       message: 'node_modules not found',
       details: 'Dependencies are not installed',
       fix: 'Run: npm install',
+      autoFix: async () => {
+        const pm = await detectPackageManager(process.cwd());
+        await execAsync(`${pm} install`, { cwd: process.cwd() });
+      },
     };
   }
 
@@ -262,6 +288,9 @@ async function checkEnvVariables() {
       message: '.env.local not found',
       details: '.env.example exists but .env.local is missing',
       fix: 'Copy .env.example to .env.local and fill in values',
+      autoFix: async () => {
+        await copyFile(envExamplePath, envPath);
+      },
     };
   }
 

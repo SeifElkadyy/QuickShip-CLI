@@ -83,6 +83,71 @@ next-env.d.ts
     await writeFile(join(projectPath, '.gitignore'), gitignore);
   }
 
+  async generateAgentsFile(projectPath, config) {
+    const stackNames = {
+      nextjs: 'Next.js (App Router)',
+      'react-vite': 'React + Vite',
+      't3-stack': 'T3 Stack (Next.js, tRPC, Prisma, NextAuth)',
+      'mern-stack': 'MERN Stack (MongoDB, Express, React, Node.js)',
+      'express-api': 'Express API',
+      'nestjs-api': 'NestJS API',
+      'expo-react-native': 'Expo React Native',
+    };
+
+    const devCommand =
+      config.stack === 'nestjs-api'
+        ? 'start:dev'
+        : config.stack === 'expo-react-native'
+          ? null
+          : 'dev';
+
+    const pm = config.packageManager || 'npm';
+    const runCmd = pm === 'npm' ? 'npm run' : pm;
+
+    const lines = [
+      `# ${config.projectName}`,
+      '',
+      'Guidance for AI coding agents working in this repository.',
+      '',
+      '## Stack',
+      '',
+      `- **Framework:** ${stackNames[config.stack] || config.stack}`,
+      `- **Language:** ${config.typescript !== false ? 'TypeScript' : 'JavaScript'}`,
+      `- **Package manager:** ${pm}`,
+    ];
+
+    if (config.database && config.database !== 'none') {
+      lines.push(`- **Database:** ${config.database}`);
+    }
+    if (config.styling) {
+      lines.push(`- **Styling:** ${config.styling}`);
+    }
+    if (config.includeAuth) {
+      lines.push('- **Auth:** JWT / Passport');
+    }
+
+    lines.push(
+      '',
+      '## Commands',
+      '',
+      devCommand
+        ? `- Dev server: \`${runCmd} ${devCommand}\``
+        : '- Dev server: `npx expo start`',
+      '- Install deps: `' + pm + ' install`'
+    );
+
+    lines.push(
+      '',
+      '## Conventions',
+      '',
+      '- Generated with [QuickShip](https://github.com/SeifElkadyy/QuickShip-CLI).',
+      '- Follow the existing file/folder structure for new code.',
+      '- Keep environment secrets in `.env` / `.env.local`, never commit them.'
+    );
+
+    await writeFile(join(projectPath, 'AGENTS.md'), lines.join('\n') + '\n');
+  }
+
   async updatePackageJson(projectPath, config) {
     try {
       const packageJsonPath = join(projectPath, 'package.json');

@@ -2,7 +2,8 @@ import logger from '../utils/logger.js';
 import { execa } from 'execa';
 import Spinner from '../utils/spinner.js';
 import pkg from 'fs-extra';
-const { pathExists, readJson, writeFile, ensureDir } = pkg;
+const { pathExists, readJson, writeFile, ensureDir, readFile, appendFile } =
+  pkg;
 import { join } from 'path';
 import { select, isCancel, cancel } from '@clack/prompts';
 import { detectPackageManager } from '../utils/project-detector.js';
@@ -28,7 +29,7 @@ export async function addCommand(feature, options) {
 
     if (!projectType) {
       logger.error(
-        'No supported project detected. Make sure you are in a Next.js or React project directory.'
+        'No supported project detected. Make sure you are in a Next.js, React, Express, NestJS, or Expo project directory.'
       );
       process.exit(1);
     }
@@ -54,9 +55,21 @@ export async function addCommand(feature, options) {
         await addDatabase(projectType);
         break;
 
+      case 'stripe':
+        await addStripe(projectType);
+        break;
+
+      case 'resend':
+        await addResend(projectType);
+        break;
+
+      case 'sentry':
+        await addSentry(projectType);
+        break;
+
       default:
         logger.error(
-          `Unknown feature: ${feature}\n\nAvailable features:\n  - shadcn (shadcn/ui components)\n  - auth (NextAuth.js)\n  - database (Prisma)`
+          `Unknown feature: ${feature}\n\nAvailable features:\n  - shadcn (shadcn/ui components)\n  - auth (NextAuth.js)\n  - database (Prisma)\n  - stripe (Stripe payments)\n  - resend (Resend transactional email)\n  - sentry (Sentry error tracking)`
         );
         process.exit(1);
     }
@@ -86,6 +99,21 @@ async function detectProjectType() {
   // Check for Next.js
   if (deps.next) {
     return 'nextjs';
+  }
+
+  // Check for NestJS
+  if (deps['@nestjs/core']) {
+    return 'nestjs';
+  }
+
+  // Check for Expo
+  if (deps.expo) {
+    return 'expo';
+  }
+
+  // Check for Express
+  if (deps.express) {
+    return 'express';
   }
 
   // Check for React + Vite
@@ -486,8 +514,9 @@ async function addNextAuth() {
 }
 
 async function addDatabase(projectType) {
-  if (projectType !== 'nextjs' && projectType !== 'react-vite') {
-    logger.error('Prisma is supported for Next.js and React projects');
+  const supported = ['nextjs', 'react-vite', 'express', 'nestjs'];
+  if (!supported.includes(projectType)) {
+    logger.error(`Prisma is supported for: ${supported.join(', ')} projects`);
     process.exit(1);
   }
 
@@ -518,6 +547,174 @@ async function addDatabase(projectType) {
     logger.info('\nDocumentation: https://www.prisma.io/docs');
   } catch (error) {
     spinner.fail('Failed to set up Prisma');
+    throw error;
+  }
+}
+
+/**
+ * Append env vars to .env.local (or .env for backend projects) if not already present
+ */
+async function appendEnvVars(projectType, content) {
+  const cwd = process.cwd();
+  const envFile = projectType === 'nextjs' ? '.env.local' : '.env';
+  const envPath = join(cwd, envFile);
+  const envExists = await pathExists(envPath);
+
+  if (envExists) {
+    const existing = await readFile(envPath, 'utf-8');
+    if (existing.includes(content.split('\n')[0])) {
+      return false;
+    }
+    await appendFile(envPath, `\n${content}`);
+  } else {
+    await writeFile(envPath, content, 'utf-8');
+  }
+  return true;
+}
+
+const STRIPE_SUPPORTED = ['nextjs', 'react-vite', 'express', 'nestjs'];
+
+async function addStripe(projectType) {
+  if (!STRIPE_SUPPORTED.includes(projectType)) {
+    logger.error(
+      `Stripe is supported for: ${STRIPE_SUPPORTED.join(', ')} projects`
+    );
+    process.exit(1);
+  }
+
+  spinner.start('Installing Stripe...');
+
+  try {
+    const pm = await getPackageManager();
+    const addCmd = pm === 'npm' ? 'install' : 'add';
+
+    await execa(pm, [addCmd, 'stripe'], { stdio: 'pipe' });
+
+    spinner.succeed('Stripe installed successfully!');
+
+    const wrote = await appendEnvVars(
+      projectType,
+      `# Stripe\n# Get these from: https://dashboard.stripe.com/apikeys\nSTRIPE_SECRET_KEY=sk_test_your_key_here\nSTRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret_here\n`
+    );
+    if (wrote) logger.success('Environment variables added!');
+
+    logger.success('\n✅ Stripe is now set up!\n');
+    logger.info('Next steps:\n');
+    logger.info(
+      '1. Get your API keys from: https://dashboard.stripe.com/apikeys'
+    );
+    logger.info('2. Add your keys to your env file\n');
+    logger.info('3. Create a Stripe client:\n');
+    logger.dim("   import Stripe from 'stripe';");
+    logger.dim(
+      '   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);\n'
+    );
+    logger.info('4. Set up webhooks: https://dashboard.stripe.com/webhooks\n');
+    logger.info('📚 Documentation: https://stripe.com/docs/api');
+  } catch (error) {
+    spinner.fail('Failed to set up Stripe');
+    throw error;
+  }
+}
+
+const RESEND_SUPPORTED = ['nextjs', 'react-vite', 'express', 'nestjs'];
+
+async function addResend(projectType) {
+  if (!RESEND_SUPPORTED.includes(projectType)) {
+    logger.error(
+      `Resend is supported for: ${RESEND_SUPPORTED.join(', ')} projects`
+    );
+    process.exit(1);
+  }
+
+  spinner.start('Installing Resend...');
+
+  try {
+    const pm = await getPackageManager();
+    const addCmd = pm === 'npm' ? 'install' : 'add';
+
+    await execa(pm, [addCmd, 'resend'], { stdio: 'pipe' });
+
+    spinner.succeed('Resend installed successfully!');
+
+    const wrote = await appendEnvVars(
+      projectType,
+      `# Resend\n# Get your API key from: https://resend.com/api-keys\nRESEND_API_KEY=re_your_api_key_here\n`
+    );
+    if (wrote) logger.success('Environment variables added!');
+
+    logger.success('\n✅ Resend is now set up!\n');
+    logger.info('Next steps:\n');
+    logger.info('1. Get your API key from: https://resend.com/api-keys');
+    logger.info('2. Add your key to your env file\n');
+    logger.info('3. Send an email:\n');
+    logger.dim("   import { Resend } from 'resend';");
+    logger.dim('   const resend = new Resend(process.env.RESEND_API_KEY);');
+    logger.dim('   await resend.emails.send({');
+    logger.dim("     from: 'you@yourdomain.com',");
+    logger.dim("     to: 'user@example.com',");
+    logger.dim("     subject: 'Hello',");
+    logger.dim("     html: '<p>Hello world</p>',");
+    logger.dim('   });\n');
+    logger.info('📚 Documentation: https://resend.com/docs');
+  } catch (error) {
+    spinner.fail('Failed to set up Resend');
+    throw error;
+  }
+}
+
+const SENTRY_SUPPORTED = ['nextjs', 'react-vite', 'express', 'nestjs', 'expo'];
+
+async function addSentry(projectType) {
+  if (!SENTRY_SUPPORTED.includes(projectType)) {
+    logger.error(
+      `Sentry is supported for: ${SENTRY_SUPPORTED.join(', ')} projects`
+    );
+    process.exit(1);
+  }
+
+  spinner.start('Setting up Sentry...');
+
+  try {
+    if (projectType === 'nextjs') {
+      spinner.stop();
+      await execa('npx', ['@sentry/wizard@latest', '-i', 'nextjs'], {
+        stdio: 'inherit',
+      });
+      logger.success('\n✅ Sentry is now set up!\n');
+      logger.info(
+        '📚 Documentation: https://docs.sentry.io/platforms/javascript/guides/nextjs/'
+      );
+      return;
+    }
+
+    const pm = await getPackageManager();
+    const addCmd = pm === 'npm' ? 'install' : 'add';
+    const sentryPackage =
+      projectType === 'expo' ? '@sentry/react-native' : '@sentry/node';
+
+    await execa(pm, [addCmd, sentryPackage], { stdio: 'pipe' });
+
+    spinner.succeed('Sentry installed successfully!');
+
+    const wrote = await appendEnvVars(
+      projectType,
+      `# Sentry\n# Get your DSN from: https://sentry.io/\nSENTRY_DSN=your_sentry_dsn_here\n`
+    );
+    if (wrote) logger.success('Environment variables added!');
+
+    logger.success('\n✅ Sentry is now set up!\n');
+    logger.info('Next steps:\n');
+    logger.info('1. Create a project at: https://sentry.io/');
+    logger.info('2. Add your DSN to your env file\n');
+    logger.info('3. Initialize Sentry at your app entry point:\n');
+    logger.dim(`   import * as Sentry from '${sentryPackage}';`);
+    logger.dim('   Sentry.init({ dsn: process.env.SENTRY_DSN });\n');
+    logger.info(
+      `📚 Documentation: https://docs.sentry.io/platforms/javascript/guides/${projectType === 'expo' ? 'react-native' : 'node'}/`
+    );
+  } catch (error) {
+    spinner.fail('Failed to set up Sentry');
     throw error;
   }
 }

@@ -5,7 +5,7 @@
 
   ### Ship production-ready projects in 60 seconds
 
-[![npm version](https://img.shields.io/npm/v/quickship-cli?color=blue&style=flat-square)](https://www.npmjs.com/package/quickship-cli)
+[![npm version](https://img.shields.io/npm/v/quickship?color=blue&style=flat-square)](https://www.npmjs.com/package/quickship)
 [![CI](https://img.shields.io/github/actions/workflow/status/SeifElkadyy/QuickShip-CLI/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/SeifElkadyy/QuickShip-CLI/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D20.12.0-brightgreen?style=flat-square)](https://nodejs.org)
@@ -51,13 +51,13 @@
 **Option 1: No installation (recommended)**
 
 ```bash
-npx quickship-cli@latest build my-app
+npx quickship@latest build my-app
 ```
 
 **Option 2: Global install**
 
 ```bash
-npm install -g quickship-cli
+npm install -g quickship
 ```
 
 ---
@@ -154,6 +154,8 @@ quickship build my-app --ascii                       # classic ASCII logo
 | `--no-install` | Skip dependency installation |
 | `--ascii` | Show classic ASCII logo |
 | `-v, --verbose` | Show detailed logs |
+| `--json` | Output machine-readable JSON instead of interactive UI |
+| `--dry-run` | Preview what would be created without writing files |
 
 ---
 
@@ -283,23 +285,41 @@ quickship build my-api --template nestjs-api -y
 ## 🛠️ Commands
 
 ```bash
-# Create a new project
+# Create a new project (create / new are aliases for build)
 quickship build [project-name]
+quickship create my-app
+quickship new my-app
+
+# Machine-readable / CI / agent use
+quickship build my-app -y --json          # JSON result on stdout
+quickship build my-app -y --dry-run       # preview without writing files
 
 # List all available templates
 quickship list
 
 # Show detailed template info
 quickship templates
+quickship templates --compare
+
+# Manage custom templates (any GitHub repo)
+quickship template add <username/repo>
+quickship template add <username/repo> --name my-template --category backend
+quickship template list
+quickship template remove my-template
+quickship build my-app --template my-template
 
 # Add features to existing project
 quickship add shadcn
 quickship add auth          # prompts for Clerk / Supabase / NextAuth
 quickship add auth --provider clerk
 quickship add database
+quickship add stripe
+quickship add resend
+quickship add sentry
 
-# Check environment + project health
+# Check environment + project health (with auto-fix)
 quickship doctor
+quickship doctor --fix
 
 # Show project info
 quickship info
@@ -339,16 +359,27 @@ quickship deploy
 ```bash
 cd my-app
 
-quickship add shadcn      # shadcn/ui component library
-quickship add auth        # authentication (Clerk / Supabase / NextAuth)
-quickship add database    # Prisma database
+quickship add shadcn      # shadcn/ui component library (Next.js)
+quickship add auth        # authentication (Clerk / Supabase / NextAuth) (Next.js)
+quickship add database    # Prisma database (Next.js, Vite, Express, NestJS)
+quickship add stripe      # Stripe payments (Next.js, Vite, Express, NestJS)
+quickship add resend      # Resend transactional email (Next.js, Vite, Express, NestJS)
+quickship add sentry      # Sentry error tracking (Next.js, Vite, Express, NestJS, Expo)
 ```
+
+`quickship add` auto-detects your project type (Next.js, React + Vite, Express, NestJS, Expo) and installs/configures the feature accordingly.
 
 | Auth Provider | Best For |
 |--------------|----------|
 | **Clerk** | Quick MVPs — pre-built UI, user management |
 | **Supabase** | Full-stack — auth + PostgreSQL + storage |
 | **NextAuth** | Custom flows — maximum flexibility |
+
+---
+
+## 🤖 Agent-Ready Projects
+
+Every project QuickShip generates includes an `AGENTS.md` file describing the stack, commands, and conventions — so Claude, Cursor, and other AI coding agents understand your project immediately, no extra setup.
 
 ---
 
@@ -476,7 +507,7 @@ QuickShip is **free and open-source**. If it saves you time:
 
 - **Issues:** [github.com/SeifElkadyy/QuickShip-CLI/issues](https://github.com/SeifElkadyy/QuickShip-CLI/issues)
 - **Discussions:** [github.com/SeifElkadyy/QuickShip-CLI/discussions](https://github.com/SeifElkadyy/QuickShip-CLI/discussions)
-- **NPM:** [npmjs.com/package/quickship-cli](https://www.npmjs.com/package/quickship-cli)
+- **NPM:** [npmjs.com/package/quickship](https://www.npmjs.com/package/quickship)
 
 ---
 

@@ -10,8 +10,8 @@ import { loadProjectConfig } from '../utils/config-loader.js';
 
 export async function buildCommand(projectName, options) {
   try {
-    // CI mode: force non-interactive defaults
-    if (ci.isCI) {
+    // CI mode, --json, and --dry-run all imply non-interactive defaults
+    if (ci.isCI || options.json || options.dryRun) {
       options.yes = true;
       options.git = options.git !== false;
     }
@@ -22,8 +22,10 @@ export async function buildCommand(projectName, options) {
       options = { ...fileConfig, ...options };
     }
 
-    // Show welcome banner
-    if (options.ascii) {
+    // Show welcome banner (skipped for machine-readable / dry-run output)
+    if (options.json || options.dryRun) {
+      // no banner
+    } else if (options.ascii) {
       logger.showAsciiLogo();
     } else {
       logger.welcome();
@@ -77,10 +79,41 @@ export async function buildCommand(projectName, options) {
       config.packageManager = options.packageManager;
     }
 
+    // --dry-run: validate and preview without writing anything
+    if (options.dryRun) {
+      const engine = new Engine(config, options);
+      await engine.validatePath();
+
+      if (options.json) {
+        console.log(
+          JSON.stringify({ dryRun: true, config, path: engine.projectPath })
+        );
+      } else {
+        logger.info('\nDry run — no files were created.\n');
+        logger.log(JSON.stringify(config, null, 2));
+        logger.info(`\nWould create project at: ${engine.projectPath}\n`);
+      }
+      return;
+    }
+
     // Step 3: Build the project
     const engine = new Engine(config, options);
     await engine.build();
+
+    if (options.json) {
+      console.log(
+        JSON.stringify({
+          success: true,
+          config,
+          path: engine.projectPath,
+        })
+      );
+    }
   } catch (error) {
+    if (options.json) {
+      console.log(JSON.stringify({ success: false, error: error.message }));
+      process.exit(1);
+    }
     ErrorHandler.handle(error, options.verbose);
     process.exit(1);
   }

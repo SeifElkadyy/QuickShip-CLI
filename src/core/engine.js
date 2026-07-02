@@ -36,13 +36,16 @@ class Engine {
       }
       process.exit(130);
     };
-    process.on('SIGINT', this._sigintHandler);
-    process.on('SIGTERM', this._sigintHandler);
   }
 
   async build() {
-    // Validate before showing the task list so errors surface cleanly
+    // Validate before showing the task list so errors surface cleanly.
+    // Confirms projectPath doesn't already exist, so it's safe for the
+    // SIGINT handler (registered next) to delete it on interrupt.
     await this.validatePath();
+
+    process.on('SIGINT', this._sigintHandler);
+    process.on('SIGTERM', this._sigintHandler);
 
     const templateName = this.templateManager.determineTemplate(this.config);
     const template = this.templateManager.getTemplate(templateName);
@@ -81,6 +84,15 @@ class Engine {
           },
         },
         {
+          title: 'Generate AGENTS.md',
+          task: async () => {
+            await this.fileGenerator.generateAgentsFile(
+              this.projectPath,
+              this.config
+            );
+          },
+        },
+        {
           title: 'Install dependencies',
           enabled: () =>
             !toolsWithAutoInstall && this.options.install !== false,
@@ -111,6 +123,7 @@ class Engine {
         },
       ],
       {
+        renderer: this.options.json ? 'silent' : 'default',
         rendererOptions: {
           showTimer: true,
           collapseErrors: false,
@@ -123,8 +136,10 @@ class Engine {
       await tasks.run();
       process.removeListener('SIGINT', this._sigintHandler);
       process.removeListener('SIGTERM', this._sigintHandler);
-      this.showSuccessMessage();
-      await this._offerOpenEditor();
+      if (!this.options.json) {
+        this.showSuccessMessage();
+        await this._offerOpenEditor();
+      }
     } catch (error) {
       process.removeListener('SIGINT', this._sigintHandler);
       process.removeListener('SIGTERM', this._sigintHandler);

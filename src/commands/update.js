@@ -25,7 +25,7 @@ export async function updateCommand() {
 
     let latestVersion;
     try {
-      const { stdout } = await execAsync('npm view quickship-cli version');
+      const { stdout } = await execAsync('npm view quickship version');
       latestVersion = stdout.trim();
     } catch {
       logger.error('✘ Could not check for updates');
@@ -69,11 +69,11 @@ export async function updateCommand() {
     logger.info('\n⏳ Updating QuickShip CLI...\n');
 
     try {
-      const { stdout } = await execAsync('npm list -g quickship-cli --depth=0');
-      const isGlobal = stdout.includes('quickship-cli');
+      const { stdout } = await execAsync('npm list -g quickship --depth=0');
+      const isGlobal = stdout.includes('quickship');
       const updateCmd = isGlobal
-        ? 'npm install -g quickship-cli@latest'
-        : 'npm install quickship-cli@latest';
+        ? 'npm install -g quickship@latest'
+        : 'npm install quickship@latest';
 
       await execAsync(updateCmd);
 
@@ -81,7 +81,7 @@ export async function updateCommand() {
       logger.dim("🎉 Run 'quickship --version' to verify.\n");
     } catch {
       logger.error('\n✘ Update failed');
-      logger.dim('Try manually: npm install -g quickship-cli@latest\n');
+      logger.dim('Try manually: npm install -g quickship@latest\n');
     }
   } catch (error) {
     logger.error('\n✘ Error checking for updates');
