@@ -74,11 +74,15 @@ class TemplateManager {
       return;
     }
 
-    // Fall back to degit for other templates
+    // Fall back to giget for custom templates
     this.spinner.start(`Cloning template: ${templateName}`);
 
     try {
-      await downloadTemplate(template.repo, {
+      // giget treats a bare "user/repo" as its own registry, not GitHub
+      const source = template.repo.includes(':')
+        ? template.repo
+        : `gh:${template.repo}`;
+      await downloadTemplate(source, {
         dir: destinationPath,
         force: true,
       });
@@ -135,16 +139,6 @@ class TemplateManager {
       bun: '--use-bun',
     };
     return flags[packageManager] || '--use-npm';
-  }
-
-  getTemplate(templateName) {
-    // Search through all platforms
-    for (const platform in this.templates) {
-      if (this.templates[platform][templateName]) {
-        return this.templates[platform][templateName];
-      }
-    }
-    return null;
   }
 
   getTemplatesForPlatform(platform) {
@@ -214,48 +208,22 @@ class TemplateManager {
       const installCmd = packageManager === 'npm' ? 'install' : 'add';
       const devFlag = packageManager === 'npm' ? '--save-dev' : '-D';
 
-      // Install Tailwind v4 PostCSS plugin and dependencies
-      this.spinner.succeed('Tailwind CSS setup started');
+      // Tailwind v4: PostCSS plugin, no tailwind.config.js, no autoprefixer
+      // (v4 detects content and vendor-prefixes on its own)
       await execa(
         packageManager,
-        [
-          installCmd,
-          devFlag,
-          '@tailwindcss/postcss',
-          'tailwindcss',
-          'autoprefixer',
-        ],
+        [installCmd, devFlag, '@tailwindcss/postcss', 'tailwindcss'],
         {
           cwd: destinationPath,
           stdio: 'pipe',
         }
       );
 
-      // Create Tailwind and PostCSS config files manually
       const { writeFile } = await import('fs/promises');
 
-      const tailwindConfig = `/** @type {import('tailwindcss').Config} */
-export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-}
-`;
-      await writeFile(
-        join(destinationPath, 'tailwind.config.js'),
-        tailwindConfig
-      );
-
-      // Create postcss.config.js with @tailwindcss/postcss
       const postcssConfig = `export default {
   plugins: {
     '@tailwindcss/postcss': {},
-    autoprefixer: {},
   },
 }
 `;
@@ -264,12 +232,11 @@ export default {
         postcssConfig
       );
 
-      // Update index.css with Tailwind directives
-      const indexCss = `@tailwind base;
-@tailwind components;
-@tailwind utilities;
-`;
-      await writeFile(join(destinationPath, 'src', 'index.css'), indexCss);
+      // v4 dropped the @tailwind base/components/utilities directives
+      await writeFile(
+        join(destinationPath, 'src', 'index.css'),
+        '@import "tailwindcss";\n'
+      );
 
       this.spinner.succeed('Tailwind CSS configured');
     } catch (error) {
@@ -686,8 +653,9 @@ ${config.styling === 'tailwind' ? '- Tailwind CSS' : ''}
       // Create README
       await backendTemplates.createExpressReadme(destinationPath, config);
 
-      // Create Jest config
-      await backendTemplates.createExpressJestConfig(destinationPath);
+      // Create test + lint config
+      await backendTemplates.createExpressTestConfig(destinationPath);
+      await backendTemplates.createEslintConfig(destinationPath);
 
       this.spinner.succeed('Express API files created');
 
@@ -765,8 +733,9 @@ ${config.styling === 'tailwind' ? '- Tailwind CSS' : ''}
       // Create nest-cli.json
       await backendTemplates.createNestCliConfig(destinationPath);
 
-      // Create Jest config
-      await backendTemplates.createNestJestConfig(destinationPath);
+      // Create example test + lint config
+      await backendTemplates.createNestTestFiles(destinationPath);
+      await backendTemplates.createEslintConfig(destinationPath);
 
       this.spinner.succeed('NestJS API files created');
 
@@ -977,43 +946,30 @@ module.exports = withNativeWind(config, { input: './global.css' });`;
   }
 
   determineTemplate(config) {
-    // Expo React Native
-    if (config.stack === 'expo-react-native') {
-      return 'expo-react-native';
+    const aliases = {
+      nextjs: 'nextjs-typescript-tailwind',
+      expo: 'expo-react-native',
+    };
+    const name = aliases[config.stack] || config.stack;
+
+    // Built-in or custom (quickship template add) — never silently fall back
+    if (this.getTemplate(name)) {
+      return name;
     }
 
-    // React + Vite
-    if (config.stack === 'react-vite') {
-      return 'react-vite';
-    }
+    const custom = Object.keys(getCustomTemplates());
+    const available = ['nextjs', 'expo', ...this.getBuiltInNames(), ...custom];
+    throw new Error(
+      `Unknown template: ${config.stack}\n\nAvailable templates: ${available.join(', ')}`
+    );
+  }
 
-    // T3 Stack
-    if (config.stack === 't3-stack') {
-      return 't3-stack';
-    }
+  getBuiltInNames() {
+    return Object.values(this.templates).flatMap((t) => Object.keys(t));
+  }
 
-    // MERN Stack
-    if (config.stack === 'mern-stack') {
-      return 'mern-stack';
-    }
-
-    // Express API
-    if (config.stack === 'express-api') {
-      return 'express-api';
-    }
-
-    // NestJS API
-    if (config.stack === 'nestjs-api') {
-      return 'nestjs-api';
-    }
-
-    // Next.js (default)
-    if (config.stack === 'nextjs') {
-      return 'nextjs-typescript-tailwind';
-    }
-
-    // Default fallback
-    return 'nextjs-typescript-tailwind';
+  isCustomTemplate(name) {
+    return !!getCustomTemplates()[name];
   }
 
   getTemplate(templateName) {

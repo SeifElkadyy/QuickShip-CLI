@@ -87,10 +87,12 @@ jobs:
         run: node bin/index.js build test-express -t express-api -y --no-git
         timeout-minutes: 5
 
-      - name: Build Express project
+      - name: Build, test, and lint Express project
         run: |
           cd test-express
           npm run build
+          npm test
+          npm run lint
         timeout-minutes: 5
 
       - name: Cleanup
@@ -117,10 +119,12 @@ jobs:
         run: node bin/index.js build test-nestjs -t nestjs-api -y --no-git
         timeout-minutes: 5
 
-      - name: Build NestJS project
+      - name: Build, test, and lint NestJS project
         run: |
           cd test-nestjs
           npm run build
+          npm test
+          npm run lint
         timeout-minutes: 5
 
       - name: Cleanup

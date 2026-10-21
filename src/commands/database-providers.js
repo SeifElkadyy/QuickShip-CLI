@@ -6,6 +6,7 @@ import {
   libDir,
   writeClientFile,
   appendEnvVars,
+  assertServerProject,
 } from '../utils/add-helpers.js';
 
 const spinner = new Spinner();
@@ -79,6 +80,7 @@ export const supabase = createClient(
 }
 
 export async function addNeon(projectType, cwd = process.cwd()) {
+  assertServerProject('Neon', projectType);
   assertSupported('Neon', projectType);
   spinner.start('Installing Neon client...');
 
@@ -126,6 +128,7 @@ export const sql = neon(process.env.DATABASE_URL!);
 }
 
 export async function addMongoDatabase(projectType, cwd = process.cwd()) {
+  assertServerProject('MongoDB', projectType);
   assertSupported('MongoDB', projectType);
   spinner.start('Installing MongoDB driver...');
 
@@ -245,6 +248,7 @@ export const db = getFirestore(firebaseApp);
  * so it's safe to call non-interactively from the build pipeline.
  */
 export async function addPrismaDatabase(projectType, cwd = process.cwd()) {
+  assertServerProject('Prisma', projectType);
   assertSupported('Prisma', projectType);
   spinner.start('Installing Prisma...');
 

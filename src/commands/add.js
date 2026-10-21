@@ -10,6 +10,7 @@ import {
   libDir,
   writeClientFile,
   appendEnvVars,
+  assertServerProject,
 } from '../utils/add-helpers.js';
 import {
   addSupabaseDatabase,
@@ -603,7 +604,8 @@ async function addDatabase(projectType, options = {}) {
 }
 
 async function addPrisma(projectType) {
-  const supported = ['nextjs', 'react-vite', 'express', 'nestjs'];
+  assertServerProject('Prisma', projectType);
+  const supported = ['nextjs', 'express', 'nestjs'];
   if (!supported.includes(projectType)) {
     logger.error(`Prisma is supported for: ${supported.join(', ')} projects`);
     process.exit(1);
@@ -640,9 +642,10 @@ async function addPrisma(projectType) {
   }
 }
 
-const STRIPE_SUPPORTED = ['nextjs', 'react-vite', 'express', 'nestjs'];
+const STRIPE_SUPPORTED = ['nextjs', 'express', 'nestjs'];
 
 async function addStripe(projectType) {
+  assertServerProject('Stripe', projectType);
   if (!STRIPE_SUPPORTED.includes(projectType)) {
     logger.error(
       `Stripe is supported for: ${STRIPE_SUPPORTED.join(', ')} projects`
@@ -699,9 +702,10 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   }
 }
 
-const RESEND_SUPPORTED = ['nextjs', 'react-vite', 'express', 'nestjs'];
+const RESEND_SUPPORTED = ['nextjs', 'express', 'nestjs'];
 
 async function addResend(projectType) {
+  assertServerProject('Resend', projectType);
   if (!RESEND_SUPPORTED.includes(projectType)) {
     logger.error(
       `Resend is supported for: ${RESEND_SUPPORTED.join(', ')} projects`

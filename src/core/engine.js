@@ -1,4 +1,4 @@
-import { resolve } from 'path';
+import { resolve, join } from 'path';
 import { pathExists, remove } from 'fs-extra';
 import { Listr } from 'listr2';
 import { execa } from 'execa';
@@ -73,20 +73,32 @@ class Engine {
           title: 'Generate project files',
           enabled: () => !toolsWithAutoInstall,
           task: async () => {
-            await this.fileGenerator.updatePackageJson(
-              this.projectPath,
-              this.config
-            );
-            await this.fileGenerator.generateReadme(
-              this.projectPath,
-              this.config
-            );
-            await this.fileGenerator.generateGitignore(this.projectPath);
+            // Never clobber files the template (custom or Expo) already ships
+            const has = (f) => pathExists(join(this.projectPath, f));
+            if (await has('package.json')) {
+              await this.fileGenerator.updatePackageJson(
+                this.projectPath,
+                this.config
+              );
+            }
+            if (!(await has('README.md'))) {
+              await this.fileGenerator.generateReadme(
+                this.projectPath,
+                this.config
+              );
+            }
+            if (!(await has('.gitignore'))) {
+              await this.fileGenerator.generateGitignore(this.projectPath);
+            }
           },
         },
         {
           title: 'Generate AGENTS.md',
-          task: async () => {
+          task: async (ctx, task) => {
+            if (await pathExists(join(this.projectPath, 'AGENTS.md'))) {
+              task.skip('Template already ships AGENTS.md');
+              return;
+            }
             await this.fileGenerator.generateAgentsFile(
               this.projectPath,
               this.config
@@ -97,7 +109,11 @@ class Engine {
           title: 'Install dependencies',
           enabled: () =>
             !toolsWithAutoInstall && this.options.install !== false,
-          task: async () => {
+          task: async (ctx, task) => {
+            if (!(await pathExists(join(this.projectPath, 'package.json')))) {
+              task.skip('No package.json in template');
+              return;
+            }
             await this.dependencyInstaller.install(this.projectPath);
           },
         },

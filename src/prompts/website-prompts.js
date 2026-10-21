@@ -2,6 +2,8 @@ import { text, select, confirm, isCancel, cancel, note } from '@clack/prompts';
 import validator from '../utils/validator.js';
 import { analyzeProjectName } from '../utils/smart-defaults.js';
 
+const SERVER_ONLY_DBS = ['neon', 'mongodb', 'prisma'];
+
 function handleCancel(value) {
   if (isCancel(value)) {
     cancel('Operation cancelled.');
@@ -150,7 +152,10 @@ export async function websitePrompts(projectName, options = {}) {
               label: 'Prisma',
               hint: 'ORM — bring your own Postgres URL',
             },
-          ],
+          ].filter(
+            // Vite is browser-only: hide providers that need a server secret
+            (o) => stack !== 'react-vite' || !SERVER_ONLY_DBS.includes(o.value)
+          ),
         })
       );
     }

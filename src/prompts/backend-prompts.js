@@ -81,12 +81,17 @@ export async function backendPrompts(projectName, options = {}) {
 
   let database = dbBase;
   if (dbBase !== 'none') {
-    const useOrm = handleCancel(
-      await confirm({
-        message: dbBase === 'mongodb' ? 'Use Mongoose ODM?' : 'Use Prisma ORM?',
-        initialValue: true,
-      })
-    );
+    // ponytail: NestJS template only implements Prisma/Mongoose modules;
+    // offer raw drivers there once a raw DatabaseModule exists
+    const useOrm =
+      stack === 'nestjs-api' ||
+      handleCancel(
+        await confirm({
+          message:
+            dbBase === 'mongodb' ? 'Use Mongoose ODM?' : 'Use Prisma ORM?',
+          initialValue: true,
+        })
+      );
     if (dbBase === 'postgresql')
       database = useOrm ? 'postgresql-prisma' : 'postgresql-raw';
     else if (dbBase === 'mongodb')
@@ -95,12 +100,16 @@ export async function backendPrompts(projectName, options = {}) {
       database = useOrm ? 'sqlite-prisma' : 'sqlite-raw';
   }
 
-  const includeAuth = handleCancel(
-    await confirm({
-      message: 'Include JWT authentication?',
-      initialValue: true,
-    })
-  );
+  // Generated auth is built on the Prisma/Mongoose user model
+  const hasOrm = database.endsWith('-prisma') || database.endsWith('-mongoose');
+  const includeAuth = hasOrm
+    ? handleCancel(
+        await confirm({
+          message: 'Include JWT authentication?',
+          initialValue: true,
+        })
+      )
+    : false;
   const includeSwagger = handleCancel(
     await confirm({
       message: 'Include Swagger/OpenAPI docs?',

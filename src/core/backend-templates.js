@@ -30,9 +30,10 @@ export async function createExpressPackageJson(destinationPath, config) {
     '@types/node': v('@types/node'),
     typescript: v('typescript'),
     tsx: v('tsx'),
-    jest: v('jest'),
-    '@types/jest': v('@types/jest'),
+    vitest: v('vitest'),
     eslint: v('eslint'),
+    '@eslint/js': v('@eslint/js'),
+    'typescript-eslint': v('typescript-eslint'),
     prettier: v('prettier'),
     '@types/cors': v('@types/cors'),
   };
@@ -85,10 +86,10 @@ export async function createExpressPackageJson(destinationPath, config) {
       dev: 'tsx watch src/index.ts',
       build: 'tsc',
       start: 'node dist/index.js',
-      test: 'jest',
-      'test:watch': 'jest --watch',
-      lint: 'eslint src/**/*.ts',
-      'lint:fix': 'eslint src/**/*.ts --fix',
+      test: 'vitest run',
+      'test:watch': 'vitest',
+      lint: 'eslint src tests',
+      'lint:fix': 'eslint src tests --fix',
       format: 'prettier --write "src/**/*.ts"',
     },
     keywords: ['express', 'typescript', 'api'],
@@ -133,6 +134,8 @@ export async function createNestPackageJson(destinationPath, config) {
     supertest: v('supertest'),
     '@types/supertest': v('@types/supertest'),
     eslint: v('eslint'),
+    '@eslint/js': v('@eslint/js'),
+    'typescript-eslint': v('typescript-eslint'),
     prettier: v('prettier'),
   };
 
@@ -186,7 +189,7 @@ export async function createNestPackageJson(destinationPath, config) {
       'start:dev': 'nest start --watch',
       'start:debug': 'nest start --debug --watch',
       'start:prod': 'node dist/main',
-      lint: 'eslint "{src,apps,libs,test}/**/*.ts" --fix',
+      lint: 'eslint src --fix',
       test: 'jest',
       'test:watch': 'jest --watch',
       'test:cov': 'jest --coverage',
@@ -236,7 +239,8 @@ export async function createExpressTsConfig(destinationPath) {
       sourceMap: true,
       removeComments: true,
       noUnusedLocals: true,
-      noUnusedParameters: true,
+      // Express handlers/error middleware need positional (req, res, next)
+      noUnusedParameters: false,
       noImplicitReturns: true,
       noFallthroughCasesInSwitch: true,
     },
@@ -410,7 +414,7 @@ config();
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PORT: z.string().default('3000'),
-  ${config.database === 'postgresql-prisma' || config.database === 'sqlite' ? "DATABASE_URL: z.string().min(1, 'DATABASE_URL is required')," : ''}
+  ${config.database === 'postgresql-prisma' || config.database === 'sqlite-prisma' ? "DATABASE_URL: z.string().min(1, 'DATABASE_URL is required')," : ''}
   ${config.database === 'mongodb-mongoose' ? "MONGODB_URI: z.string().min(1, 'MONGODB_URI is required')," : ''}
   ${config.includeAuth ? "JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),\n  JWT_EXPIRES_IN: z.string().default('7d')," : ''}
 });
@@ -431,16 +435,86 @@ export const env = parsed.data;
   );
 }
 
+// Raw drivers: just a connection module matching the connectDatabase()
+// contract src/index.ts imports. Auth needs an ORM model, so raw drivers
+// are generated without auth (see backend prompts).
+const RAW_DB_CODE = {
+  'postgresql-raw': `import pg from 'pg';
+
+export const pool = new pg.Pool({
+  connectionString: process.env.DATABASE_URL ?? 'postgresql://postgres:postgres@localhost:5432/postgres',
+});
+
+export async function connectDatabase() {
+  try {
+    await pool.query('SELECT 1');
+    console.log('✅ PostgreSQL connected successfully');
+  } catch (error) {
+    console.error('❌ PostgreSQL connection failed:', error);
+    process.exit(1);
+  }
+}
+
+export async function disconnectDatabase() {
+  await pool.end();
+}
+`,
+  'mongodb-raw': `import { MongoClient } from 'mongodb';
+
+export const client = new MongoClient(process.env.MONGODB_URI ?? 'mongodb://localhost:27017/app');
+export const db = client.db();
+
+export async function connectDatabase() {
+  try {
+    await client.connect();
+    console.log('✅ MongoDB connected successfully');
+  } catch (error) {
+    console.error('❌ MongoDB connection failed:', error);
+    process.exit(1);
+  }
+}
+
+export async function disconnectDatabase() {
+  await client.close();
+}
+`,
+  'sqlite-raw': `import Database from 'better-sqlite3';
+
+export const db: Database.Database = new Database(process.env.DATABASE_PATH ?? 'dev.db');
+
+export async function connectDatabase() {
+  db.pragma('journal_mode = WAL');
+  console.log('✅ SQLite database ready');
+}
+
+export async function disconnectDatabase() {
+  db.close();
+}
+`,
+};
+
 export async function createExpressDatabase(destinationPath, config) {
   const { writeFile } = await import('fs/promises');
   const { mkdir } = await import('fs/promises');
 
-  if (config.database === 'postgresql-prisma' || config.database === 'sqlite') {
+  if (RAW_DB_CODE[config.database]) {
+    await writeFile(
+      join(destinationPath, 'src', 'config', 'database.ts'),
+      RAW_DB_CODE[config.database]
+    );
+    return;
+  }
+
+  if (
+    config.database === 'postgresql-prisma' ||
+    config.database === 'sqlite-prisma'
+  ) {
     // Create Prisma directory
     await mkdir(join(destinationPath, 'prisma'), { recursive: true });
 
     // Create Prisma schema
-    const provider = config.database === 'sqlite' ? 'sqlite' : 'postgresql';
+    const provider =
+      config.database === 'sqlite-prisma' ? 'sqlite' : 'postgresql';
     const prismaSchema = `generator client {
   provider = "prisma-client-js"
 }
@@ -741,17 +815,17 @@ export async function createExpressAuth(destinationPath, config) {
   // Auth controller
   const authControllerCode = `import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import jwt, { type SignOptions } from 'jsonwebtoken';
 import { env } from '../config/environment.js';
 import { AppError } from '../middleware/error.middleware.js';
-${config.database === 'postgresql-prisma' || config.database === 'sqlite' ? "import { prisma } from '../config/database.js';" : "import { User } from '../models/user.model.js';"}
+${config.database === 'postgresql-prisma' || config.database === 'sqlite-prisma' ? "import { prisma } from '../config/database.js';" : "import { User } from '../models/user.model.js';"}
 
 export async function register(req: Request, res: Response, next: NextFunction) {
   try {
     const { email, password, name } = req.body;
 
     // Check if user exists
-    ${config.database === 'postgresql-prisma' || config.database === 'sqlite' ? `const existingUser = await prisma.user.findUnique({ where: { email } });` : `const existingUser = await User.findOne({ email });`}
+    ${config.database === 'postgresql-prisma' || config.database === 'sqlite-prisma' ? `const existingUser = await prisma.user.findUnique({ where: { email } });` : `const existingUser = await User.findOne({ email });`}
 
     if (existingUser) {
       throw new AppError(400, 'User already exists');
@@ -762,7 +836,8 @@ export async function register(req: Request, res: Response, next: NextFunction) 
 
     // Create user
     ${
-      config.database === 'postgresql-prisma' || config.database === 'sqlite'
+      config.database === 'postgresql-prisma' ||
+      config.database === 'sqlite-prisma'
         ? `const user = await prisma.user.create({
       data: { email, password: hashedPassword, name },
     });`
@@ -773,7 +848,7 @@ export async function register(req: Request, res: Response, next: NextFunction) 
     const token = jwt.sign(
       { id: user.id, email: user.email },
       env.JWT_SECRET,
-      { expiresIn: env.JWT_EXPIRES_IN }
+      { expiresIn: env.JWT_EXPIRES_IN as SignOptions['expiresIn'] }
     );
 
     res.status(201).json({
@@ -797,7 +872,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     const { email, password } = req.body;
 
     // Find user
-    ${config.database === 'postgresql-prisma' || config.database === 'sqlite' ? `const user = await prisma.user.findUnique({ where: { email } });` : `const user = await User.findOne({ email });`}
+    ${config.database === 'postgresql-prisma' || config.database === 'sqlite-prisma' ? `const user = await prisma.user.findUnique({ where: { email } });` : `const user = await User.findOne({ email });`}
 
     if (!user) {
       throw new AppError(401, 'Invalid credentials');
@@ -813,7 +888,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     const token = jwt.sign(
       { id: user.id, email: user.email },
       env.JWT_SECRET,
-      { expiresIn: env.JWT_EXPIRES_IN }
+      { expiresIn: env.JWT_EXPIRES_IN as SignOptions['expiresIn'] }
     );
 
     res.json({
@@ -835,7 +910,8 @@ export async function login(req: Request, res: Response, next: NextFunction) {
 export async function getMe(req: any, res: Response, next: NextFunction) {
   try {
     ${
-      config.database === 'postgresql-prisma' || config.database === 'sqlite'
+      config.database === 'postgresql-prisma' ||
+      config.database === 'sqlite-prisma'
         ? `const user = await prisma.user.findUnique({
       where: { id: req.user.id },
       select: { id: true, email: true, name: true, createdAt: true },
@@ -884,7 +960,7 @@ export const loginSchema = z.object({
 
   // Validation middleware
   const validateMiddlewareCode = `import { Request, Response, NextFunction } from 'express';
-import { AnyZodObject, ZodError } from 'zod';
+import { AnyZodObject } from 'zod';
 
 export function validate(schema: AnyZodObject) {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -1111,7 +1187,7 @@ PORT=3000
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/${config.projectName}?schema=public"
 
 `;
-  } else if (config.database === 'sqlite') {
+  } else if (config.database === 'sqlite-prisma') {
     envExample += `# SQLite Database
 DATABASE_URL="file:./dev.db"
 
@@ -1179,7 +1255,7 @@ cp .env.example .env
 Edit \`.env\` with your configuration.
 
 ${
-  config.database === 'postgresql-prisma' || config.database === 'sqlite'
+  config.database === 'postgresql-prisma' || config.database === 'sqlite-prisma'
     ? `3. Run database migrations:
 
 \`\`\`bash
@@ -1310,29 +1386,14 @@ Built with ❤️ using [QuickShip CLI](https://github.com/SeifElkadyy/QuickShip
   await writeFile(join(destinationPath, 'README.md'), readme);
 }
 
-export async function createExpressJestConfig(destinationPath) {
+// Vitest runs ESM + TypeScript natively, so the "type": "module" project
+// needs no transform config (ts-jest would need experimental ESM flags)
+export async function createExpressTestConfig(destinationPath) {
   const { writeFile } = await import('fs/promises');
 
-  const jestConfig = `export default {
-  preset: 'ts-jest',
-  testEnvironment: 'node',
-  roots: ['<rootDir>/src', '<rootDir>/tests'],
-  testMatch: ['**/__tests__/**/*.ts', '**/?(*.)+(spec|test).ts'],
-  moduleFileExtensions: ['ts', 'js', 'json'],
-  collectCoverageFrom: [
-    'src/**/*.ts',
-    '!src/**/*.d.ts',
-    '!src/index.ts',
-  ],
-  coverageDirectory: 'coverage',
-  verbose: true,
-};
-`;
+  const exampleTest = `import { describe, it, expect } from 'vitest';
 
-  await writeFile(join(destinationPath, 'jest.config.js'), jestConfig);
-
-  // Create example test
-  const exampleTest = `describe('Example Test', () => {
+describe('Example Test', () => {
   it('should pass', () => {
     expect(true).toBe(true);
   });
@@ -1343,6 +1404,30 @@ export async function createExpressJestConfig(destinationPath) {
     join(destinationPath, 'tests', 'example.test.ts'),
     exampleTest
   );
+}
+
+// ESLint 9 only reads flat config; .mjs works in both ESM and CJS projects
+export async function createEslintConfig(destinationPath) {
+  const { writeFile } = await import('fs/promises');
+
+  const eslintConfig = `import js from '@eslint/js';
+import tseslint from 'typescript-eslint';
+
+export default [
+  { ignores: ['dist', 'coverage', 'node_modules'] },
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
+  {
+    rules: {
+      // Express/Nest signatures need positional (req, res, next) args
+      '@typescript-eslint/no-unused-vars': ['error', { args: 'none' }],
+      '@typescript-eslint/no-explicit-any': 'warn',
+    },
+  },
+];
+`;
+
+  await writeFile(join(destinationPath, 'eslint.config.mjs'), eslintConfig);
 }
 
 // ============================================
@@ -1468,11 +1553,15 @@ export async function createNestDatabase(destinationPath, config) {
   const { writeFile } = await import('fs/promises');
   const { mkdir } = await import('fs/promises');
 
-  if (config.database === 'postgresql-prisma' || config.database === 'sqlite') {
+  if (
+    config.database === 'postgresql-prisma' ||
+    config.database === 'sqlite-prisma'
+  ) {
     // Create Prisma directory
     await mkdir(join(destinationPath, 'prisma'), { recursive: true });
 
-    const provider = config.database === 'sqlite' ? 'sqlite' : 'postgresql';
+    const provider =
+      config.database === 'sqlite-prisma' ? 'sqlite' : 'postgresql';
     const prismaSchema = `generator client {
   provider = "prisma-client-js"
 }
@@ -1613,7 +1702,8 @@ export class UsersModule {}
 
   // users.service.ts
   const usersServiceCode =
-    config.database === 'postgresql-prisma' || config.database === 'sqlite'
+    config.database === 'postgresql-prisma' ||
+    config.database === 'sqlite-prisma'
       ? `import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 
@@ -1799,7 +1889,8 @@ export class AuthModule {}
 
   // auth.service.ts
   const authServiceCode =
-    config.database === 'postgresql-prisma' || config.database === 'sqlite'
+    config.database === 'postgresql-prisma' ||
+    config.database === 'sqlite-prisma'
       ? `import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
@@ -2114,7 +2205,7 @@ PORT=3000
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/${config.projectName}?schema=public"
 
 `;
-  } else if (config.database === 'sqlite') {
+  } else if (config.database === 'sqlite-prisma') {
     envExample += `# SQLite Database
 DATABASE_URL="file:./dev.db"
 
@@ -2181,7 +2272,7 @@ cp .env.example .env
 Edit \`.env\` with your configuration.
 
 ${
-  config.database === 'postgresql-prisma' || config.database === 'sqlite'
+  config.database === 'postgresql-prisma' || config.database === 'sqlite-prisma'
     ? `3. Run database migrations:
 
 \`\`\`bash
@@ -2328,25 +2419,10 @@ export async function createNestCliConfig(destinationPath) {
   );
 }
 
-export async function createNestJestConfig(destinationPath) {
+// Jest config lives in package.json's "jest" key (createNestPackageJson);
+// writing a jest.config.js too makes Jest refuse to run
+export async function createNestTestFiles(destinationPath) {
   const { writeFile } = await import('fs/promises');
-
-  const jestConfig = `module.exports = {
-  moduleFileExtensions: ['js', 'json', 'ts'],
-  rootDir: 'src',
-  testRegex: '.*\\.spec\\.ts$',
-  transform: {
-    '^.+\\.(t|j)s$': 'ts-jest',
-  },
-  collectCoverageFrom: [
-    '**/*.(t|j)s',
-  ],
-  coverageDirectory: '../coverage',
-  testEnvironment: 'node',
-};
-`;
-
-  await writeFile(join(destinationPath, 'jest.config.js'), jestConfig);
 
   // Create example test
   const exampleTest = `import { Test, TestingModule } from '@nestjs/testing';

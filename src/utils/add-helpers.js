@@ -2,6 +2,20 @@ import pkg from 'fs-extra';
 const { pathExists, writeFile, ensureDir, readFile, appendFile } = pkg;
 import { join } from 'path';
 import { detectPackageManager } from './project-detector.js';
+import logger from './logger.js';
+
+/**
+ * React + Vite is a browser-only SPA: every env var it reads ships in the
+ * public bundle. Refuse integrations that need a server-side secret
+ * (API keys, DB connection strings) instead of leaking them.
+ */
+export function assertServerProject(name, projectType) {
+  if (projectType !== 'react-vite' && projectType !== 'react') return;
+  logger.error(
+    `${name} needs a server-side secret, but React + Vite runs only in the browser — the secret would be exposed to every visitor.\n\nAdd ${name} to a backend (Express / NestJS / Next.js) instead, e.g.:\n  quickship build my-api --template express-api`
+  );
+  process.exit(1);
+}
 
 export async function getPackageManager(cwd = process.cwd()) {
   return detectPackageManager(cwd);

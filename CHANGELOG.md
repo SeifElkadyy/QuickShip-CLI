@@ -5,6 +5,16 @@ All notable changes to QuickShip CLI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- **Custom / unknown templates** - `--template <name>` no longer silently scaffolds Next.js for custom or misspelled names; unknown names now error with the list of available templates. Custom templates download from GitHub (`user/repo` → `gh:user/repo`) and keep their own README, `.gitignore`, and `AGENTS.md`
+- **Express API template** - generated projects now pass `build`, `test`, and `lint`: fixed `jsonwebtoken` `expiresIn` typing, unused-import errors, switched tests to Vitest (native ESM + TS), added an ESLint 9 flat config, fixed SQLite + Prisma generating Mongoose code, and added real connection modules for raw `pg` / `mongodb` / `better-sqlite3` drivers (raw drivers are generated without auth)
+- **NestJS API template** - removed the duplicate `jest.config.js` that made Jest refuse to run, added an ESLint 9 flat config; raw drivers are no longer offered (Prisma/Mongoose only)
+- **React + Vite Tailwind** - uses Tailwind v4 syntax (`@import "tailwindcss"`); the old v3 `@tailwind` directives and `tailwind.config.js` produced no utility classes
+- **Secrets in browser bundles** - `add stripe`, `add resend`, `add prisma`, and `add database --provider neon|mongodb|prisma` now refuse React + Vite projects instead of writing server secrets into a client-side SPA; the build wizard no longer offers those databases for Vite
+
 ## [1.4.0] - 2026-07-02
 
 ### Added
