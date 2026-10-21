@@ -87,14 +87,16 @@ npm run dev
 
 ### Smart suggestions
 
-QuickShip analyzes your project name and pre-selects the best stack:
+When you pick **Website**, QuickShip reads your project name and pre-selects a stack (you can still change it):
 
 ```bash
-quickship build my-saas-dashboard   # → suggests Next.js + shadcn/ui
+quickship build my-saas-dashboard   # → suggests Next.js
 quickship build my-shop             # → suggests T3 Stack (auth + DB)
-quickship build my-rest-api         # → suggests Express API
+quickship build my-rest-api         # → suggests MERN Stack (Express backend)
 quickship build my-admin-panel      # → suggests React + Vite SPA
 ```
+
+For a standalone API, pick **API / Backend** or pass `--template express-api` / `--template nestjs-api`.
 
 ---
 
@@ -258,7 +260,7 @@ Fast REST API with flexible database options.
 - Express.js + TypeScript
 - PostgreSQL / MongoDB / SQLite / None
 - Prisma ORM or raw drivers (your choice)
-- JWT auth (optional)
+- JWT auth (optional, Prisma / Mongoose only)
 - Swagger docs (optional)
 - Docker (optional)
 
@@ -271,7 +273,7 @@ quickship build my-api --template express-api -y
 Enterprise-grade modular API.
 
 - NestJS 10+ + TypeScript
-- Same database options as Express
+- PostgreSQL / MongoDB / SQLite / None via Prisma or Mongoose
 - Passport.js + JWT (optional)
 - Swagger auto-generated (optional)
 - Docker (optional)
@@ -364,8 +366,8 @@ quickship add auth         # authentication (Clerk / Supabase / NextAuth) (Next.
 quickship add database     # pick a provider interactively (Supabase / Neon / MongoDB / Firebase / Prisma)
 quickship add database --provider neon
 quickship add prisma       # Prisma ORM directly, skip the picker
-quickship add stripe       # Stripe payments
-quickship add resend       # Resend transactional email
+quickship add stripe       # Stripe payments (needs a server: Next.js / Express / NestJS)
+quickship add resend       # Resend transactional email (needs a server)
 quickship add sentry       # Sentry error tracking
 quickship add posthog      # PostHog analytics + feature flags
 quickship add i18n         # next-intl internationalization (Next.js)
@@ -374,7 +376,7 @@ quickship add playwright   # Playwright e2e testing (Next.js, Vite)
 quickship add trpc         # tRPC type-safe API layer (Next.js, Vite)
 ```
 
-`quickship add` auto-detects your project type (Next.js, React + Vite, Express, NestJS, Expo) and installs/configures the feature accordingly — writing real client files (`lib/*.ts` or `src/config/*.ts`), not just instructions.
+`quickship add` auto-detects your project type (Next.js, React + Vite, Express, NestJS, Expo) and installs/configures the feature accordingly — writing real client files (`lib/*.ts` or `src/config/*.ts`), not just instructions. Integrations that need a server-side secret (Stripe, Resend, Neon, MongoDB, Prisma) refuse React + Vite projects, since anything in a browser SPA is public.
 
 | Auth Provider | Best For |
 |--------------|----------|
@@ -409,8 +411,9 @@ npm run test:integration  # scaffold + CLI integration tests
 npm run test:coverage # coverage report
 ```
 
-**75 tests** covering:
+**78 tests** covering:
 - Project name validation + path traversal protection
+- Template resolution (aliases, custom templates, unknown names rejected)
 - Smart stack suggestions
 - Git isolation (prevents parent-repo detection)
 - Config file loading
@@ -451,8 +454,24 @@ npm run test:coverage # coverage report
 - **"Open in editor"** — offers VS Code / Cursor / Zed after scaffold
 - **75 tests** — unit + integration + cross-platform CI (Ubuntu/macOS/Windows)
 
-### 🔜 v1.3.0
-- Plugin registry — `quickship add stripe` / `quickship add resend`
+### ✅ v1.3.0 — Integrations + agent-ready output
+- Renamed package `quickship-cli` → `quickship`
+- Custom template registry — `quickship template add <user/repo>`
+- `quickship add stripe` / `resend` / `sentry`, plus Express, NestJS, and Expo support for `add`
+- `AGENTS.md` in every generated project, `--json` / `--dry-run` for CI and agents
+
+### ✅ v1.4.0 — Database providers
+- Database provider choice (Supabase / Neon / MongoDB / Firebase / Prisma), in `add database` and during `build`
+- `quickship add posthog` / `i18n` / `vitest` / `playwright` / `trpc`
+
+### ✅ v1.4.1 — Template fixes
+- Express and NestJS projects pass `build`, `test`, and `lint` out of the box
+- Custom templates work end to end; unknown `--template` names error instead of building Next.js
+- React + Vite uses Tailwind v4 syntax
+- Server-secret integrations (Stripe, Resend, Neon, MongoDB, Prisma) refuse browser-only React + Vite projects
+
+### 🔜 Next
+- MCP server — let Claude / Cursor scaffold and `add` features as tool calls
 - `quickship migrate` — Next.js / Prisma codemod runner
 - Astro, SvelteKit, Remix templates
 - Monorepo mode
@@ -534,6 +553,6 @@ QuickShip is **free and open-source**. If it saves you time:
 
 [Get Started](#-getting-started) • [Templates](#-templates) • [Commands](#-commands)
 
-**v1.2.0** | MIT License
+**v1.4.1** | MIT License
 
 </div>
